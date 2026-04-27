@@ -1,0 +1,85 @@
+/* ============================================================
+   Threekit · B3 Design System — Tokens
+   Derived from the Aug 2019 Threekit Brand Guide, refined for
+   the "duo-tone editorial" direction (B3).
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ---------- Brand · primary greens ---------- */
+  --tk-mint:        #78C4A2;
+  --tk-green:       #2A826B;
+  --tk-dark-green:  #044849;   /* canonical "ink" for headings */
+  --tk-black:       #021B15;
+
+  /* ---------- Brand · warm secondaries ---------- */
+  --tk-peach:       #FFBA9B;
+  --tk-orange:      #FA8D71;
+  --tk-neon-orange: #FF6B42;
+
+  /* ---------- B3 · clay accents (primary hero color) ---------- */
+  --tk-clay:        #C96442;   /* the B3 hero accent */
+  --tk-clay-soft:   #E18A68;
+  --tk-clay-deep:   #8E3E25;
+
+  /* ---------- Surfaces ---------- */
+  --tk-paper:       #FBFAF6;   /* warm off-white page bg */
+  --tk-cream:       #FBF4EF;   /* warm slab bg */
+  --tk-cream-2:     #F3E7DD;   /* stronger cream */
+  --tk-peach-wash:  #FFE6D6;   /* duo-tone hero wash */
+  --tk-peach-wash-2:#FFCFB5;
+  --tk-gray:        #E8EEF0;
+
+  /* ---------- Ink (text + stroke) ---------- */
+  --tk-ink:         #021B15;
+  --tk-ink-70:      rgba(2,27,21,0.72);
+  --tk-ink-55:      rgba(2,27,21,0.55);
+  --tk-ink-35:      rgba(2,27,21,0.35);
+  --tk-ink-15:      rgba(2,27,21,0.15);
+  --tk-ink-08:      rgba(2,27,21,0.08);
+
+  --tk-light-50:    rgba(255,255,255,0.50);
+  --tk-light-70:    rgba(255,255,255,0.70);
+
+  /* ---------- Type families ---------- */
+  --tk-font:  'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --tk-mono:  'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ---------- Radii ---------- */
+  --tk-radius-sm:   6px;
+  --tk-radius:     12px;
+  --tk-radius-lg:  20px;
+  --tk-radius-xl:  28px;      /* hero + CTA panel */
+
+  /* ---------- Spacing (section rhythm) ---------- */
+  --tk-gutter:     32px;
+  --tk-pad-x:      48px;      /* page horizontal padding */
+  --tk-section:    112px;     /* default section vertical padding */
+  --tk-section-sm: 80px;
+  --tk-section-lg: 128px;
+
+  /* ---------- Container widths ---------- */
+  --tk-container:      1200px;
+  --tk-container-wide: 1344px;
+
+  /* ---------- Elevation ---------- */
+  --tk-shadow-soft:   0 10px 30px -12px rgba(2,27,21,0.18);
+  --tk-shadow-clay:   0 6px 20px -6px rgba(201,100,66,0.5);
+  --tk-shadow-clay-h: 0 10px 26px -6px rgba(201,100,66,0.6);
+  --tk-shadow-forest: 0 6px 20px -6px rgba(4,72,73,0.45);
+
+  /* ---------- Gradients ---------- */
+  --tk-grad-peach:      linear-gradient(135deg, #FFD9C2 0%, #FFBA9B 40%, #FA8D71 100%);
+  --tk-grad-clay:       linear-gradient(135deg, #FFBA9B 0%, #FA8D71 40%, #C96442 100%);
+  --tk-grad-sunrise:    linear-gradient(180deg, #FBF4EF 0%, #FFD9C2 55%, #FFBA9B 100%);
+  --tk-grad-dusk:       linear-gradient(160deg, #FFBA9B 0%, #FA8D71 40%, #2A826B 100%);
+  --tk-grad-mint-dawn:  linear-gradient(180deg, #E8F3EE 0%, #C6E5D5 55%, #78C4A2 100%);
+  --tk-grad-forest:     linear-gradient(160deg, #2A826B 0%, #044849 70%, #021B15 100%);
+  --tk-grad-btn-clay:   linear-gradient(135deg, #FA8D71 0%, #C96442 100%);
+  --tk-grad-btn-clay-h: linear-gradient(135deg, #FFBA9B 0%, #E18A68 100%);
+  --tk-grad-btn-forest: linear-gradient(135deg, #2A826B 0%, #044849 100%);
+
+  /* B3 signature: hero duo-tone panel */
+  --tk-grad-duo-hero:   linear-gradient(105deg, #ffffff 0%, #ffffff 54%, #FFE6D6 54%, #FFCFB5 100%);
+}

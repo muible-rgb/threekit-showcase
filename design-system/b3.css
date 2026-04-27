@@ -1,0 +1,167 @@
+/* ============================================================
+   Threekit · B3 Design System — Components & Utilities
+   Requires tokens.css.
+   ============================================================ */
+
+/* ---------- Page reset (scoped) ---------- */
+.tk-page, .tk-page * { box-sizing: border-box; }
+.tk-page {
+  font-family: var(--tk-font);
+  color: var(--tk-ink);
+  background: #ffffff;                 /* B3 is white-first */
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "ss02";
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+
+/* ---------- Type scale ---------- */
+.tk-display {
+  font-weight: 500;
+  font-size: clamp(56px, 6.6vw, 108px);
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  color: var(--tk-dark-green);
+  text-wrap: balance;
+}
+.tk-h1 { font-weight: 500; font-size: clamp(48px, 5.6vw, 88px); line-height: 0.96; letter-spacing: -0.03em;  color: var(--tk-dark-green); text-wrap: balance; }
+.tk-h2 { font-weight: 500; font-size: clamp(44px, 5vw, 80px);   line-height: 1.02; letter-spacing: -0.03em;  color: var(--tk-dark-green); text-wrap: balance; }
+.tk-h3 { font-weight: 500; font-size: 36px; line-height: 1.1;   letter-spacing: -0.02em;  color: var(--tk-dark-green); }
+.tk-h4 { font-weight: 500; font-size: 26px; line-height: 1.2;   letter-spacing: -0.015em; color: var(--tk-dark-green); }
+.tk-lead  { font-weight: 400; font-size: 22px; line-height: 1.4;  letter-spacing: -0.01em; color: var(--tk-ink-70); }
+.tk-body  { font-weight: 400; font-size: 17px; line-height: 1.55; color: var(--tk-ink-70); }
+.tk-small { font-weight: 400; font-size: 14px; line-height: 1.5;  color: var(--tk-ink-70); }
+
+.tk-eyebrow {
+  font-family: var(--tk-mono);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tk-clay);               /* B3: clay is the hero accent */
+}
+.tk-eyebrow::before { content: "· "; }  /* B3 prefixes eyebrows with a dot */
+
+.tk-cta { text-transform: lowercase; letter-spacing: 0.01em; }
+
+/* Gradient text — B3 signature "accent phrase" treatment */
+.tk-accent-clay {
+  background: var(--tk-grad-btn-clay);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ---------- Buttons ---------- */
+.tk-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-family: var(--tk-font);
+  font-weight: 500; font-size: 15px;
+  text-transform: lowercase;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tk-btn:hover { transform: translateY(-1px); }
+
+.tk-btn-primary       { background: var(--tk-dark-green); color: #fff; }
+.tk-btn-primary:hover { background: var(--tk-black); }
+
+.tk-btn-clay          { background: var(--tk-grad-btn-clay); color: #fff; box-shadow: var(--tk-shadow-clay); }
+.tk-btn-clay:hover    { background: var(--tk-grad-btn-clay-h); box-shadow: var(--tk-shadow-clay-h); }
+
+.tk-btn-forest        { background: var(--tk-grad-btn-forest); color: #fff; box-shadow: var(--tk-shadow-forest); }
+.tk-btn-forest:hover  { filter: brightness(1.1); }
+
+.tk-btn-mint          { background: var(--tk-mint); color: var(--tk-dark-green); }
+.tk-btn-mint:hover    { background: #93d3b6; }
+
+.tk-btn-ghost         { background: transparent; color: var(--tk-ink); border-color: var(--tk-ink-15); }
+.tk-btn-ghost:hover   { border-color: var(--tk-ink); }
+
+.tk-btn-ghost-light   { background: transparent; color: #fff; border-color: rgba(255,255,255,0.24); }
+.tk-btn-ghost-light:hover { border-color: #fff; background: rgba(255,255,255,0.06); }
+
+.tk-btn-on-clay       { background: #fff; color: var(--tk-dark-green); }
+
+.tk-btn .tk-arrow { display: inline-flex; width: 18px; height: 18px; transition: transform .2s ease; }
+.tk-btn:hover .tk-arrow { transform: translateX(3px); }
+
+/* ---------- Link ---------- */
+.tk-link {
+  color: inherit; text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+  transition: opacity .18s;
+  font-weight: 500;
+}
+.tk-link:hover { opacity: .7; }
+
+/* ---------- Render slot (3d product placeholder) ---------- */
+.tk-slot {
+  position: relative; overflow: hidden;
+  border-radius: var(--tk-radius);
+  background:
+    radial-gradient(120% 80% at 30% 20%, rgba(255,255,255,0.7), transparent 60%),
+    linear-gradient(180deg, #eef3f1 0%, #dfe8e5 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.tk-slot::after {
+  content: attr(data-label);
+  position: absolute; top: 14px; left: 16px;
+  font-family: var(--tk-mono);
+  font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tk-ink-55);
+}
+.tk-slot .tk-slot-tag {
+  position: absolute; bottom: 14px; right: 16px;
+  font-family: var(--tk-mono);
+  font-size: 11px; letter-spacing: 0.1em;
+  color: var(--tk-ink-55);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.tk-slot .tk-slot-tag::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--tk-green);
+  box-shadow: 0 0 0 3px rgba(42,130,108,0.2);
+}
+
+/* ---------- Layout helpers ---------- */
+.tk-container      { max-width: var(--tk-container);      margin: 0 auto; padding: 0 var(--tk-pad-x); }
+.tk-container-wide { max-width: var(--tk-container-wide); margin: 0 auto; padding: 0 var(--tk-pad-x); }
+.tk-section        { padding: var(--tk-section) var(--tk-pad-x); }
+.tk-section-sm     { padding: var(--tk-section-sm) var(--tk-pad-x); }
+.tk-section-lg     { padding: var(--tk-section-lg) var(--tk-pad-x); }
+.tk-row            { display: grid; gap: var(--tk-gutter); }
+.tk-hr             { height: 1px; background: var(--tk-ink-15); width: 100%; border: 0; }
+
+/* ---------- B3 surface patterns ---------- */
+.tk-surface-white  { background: #ffffff; }
+.tk-surface-paper  { background: var(--tk-paper); }
+.tk-surface-cream  { background: var(--tk-cream); }
+.tk-surface-duo    { background: var(--tk-grad-duo-hero); }
+.tk-surface-peach  { background: linear-gradient(135deg, var(--tk-peach-wash) 0%, var(--tk-peach-wash-2) 100%); }
+
+.tk-panel {
+  position: relative; overflow: hidden;
+  border-radius: var(--tk-radius-xl);
+  border: 1px solid var(--tk-ink-08);
+}
+
+/* ---------- Reveal-on-scroll helper ---------- */
+.tk-reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.2,.7,.3,1), transform .7s cubic-bezier(.2,.7,.3,1); }
+.tk-reveal.in { opacity: 1; transform: none; }
+
+/* ---------- Subtle grain overlay ---------- */
+.tk-grain { position: relative; }
+.tk-grain::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05; mix-blend-mode: overlay;
+}

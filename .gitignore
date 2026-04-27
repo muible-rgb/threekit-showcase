@@ -1,0 +1,27 @@
+# OS junk
+.DS_Store
+**/.DS_Store
+
+# Vercel local config
+.vercel/
+
+# Backup files from logo cleanup
+**/*.bak.png
+
+# Original screenshot uploads (live versions are in assets/showcases/)
+ADecShowcasePage.png
+Amarr_ShowcasePage.png
+BobCatShowcasepage.png
+CintasShowcasePage.png
+Sloan_ShowcasePage.png
+ThermaTruShowcasePage.png
+Lovesac-1.avif
+
+# Avif source for avatar (jpg is what's referenced)
+assets/people/shawn-nelson.avif
+
+# Brand asset library backup (curated copies live in assets/)
+ThreeKit Logos 2/
+logos/
+lifestyle/
+videos/

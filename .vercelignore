@@ -1,0 +1,31 @@
+# OS junk
+.DS_Store
+**/.DS_Store
+
+# Backup files from logo cleanup
+**/*.bak.png
+
+# Original screenshot uploads (live versions are in assets/showcases/)
+ADecShowcasePage.png
+Amarr_ShowcasePage.png
+BobCatShowcasepage.png
+CintasShowcasePage.png
+Sloan_ShowcasePage.png
+ThermaTruShowcasePage.png
+Lovesac-1.avif
+
+# Avif source for Shawn (jpg is what's actually referenced)
+assets/people/shawn-nelson.avif
+
+# Source-only design system files (CSS files we actually use stay)
+design-system/DESIGN_SYSTEM.md
+design-system/b3-components.jsx
+design-system/patterns.jsx
+
+# Brand asset library backup (only the curated copies in assets/threekit/ are served)
+ThreeKit Logos 2/
+
+# Raw logo source (curated copies live in assets/logos/)
+logos/
+lifestyle/
+videos/
