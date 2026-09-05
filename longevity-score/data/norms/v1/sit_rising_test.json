@@ -1,0 +1,210 @@
+{
+  "test_variant": "sit_rising_test",
+  "capacity": "mobility",
+  "unit": "points",
+  "direction": "higher_better",
+  "norms_version": "v1",
+  "source": {
+    "citation": "Brito LBB, Ricardo DR, Araujo DSMS, Ramos PS, Myers J, Araujo CGS. Ability to sit and rise from the floor as a predictor of all-cause mortality. Eur J Prev Cardiol. 2014;21(7):892-898.",
+    "url": "https://doi.org/10.1177/2047487312471759",
+    "population": "Source cohort is 2,002 adults aged 51-80 referred for exercise testing. This battery targets 30-55, which the source barely covers.",
+    "provisional": true,
+    "transcription_verified": false,
+    "notes": "PROVISIONAL. The source establishes that the SRT predicts mortality and reports score distributions for 51-80 year olds, but does not publish age-and-sex normative tables for the 30-55 range this battery targets. The curve here is anchored at 8.4 (men) / 8.6 (women) at age 42 and declines 7% per decade, which reproduces the source's reported distribution shape at 51-80 within about half a point. Women are anchored slightly higher on the published sex difference in hip and ankle range of motion. The 0-10 ceiling means the top of this scale is compressed: a large share of fit 40-year-olds score a clean 10, so the 90th percentile and above is not well resolved. Re-fit from app data first.",
+    "generated_by": "scripts/generate-provisional-norms.ts",
+    "model": {
+      "form": "mean(age) = anchor42 * (1 -/+ declinePerDecade) ^ ((max(age, peakAge) - 42) / 10)",
+      "peak_age": 25,
+      "decline_per_decade": 0.07,
+      "anchor_age_42": {
+        "M": 8.4,
+        "F": 8.6
+      },
+      "fixed_sd": 1.6
+    }
+  },
+  "cohorts": [
+    {
+      "sex": "M",
+      "age_min": 20,
+      "age_max": 24,
+      "mean": 9.5,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 25,
+      "age_max": 29,
+      "mean": 9.4,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 30,
+      "age_max": 34,
+      "mean": 9,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 35,
+      "age_max": 39,
+      "mean": 8.7,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 40,
+      "age_max": 44,
+      "mean": 8.4,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 45,
+      "age_max": 49,
+      "mean": 8.1,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 50,
+      "age_max": 54,
+      "mean": 7.8,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 55,
+      "age_max": 59,
+      "mean": 7.5,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 60,
+      "age_max": 64,
+      "mean": 7.3,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 65,
+      "age_max": 69,
+      "mean": 7,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 70,
+      "age_max": 74,
+      "mean": 6.8,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 75,
+      "age_max": 79,
+      "mean": 6.5,
+      "sd": 1.6
+    },
+    {
+      "sex": "M",
+      "age_min": 80,
+      "age_max": 84,
+      "mean": 6.3,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 20,
+      "age_max": 24,
+      "mean": 9.7,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 25,
+      "age_max": 29,
+      "mean": 9.6,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 30,
+      "age_max": 34,
+      "mean": 9.2,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 35,
+      "age_max": 39,
+      "mean": 8.9,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 40,
+      "age_max": 44,
+      "mean": 8.6,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 45,
+      "age_max": 49,
+      "mean": 8.3,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 50,
+      "age_max": 54,
+      "mean": 8,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 55,
+      "age_max": 59,
+      "mean": 7.7,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 60,
+      "age_max": 64,
+      "mean": 7.4,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 65,
+      "age_max": 69,
+      "mean": 7.2,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 70,
+      "age_max": 74,
+      "mean": 6.9,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 75,
+      "age_max": 79,
+      "mean": 6.7,
+      "sd": 1.6
+    },
+    {
+      "sex": "F",
+      "age_min": 80,
+      "age_max": 84,
+      "mean": 6.4,
+      "sd": 1.6
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "test_variant": "single_leg_balance_eyes_closed",
+  "capacity": "balance",
+  "unit": "s",
+  "direction": "higher_better",
+  "norms_version": "v1",
+  "value_cap": 60,
+  "source": {
+    "citation": "Springer BA, Marin R, Cyhan T, Roberts H, Gill NW. Normative Values for the Unipedal Stance Test with Eyes Open and Closed. J Geriatr Phys Ther. 2007;30(1):8-15.",
+    "url": "https://doi.org/10.1519/00139143-200704000-00003",
+    "population": "Convenience sample of 549 healthy US adults 18-99, eyes-closed unipedal stance, hands on hips, best of multiple trials.",
+    "provisional": true,
+    "transcription_verified": false,
+    "notes": "PROVISIONAL for two reasons, both about dispersion rather than centre. The published means by age and sex are used as-is and are the reliable part of this file. But the source reports ranges rather than usable SDs for every band, so the SD here is set at 0.75 x mean (capped at 18s) - that is an inference, not a published number. Second, and more important: eyes-closed balance times are strongly right-skewed and this battery caps the test at 60 seconds, so a normal model misbehaves at both ends. In practice that means the difference between a 45-second hold and a 60-second hold is compressed near the top of the scale, and anyone capping out at 60s is reported at the 99th percentile ceiling. Balance is the test where a percentile is least likely to move on retest."
+  },
+  "cohorts": [
+    {
+      "sex": "M",
+      "age_min": 20,
+      "age_max": 24,
+      "mean": 29.0,
+      "sd": 18.0
+    },
+    {
+      "sex": "M",
+      "age_min": 25,
+      "age_max": 29,
+      "mean": 28.5,
+      "sd": 18.0
+    },
+    {
+      "sex": "M",
+      "age_min": 30,
+      "age_max": 34,
+      "mean": 28.0,
+      "sd": 18.0
+    },
+    {
+      "sex": "M",
+      "age_min": 35,
+      "age_max": 39,
+      "mean": 27.2,
+      "sd": 18.0
+    },
+    {
+      "sex": "M",
+      "age_min": 40,
+      "age_max": 44,
+      "mean": 26.5,
+      "sd": 18.0
+    },
+    {
+      "sex": "M",
+      "age_min": 45,
+      "age_max": 49,
+      "mean": 23.2,
+      "sd": 17.4
+    },
+    {
+      "sex": "M",
+      "age_min": 50,
+      "age_max": 54,
+      "mean": 20.0,
+      "sd": 15.0
+    },
+    {
+      "sex": "M",
+      "age_min": 55,
+      "age_max": 59,
+      "mean": 15.0,
+      "sd": 11.2
+    },
+    {
+      "sex": "M",
+      "age_min": 60,
+      "age_max": 64,
+      "mean": 10.0,
+      "sd": 7.5
+    },
+    {
+      "sex": "M",
+      "age_min": 65,
+      "age_max": 69,
+      "mean": 7.2,
+      "sd": 5.4
+    },
+    {
+      "sex": "M",
+      "age_min": 70,
+      "age_max": 74,
+      "mean": 4.5,
+      "sd": 3.4
+    },
+    {
+      "sex": "M",
+      "age_min": 75,
+      "age_max": 79,
+      "mean": 3.8,
+      "sd": 2.8
+    },
+    {
+      "sex": "M",
+      "age_min": 80,
+      "age_max": 84,
+      "mean": 3.1,
+      "sd": 2.3
+    },
+    {
+      "sex": "F",
+      "age_min": 20,
+      "age_max": 24,
+      "mean": 28.5,
+      "sd": 18.0
+    },
+    {
+      "sex": "F",
+      "age_min": 25,
+      "age_max": 29,
+      "mean": 28.0,
+      "sd": 18.0
+    },
+    {
+      "sex": "F",
+      "age_min": 30,
+      "age_max": 34,
+      "mean": 27.5,
+      "sd": 18.0
+    },
+    {
+      "sex": "F",
+      "age_min": 35,
+      "age_max": 39,
+      "mean": 26.2,
+      "sd": 18.0
+    },
+    {
+      "sex": "F",
+      "age_min": 40,
+      "age_max": 44,
+      "mean": 25.0,
+      "sd": 18.0
+    },
+    {
+      "sex": "F",
+      "age_min": 45,
+      "age_max": 49,
+      "mean": 21.5,
+      "sd": 16.1
+    },
+    {
+      "sex": "F",
+      "age_min": 50,
+      "age_max": 54,
+      "mean": 18.0,
+      "sd": 13.5
+    },
+    {
+      "sex": "F",
+      "age_min": 55,
+      "age_max": 59,
+      "mean": 13.5,
+      "sd": 10.1
+    },
+    {
+      "sex": "F",
+      "age_min": 60,
+      "age_max": 64,
+      "mean": 9.0,
+      "sd": 6.8
+    },
+    {
+      "sex": "F",
+      "age_min": 65,
+      "age_max": 69,
+      "mean": 6.4,
+      "sd": 4.8
+    },
+    {
+      "sex": "F",
+      "age_min": 70,
+      "age_max": 74,
+      "mean": 3.8,
+      "sd": 2.8
+    },
+    {
+      "sex": "F",
+      "age_min": 75,
+      "age_max": 79,
+      "mean": 3.2,
+      "sd": 2.4
+    },
+    {
+      "sex": "F",
+      "age_min": 80,
+      "age_max": 84,
+      "mean": 2.6,
+      "sd": 2.0
+    }
+  ]
+}

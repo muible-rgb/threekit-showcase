@@ -1,0 +1,210 @@
+{
+  "test_variant": "dead_hang",
+  "capacity": "grip_endurance",
+  "unit": "s",
+  "direction": "higher_better",
+  "norms_version": "v1",
+  "source": {
+    "citation": "No adequate published normative table. Anchors informed by grip-endurance decline reported in Wang YC et al. (2018) and by climbing-population hang-time distributions.",
+    "url": "",
+    "population": "None. This is a construction, not a normative sample.",
+    "provisional": true,
+    "transcription_verified": false,
+    "notes": "PROVISIONAL, AND THE WEAKEST FILE IN THE SET. There is no general-population dead hang norm. The anchor of 52s (men) / 38s (women) at 42 reflects commonly cited practical benchmarks (30s minimum, 60s good) rather than a measured distribution. The 0.45 coefficient of variation is deliberately wide because dead hang variance is genuinely large and driven by bodyweight and hand size as much as by grip endurance - a heavier person hangs less time at identical grip strength, which this file does not correct for. Treat every dead hang percentile as indicative until re-fit. This is the first file to replace from app data.",
+    "generated_by": "scripts/generate-provisional-norms.ts",
+    "model": {
+      "form": "mean(age) = anchor42 * (1 -/+ declinePerDecade) ^ ((max(age, peakAge) - 42) / 10)",
+      "peak_age": 28,
+      "decline_per_decade": 0.13,
+      "anchor_age_42": {
+        "M": 52,
+        "F": 38
+      },
+      "coefficient_of_variation": 0.45
+    }
+  },
+  "cohorts": [
+    {
+      "sex": "M",
+      "age_min": 20,
+      "age_max": 24,
+      "mean": 63,
+      "sd": 28.4
+    },
+    {
+      "sex": "M",
+      "age_min": 25,
+      "age_max": 29,
+      "mean": 63,
+      "sd": 28.4
+    },
+    {
+      "sex": "M",
+      "age_min": 30,
+      "age_max": 34,
+      "mean": 60,
+      "sd": 26.9
+    },
+    {
+      "sex": "M",
+      "age_min": 35,
+      "age_max": 39,
+      "mean": 56,
+      "sd": 25.1
+    },
+    {
+      "sex": "M",
+      "age_min": 40,
+      "age_max": 44,
+      "mean": 52,
+      "sd": 23.4
+    },
+    {
+      "sex": "M",
+      "age_min": 45,
+      "age_max": 49,
+      "mean": 49,
+      "sd": 21.8
+    },
+    {
+      "sex": "M",
+      "age_min": 50,
+      "age_max": 54,
+      "mean": 45,
+      "sd": 20.4
+    },
+    {
+      "sex": "M",
+      "age_min": 55,
+      "age_max": 59,
+      "mean": 42,
+      "sd": 19
+    },
+    {
+      "sex": "M",
+      "age_min": 60,
+      "age_max": 64,
+      "mean": 39,
+      "sd": 17.7
+    },
+    {
+      "sex": "M",
+      "age_min": 65,
+      "age_max": 69,
+      "mean": 37,
+      "sd": 16.5
+    },
+    {
+      "sex": "M",
+      "age_min": 70,
+      "age_max": 74,
+      "mean": 34,
+      "sd": 15.4
+    },
+    {
+      "sex": "M",
+      "age_min": 75,
+      "age_max": 79,
+      "mean": 32,
+      "sd": 14.4
+    },
+    {
+      "sex": "M",
+      "age_min": 80,
+      "age_max": 84,
+      "mean": 30,
+      "sd": 13.4
+    },
+    {
+      "sex": "F",
+      "age_min": 20,
+      "age_max": 24,
+      "mean": 46,
+      "sd": 20.8
+    },
+    {
+      "sex": "F",
+      "age_min": 25,
+      "age_max": 29,
+      "mean": 46,
+      "sd": 20.8
+    },
+    {
+      "sex": "F",
+      "age_min": 30,
+      "age_max": 34,
+      "mean": 44,
+      "sd": 19.7
+    },
+    {
+      "sex": "F",
+      "age_min": 35,
+      "age_max": 39,
+      "mean": 41,
+      "sd": 18.3
+    },
+    {
+      "sex": "F",
+      "age_min": 40,
+      "age_max": 44,
+      "mean": 38,
+      "sd": 17.1
+    },
+    {
+      "sex": "F",
+      "age_min": 45,
+      "age_max": 49,
+      "mean": 35,
+      "sd": 15.9
+    },
+    {
+      "sex": "F",
+      "age_min": 50,
+      "age_max": 54,
+      "mean": 33,
+      "sd": 14.9
+    },
+    {
+      "sex": "F",
+      "age_min": 55,
+      "age_max": 59,
+      "mean": 31,
+      "sd": 13.9
+    },
+    {
+      "sex": "F",
+      "age_min": 60,
+      "age_max": 64,
+      "mean": 29,
+      "sd": 12.9
+    },
+    {
+      "sex": "F",
+      "age_min": 65,
+      "age_max": 69,
+      "mean": 27,
+      "sd": 12.1
+    },
+    {
+      "sex": "F",
+      "age_min": 70,
+      "age_max": 74,
+      "mean": 25,
+      "sd": 11.3
+    },
+    {
+      "sex": "F",
+      "age_min": 75,
+      "age_max": 79,
+      "mean": 23,
+      "sd": 10.5
+    },
+    {
+      "sex": "F",
+      "age_min": 80,
+      "age_max": 84,
+      "mean": 22,
+      "sd": 9.8
+    }
+  ]
+}

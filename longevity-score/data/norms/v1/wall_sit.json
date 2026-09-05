@@ -1,0 +1,210 @@
+{
+  "test_variant": "wall_sit",
+  "capacity": "leg_isometric",
+  "unit": "s",
+  "direction": "higher_better",
+  "norms_version": "v1",
+  "source": {
+    "citation": "No adequate published normative table for a 90/90 wall sit in adults. Anchors informed by isometric knee-extension endurance literature.",
+    "url": "",
+    "population": "None. This is a construction, not a normative sample.",
+    "provisional": true,
+    "transcription_verified": false,
+    "notes": "PROVISIONAL. Wall sit hold times are widely reported anecdotally (60s average, 90s+ good) but not normatively. The sex gap in the anchors is small because the test is bodyweight-relative and women hold isometric positions comparably well in the published isometric endurance literature. Knee angle discipline dominates the measurement: a few degrees above 90 adds tens of seconds, so this file assumes the strict 90/90 protocol is actually enforced.",
+    "generated_by": "scripts/generate-provisional-norms.ts",
+    "model": {
+      "form": "mean(age) = anchor42 * (1 -/+ declinePerDecade) ^ ((max(age, peakAge) - 42) / 10)",
+      "peak_age": 28,
+      "decline_per_decade": 0.12,
+      "anchor_age_42": {
+        "M": 78,
+        "F": 74
+      },
+      "coefficient_of_variation": 0.45
+    }
+  },
+  "cohorts": [
+    {
+      "sex": "M",
+      "age_min": 20,
+      "age_max": 24,
+      "mean": 93,
+      "sd": 42
+    },
+    {
+      "sex": "M",
+      "age_min": 25,
+      "age_max": 29,
+      "mean": 93,
+      "sd": 42
+    },
+    {
+      "sex": "M",
+      "age_min": 30,
+      "age_max": 34,
+      "mean": 89,
+      "sd": 39.9
+    },
+    {
+      "sex": "M",
+      "age_min": 35,
+      "age_max": 39,
+      "mean": 83,
+      "sd": 37.4
+    },
+    {
+      "sex": "M",
+      "age_min": 40,
+      "age_max": 44,
+      "mean": 78,
+      "sd": 35.1
+    },
+    {
+      "sex": "M",
+      "age_min": 45,
+      "age_max": 49,
+      "mean": 73,
+      "sd": 32.9
+    },
+    {
+      "sex": "M",
+      "age_min": 50,
+      "age_max": 54,
+      "mean": 69,
+      "sd": 30.9
+    },
+    {
+      "sex": "M",
+      "age_min": 55,
+      "age_max": 59,
+      "mean": 64,
+      "sd": 29
+    },
+    {
+      "sex": "M",
+      "age_min": 60,
+      "age_max": 64,
+      "mean": 60,
+      "sd": 27.2
+    },
+    {
+      "sex": "M",
+      "age_min": 65,
+      "age_max": 69,
+      "mean": 57,
+      "sd": 25.5
+    },
+    {
+      "sex": "M",
+      "age_min": 70,
+      "age_max": 74,
+      "mean": 53,
+      "sd": 23.9
+    },
+    {
+      "sex": "M",
+      "age_min": 75,
+      "age_max": 79,
+      "mean": 50,
+      "sd": 22.4
+    },
+    {
+      "sex": "M",
+      "age_min": 80,
+      "age_max": 84,
+      "mean": 47,
+      "sd": 21
+    },
+    {
+      "sex": "F",
+      "age_min": 20,
+      "age_max": 24,
+      "mean": 89,
+      "sd": 39.8
+    },
+    {
+      "sex": "F",
+      "age_min": 25,
+      "age_max": 29,
+      "mean": 89,
+      "sd": 39.8
+    },
+    {
+      "sex": "F",
+      "age_min": 30,
+      "age_max": 34,
+      "mean": 84,
+      "sd": 37.8
+    },
+    {
+      "sex": "F",
+      "age_min": 35,
+      "age_max": 39,
+      "mean": 79,
+      "sd": 35.5
+    },
+    {
+      "sex": "F",
+      "age_min": 40,
+      "age_max": 44,
+      "mean": 74,
+      "sd": 33.3
+    },
+    {
+      "sex": "F",
+      "age_min": 45,
+      "age_max": 49,
+      "mean": 69,
+      "sd": 31.2
+    },
+    {
+      "sex": "F",
+      "age_min": 50,
+      "age_max": 54,
+      "mean": 65,
+      "sd": 29.3
+    },
+    {
+      "sex": "F",
+      "age_min": 55,
+      "age_max": 59,
+      "mean": 61,
+      "sd": 27.5
+    },
+    {
+      "sex": "F",
+      "age_min": 60,
+      "age_max": 64,
+      "mean": 57,
+      "sd": 25.8
+    },
+    {
+      "sex": "F",
+      "age_min": 65,
+      "age_max": 69,
+      "mean": 54,
+      "sd": 24.2
+    },
+    {
+      "sex": "F",
+      "age_min": 70,
+      "age_max": 74,
+      "mean": 50,
+      "sd": 22.7
+    },
+    {
+      "sex": "F",
+      "age_min": 75,
+      "age_max": 79,
+      "mean": 47,
+      "sd": 21.3
+    },
+    {
+      "sex": "F",
+      "age_min": 80,
+      "age_max": 84,
+      "mean": 44,
+      "sd": 20
+    }
+  ]
+}
