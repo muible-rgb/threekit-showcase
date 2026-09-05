@@ -50,8 +50,14 @@ Next.js 15 App Router, TypeScript strict, Tailwind v4, Vitest. No UI.
 
 ### Phase 1 - Data model
 `supabase/migrations/0001_init.sql`: tables, RLS, immutability trigger,
-join-code generation, reference data for `open-v1`.
-`0002_seed_demo.sql`: 8 fake users, 2 sessions.
+join-code generation.
+`0002_battery_open_v1.sql`: capacities, test variants, the battery version.
+
+**Changed during the build:** no SQL seed migration. The demo dataset lives in
+the local store instead. Writing eight fake people plus `auth.users` rows into
+a real Postgres with RLS is worse than it looks, and the requirement - every
+screen renders with data on first run - is met by the local seed, which is what
+actually runs on a fresh checkout. A Supabase install starts empty on purpose.
 
 ### Phase 2 - Norms
 JSON schema + validator script. Four files sourced from published tables
@@ -109,3 +115,24 @@ wrapper, weighted composite, admin beyond `/admin/norms`.
 | Airplane mode loses zero results | Outbox queue, local write is the source of truth |
 | Every percentile traces to a citation | `/methodology`, generated from the norms files |
 | Seed data renders every screen | `LocalStore` ships pre-seeded |
+
+## Status
+
+All seven phases shipped. 153 unit tests, clean lint and typecheck, verified end
+to end in a real browser including a complete battery run in airplane mode.
+
+Three things found by building rather than by planning, all fixed:
+
+1. The fitness-age curve is not monotone - grip strength peaks in the late
+   twenties, so a naive scan finds two crossings and picks the wrong one. The
+   lookup now reads the declining tail from the peak.
+2. The service worker registered on the `load` event from inside an effect,
+   which silently never fires when the effect runs after load. Invisible until
+   someone is in a park with no signal.
+3. The service worker ignored Next's RSC fetches, so every in-app navigation
+   died offline - right at the moment someone finishes a battery and taps
+   through to their score.
+
+One thing found that is not a bug and cannot be fixed in code: fitness age
+saturates at the bottom of the norms range for exactly this app's audience.
+See the known limits section of README.md.
