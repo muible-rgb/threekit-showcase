@@ -30,6 +30,10 @@ npm run norms:generate      # regenerate the provisional norms curves
 To point it at Postgres, copy `.env.example` to `.env.local`, fill in the
 Supabase URL and anon key, and apply `supabase/migrations/*.sql` in order.
 
+To put it on the web, see `DEPLOY.md`. Short version: import the repo on
+Netlify or Vercel and set the base/root directory to `longevity-score`. No
+environment variables needed - it deploys and runs on the seeded demo data.
+
 ## How it fits together
 
 ```

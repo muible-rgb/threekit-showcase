@@ -1,0 +1,34 @@
+# Netlify config for the Longevity Score app.
+#
+# This file sits inside longevity-score/, not at the repo root, because the
+# repo root is the Threekit showcase site. Set "Base directory" to
+# longevity-score when you connect the repo and Netlify reads this file from
+# there, leaving the showcase alone.
+#
+# The app needs no environment variables to run. With Supabase unset it runs
+# on local storage with the demo crew seeded, which is exactly what you want
+# for a link you send to four friends on a Friday.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Netlify's Next.js runtime. Handles the App Router, the dynamic /s/[token]
+# and /crew/[id] routes, and the server-rendered share card.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# The service worker must never be cached, or a deploy leaves people running
+# last week's app until they clear site data.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
