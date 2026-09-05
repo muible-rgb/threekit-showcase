@@ -236,3 +236,15 @@ describe("the core promise: scoring is cohort-relative", () => {
     expect(him).toBeLessThan(50);
   });
 });
+
+describe("non-finite input", () => {
+  it("names the test rather than failing inside the interpolator", () => {
+    // An empty input field or a missing cut-point used to surface as
+    // "cut-point interpolation fell through", which says nothing useful.
+    expect(() => percentileFor(cutPointsHigher, NaN, "M", 42)).toThrow(
+      /fixture_cut_points_higher: raw value must be a finite number/,
+    );
+    expect(() => percentileFor(meanSdHigher, undefined as unknown as number, "M", 42))
+      .toThrow(/must be a finite number/);
+  });
+});

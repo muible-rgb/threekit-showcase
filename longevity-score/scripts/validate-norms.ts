@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { validateNormsFile } from "../src/lib/norms/schema";
 
-const dir = join(process.cwd(), "data", "norms", "v1");
+const dir = join(process.cwd(), "data", "norms", "v2");
 const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
 
 let errors = 0;

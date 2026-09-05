@@ -1,4 +1,4 @@
-import { OPEN_V1_SLUG, OPEN_V1_TESTS } from "@/lib/battery";
+import { BATTERY_SLUG, BATTERY_TESTS } from "@/lib/battery";
 import { normsRegistry } from "@/lib/norms/registry";
 import { ageAt } from "@/lib/scoring/cohort";
 import type { NormCohort } from "@/lib/scoring/types";
@@ -64,7 +64,7 @@ const PEOPLE: SeedPerson[] = [
   { key: "you", name: "You", sex: "M", birthDate: "1983-04-12", isUser: true, ability: 0.2, drift: 0.3 },
   { key: "dan", name: "Dan R.", sex: "M", birthDate: "1980-09-02", isUser: true, ability: 0.75, drift: -0.12 },
   { key: "marisa", name: "Marisa K.", sex: "F", birthDate: "1982-01-25", isUser: true, ability: 0.5, drift: 0.4 },
-  { key: "tomas", name: "Tomas B.", sex: "M", birthDate: "1978-11-30", isUser: true, ability: -0.25, drift: 0.2, q2StopsAfter: 7 },
+  { key: "tomas", name: "Tomas B.", sex: "M", birthDate: "1978-11-30", isUser: true, ability: -0.25, drift: 0.2, q2StopsAfter: 6 },
   { key: "priya", name: "Priya N.", sex: "F", birthDate: "1965-06-18", isUser: true, ability: 0.95, drift: 0.1 },
   { key: "ines", name: "Ines V.", sex: "F", birthDate: "1992-02-08", isUser: false, ability: -0.15, drift: 0.55 },
   { key: "jonah", name: "Jonah A.", sex: "M", birthDate: "1986-07-21", isUser: true, ability: -0.7, drift: 0.45 },
@@ -94,7 +94,7 @@ function rawFor(
   z: number,
 ): number {
   const file = normsRegistry.get(slug)!;
-  const test = OPEN_V1_TESTS.find((t) => t.slug === slug)!;
+  const test = BATTERY_TESTS.find((t) => t.slug === slug)!;
   const cohort = cohortFor(slug, sex, age);
 
   let value: number;
@@ -143,7 +143,7 @@ export function buildSeedDatabase(): Database {
     {
       id: "s_q1",
       hostParticipantId: hostId,
-      batteryVersion: OPEN_V1_SLUG,
+      batteryVersion: BATTERY_SLUG,
       name: "Q1 crew test",
       code: "MARCH6",
       status: "locked",
@@ -155,7 +155,7 @@ export function buildSeedDatabase(): Database {
     {
       id: "s_q2",
       hostParticipantId: hostId,
-      batteryVersion: OPEN_V1_SLUG,
+      batteryVersion: BATTERY_SLUG,
       name: "Q2 crew test",
       code: "JUNE13",
       status: "locked",
@@ -181,10 +181,11 @@ export function buildSeedDatabase(): Database {
 
       const participantId = id("p", person.key);
       const age = ageAt(person.birthDate, session.startsAt!);
+      // Pounds. The carry load comes out of this.
       const bodyweight =
         person.sex === "M"
-          ? Math.round((78 + gauss(rand) * 7) * 10) / 10
-          : Math.round((64 + gauss(rand) * 6) * 10) / 10;
+          ? Math.round(172 + gauss(rand) * 16)
+          : Math.round(141 + gauss(rand) * 13);
 
       sessionParticipants.push({
         sessionId: session.id,
@@ -194,9 +195,9 @@ export function buildSeedDatabase(): Database {
       });
 
       const ability = person.ability + (isQ1 ? 0 : person.drift);
-      const stopAfter = !isQ1 && person.q2StopsAfter ? person.q2StopsAfter : 10;
+      const stopAfter = !isQ1 && person.q2StopsAfter ? person.q2StopsAfter : BATTERY_TESTS.length;
 
-      OPEN_V1_TESTS.forEach((test, index) => {
+      BATTERY_TESTS.forEach((test, index) => {
         if (index >= stopAfter) return;
 
         // Per-test noise: nobody is uniformly good at everything.
@@ -215,36 +216,6 @@ export function buildSeedDatabase(): Database {
         });
       });
 
-      if (stopAfter === 10) {
-        const finishedAt = new Date(startedAt + 10 * 11 * 60000).toISOString();
-        const hrFinish = Math.round(178 - (age - 40) * 0.7 + gauss(rand) * 6);
-        unscored.push(
-          {
-            id: id("m", `${session.id}_${person.key}_hrf`),
-            participantId,
-            sessionId: session.id,
-            kind: "hr_finish",
-            value: hrFinish,
-            recordedAt: finishedAt,
-          },
-          {
-            id: id("m", `${session.id}_${person.key}_hr1`),
-            participantId,
-            sessionId: session.id,
-            kind: "hr_1min",
-            value: Math.round(hrFinish - (28 + ability * 7 + gauss(rand) * 5)),
-            recordedAt: finishedAt,
-          },
-          {
-            id: id("m", `${session.id}_${person.key}_sr`),
-            participantId,
-            sessionId: session.id,
-            kind: "sit_reach",
-            value: Math.round((person.sex === "F" ? 8 : 2) + ability * 4 + gauss(rand) * 6),
-            recordedAt: finishedAt,
-          },
-        );
-      }
     }
   }
 

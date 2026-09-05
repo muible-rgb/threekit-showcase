@@ -1,45 +1,42 @@
 import type { NormsFile, NormsRegistry } from "@/lib/scoring/types";
 
-import cooper from "@data/norms/v1/cooper_12min_run.json";
-import deadHang from "@data/norms/v1/dead_hang.json";
-import farmerCarry from "@data/norms/v1/farmer_carry_half_bw.json";
-import grip from "@data/norms/v1/grip_strength_dynamometer.json";
-import pushUps from "@data/norms/v1/push_ups.json";
-import run400 from "@data/norms/v1/run_400m.json";
-import balance from "@data/norms/v1/single_leg_balance_eyes_closed.json";
-import sitRising from "@data/norms/v1/sit_rising_test.json";
-import broadJump from "@data/norms/v1/standing_broad_jump.json";
-import wallSit from "@data/norms/v1/wall_sit.json";
+import agility from "@data/norms/v2/agility_5_10_5.json";
+import balance from "@data/norms/v2/balance_eyes_closed.json";
+import broadJump from "@data/norms/v2/broad_jump.json";
+import carry from "@data/norms/v2/farmer_carry.json";
+import mile from "@data/norms/v2/mile_run.json";
+import pullUps from "@data/norms/v2/pull_ups.json";
+import pushUps from "@data/norms/v2/push_ups.json";
+import sitToRise from "@data/norms/v2/sit_to_rise.json";
 
 /**
- * The v1 norms set.
+ * The norms set, in battery order.
  *
- * Imported statically rather than read from disk so the client bundle, the
- * server, the share-card renderer and the edge all see exactly the same
- * numbers, and so a missing file is a build error rather than a runtime 500.
+ * Imported statically rather than read from disk so the browser, the server
+ * and the share-card renderer all see exactly the same numbers, and so a
+ * missing file is a build error rather than a runtime 500.
  *
- * The engine still takes this as an argument - it never imports this module.
+ * The scoring engine still takes this as an argument - it never imports this
+ * module.
  */
-export const NORMS_V1: NormsFile[] = [
-  grip,
-  balance,
-  sitRising,
+export const NORMS: NormsFile[] = [
+  mile,
+  pullUps,
   pushUps,
   broadJump,
-  deadHang,
-  farmerCarry,
-  wallSit,
-  run400,
-  cooper,
+  carry,
+  agility,
+  balance,
+  sitToRise,
 ] as unknown as NormsFile[];
 
-const byslug = new Map(NORMS_V1.map((f) => [f.test_variant, f]));
+const bySlug = new Map(NORMS.map((f) => [f.test_variant, f]));
 
 export const normsRegistry: NormsRegistry = {
-  get: (slug) => byslug.get(slug),
-  slugs: () => [...byslug.keys()],
+  get: (slug) => bySlug.get(slug),
+  slugs: () => [...bySlug.keys()],
 };
 
 export function normsFor(slug: string): NormsFile | undefined {
-  return byslug.get(slug);
+  return bySlug.get(slug);
 }

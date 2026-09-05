@@ -8,8 +8,6 @@ import { AppFrame } from "@/components/app-frame";
 import { setActiveParams, usePathname, navigate } from "./shims/navigation";
 
 import HomePage from "@/app/page";
-import TestModePage from "@/app/test/page";
-import ScorePage from "@/app/score/page";
 import CrewPage from "@/app/crew/page";
 import SessionPage from "@/app/crew/[sessionId]/page";
 import JoinPage from "@/app/join/[code]/page";
@@ -62,8 +60,6 @@ function route(
 
 const ROUTES: Route[] = [
   route("/", HomePage),
-  route("/test", TestModePage, true),
-  route("/score", ScorePage),
   route("/crew", CrewPage),
   route("/crew/:sessionId", SessionPage),
   route("/join/:code", JoinPage, true),

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildSeedDatabase } from "./seed";
 import { LocalStore } from "./local-store";
-import { OPEN_V1_TEST_SLUGS } from "@/lib/battery";
+import { BATTERY_TEST_SLUGS } from "@/lib/battery";
 import { normsRegistry } from "@/lib/norms/registry";
 import { mostImproved, rankBoard } from "@/lib/scoring/board";
 import { scoreBattery } from "@/lib/scoring/composite";
@@ -20,7 +20,7 @@ function scoreFor(participantId: string, sessionId: string) {
   return scoreBattery({
     sex: p.sex,
     birthDate: p.birthDate,
-    batteryTests: OPEN_V1_TEST_SLUGS,
+    batteryTests: BATTERY_TEST_SLUGS,
     results: db.results
       .filter((r) => r.participantId === participantId && r.sessionId === sessionId)
       .map((r) => ({
@@ -59,10 +59,6 @@ describe("seed shape", () => {
     expect(db.results.every((r) => r.witnessed && r.sessionId !== null)).toBe(true);
   });
 
-  it("captures unscored measurements for everyone who finished", () => {
-    const kinds = new Set(db.unscored.map((m) => m.kind));
-    expect([...kinds].sort()).toEqual(["hr_1min", "hr_finish", "sit_reach"]);
-  });
 });
 
 describe("seed produces the states each screen needs", () => {
@@ -78,11 +74,11 @@ describe("seed produces the states each screen needs", () => {
     expect(scoreFor("p_you", "s_q2").fitnessAge).not.toBeNull();
   });
 
-  it("has one incomplete battery, so the 7/10 state is on screen", () => {
+  it("has one incomplete battery, so the partial state is on screen", () => {
     const tomas = scoreFor("p_tomas", "s_q2");
     expect(tomas.composite).toBeNull();
-    expect(tomas.testsCompleted).toBe(7);
-    expect(tomas.testsRequired).toBe(10);
+    expect(tomas.testsCompleted).toBe(6);
+    expect(tomas.testsRequired).toBe(BATTERY_TEST_SLUGS.length);
   });
 
   it("has one first-timer, so most-improved shows that path", () => {
@@ -139,13 +135,14 @@ describe("seed produces the states each screen needs", () => {
       const file = normsRegistry.get(r.testVariant)!;
       expect(file, r.testVariant).toBeDefined();
       expect(Number.isFinite(r.rawValue)).toBe(true);
-      expect(r.rawValue).toBeGreaterThan(0);
+      // Zero is a real result on pull-ups and on balance.
+      expect(r.rawValue).toBeGreaterThanOrEqual(0);
     }
   });
 
-  it("records a bodyweight for everyone, which the farmer carry needs", () => {
+  it("records a bodyweight in pounds for everyone, which the carry needs", () => {
     expect(
-      db.sessionParticipants.every((sp) => (sp.bodyweightKg ?? 0) > 40),
+      db.sessionParticipants.every((sp) => (sp.bodyweightKg ?? 0) > 90),
     ).toBe(true);
   });
 });
@@ -177,7 +174,7 @@ describe("LocalStore durability", () => {
     await store.addResult({
       participantId: "p_you",
       sessionId: null,
-      testVariant: "wall_sit",
+      testVariant: "balance_eyes_closed",
       rawValue: 90,
       recordedAt: new Date().toISOString(),
       recordedByParticipantId: "p_you",
@@ -193,7 +190,7 @@ describe("LocalStore durability", () => {
     const first = await store.addResult({
       participantId: "p_you",
       sessionId: null,
-      testVariant: "grip_strength_dynamometer",
+      testVariant: "broad_jump",
       rawValue: 10,
       recordedAt: at,
       recordedByParticipantId: "p_you",
@@ -202,7 +199,7 @@ describe("LocalStore durability", () => {
     await store.addResult({
       participantId: "p_you",
       sessionId: null,
-      testVariant: "grip_strength_dynamometer",
+      testVariant: "broad_jump",
       rawValue: 52,
       recordedAt: new Date(Date.parse(at) + 1000).toISOString(),
       recordedByParticipantId: "p_you",
@@ -211,7 +208,7 @@ describe("LocalStore durability", () => {
     });
 
     const rows = (await store.listResults("p_you")).filter(
-      (r) => r.testVariant === "grip_strength_dynamometer",
+      (r) => r.testVariant === "broad_jump",
     );
     // Both rows survive. The engine takes the newest.
     expect(rows.filter((r) => r.rawValue === 10)).toHaveLength(1);

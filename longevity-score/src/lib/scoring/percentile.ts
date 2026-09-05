@@ -154,6 +154,16 @@ export function percentileFor(
   sex: Sex,
   age: number,
 ): PercentileResult {
+  // A NaN reaching the interpolator used to surface as "interpolation fell
+  // through", which says nothing about where the bad number came from. It is
+  // always a caller bug - an empty input field, a missing cut-point - so name
+  // it here where the test variant is still in scope.
+  if (!Number.isFinite(value)) {
+    throw new Error(
+      `${norms.test_variant}: raw value must be a finite number, got ${value}`,
+    );
+  }
+
   const found = findCohort(norms, sex, age);
   if (!found) {
     throw new Error(

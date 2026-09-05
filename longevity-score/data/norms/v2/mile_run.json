@@ -1,0 +1,329 @@
+{
+  "test_variant": "mile_run",
+  "capacity": "aerobic_capacity",
+  "unit": "s",
+  "direction": "lower_better",
+  "norms_version": "v2",
+  "source": {
+    "citation": "Kaminsky LA, Arena R, Myers J. Reference Standards for Cardiorespiratory Fitness (FRIEND registry). Mayo Clin Proc. 2015;90(11):1515-1523, as tabulated in ACSM's Guidelines for Exercise Testing and Prescription, 10th ed. Distance conversion: Cooper KH. JAMA. 1968;203(3):201-204.",
+    "url": "https://doi.org/10.1016/j.mayocp.2015.07.026",
+    "population": "US adults 20-79 who underwent maximal treadmill cardiopulmonary exercise testing. A referred, self-selected group, fitter than the general public.",
+    "provisional": true,
+    "transcription_verified": false,
+    "notes": "PROVISIONAL because of the conversion chain, not the source. Published VO2max percentiles are converted to 12-minute run distance with the 1968 Cooper regression, then to a mile time assuming a mile is run about 5 per cent quicker than 12-minute pace. Each step is a documented equation and each adds error; the Cooper regression alone carries roughly a 250m individual standard error. Percentile ORDER survives all of it because every step is monotone, so your ranking is sounder than the absolute time implies. Decade tables are interpolated to 5-year bands."
+  },
+  "cohorts": [
+    {
+      "sex": "M",
+      "age_min": 20,
+      "age_max": 24,
+      "percentiles": {
+        "10": 567.2,
+        "25": 478.9,
+        "50": 415.1,
+        "75": 370.1,
+        "90": 336.7
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 25,
+      "age_max": 29,
+      "percentiles": {
+        "10": 579.9,
+        "25": 499.3,
+        "50": 435.7,
+        "75": 387.6,
+        "90": 349.4
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 30,
+      "age_max": 34,
+      "percentiles": {
+        "10": 593.2,
+        "25": 521.5,
+        "50": 458.4,
+        "75": 406.9,
+        "90": 363.0
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 35,
+      "age_max": 39,
+      "percentiles": {
+        "10": 618.5,
+        "25": 544.6,
+        "50": 478.9,
+        "75": 424.4,
+        "90": 375.2
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 40,
+      "age_max": 44,
+      "percentiles": {
+        "10": 646.1,
+        "25": 569.8,
+        "50": 501.3,
+        "75": 443.5,
+        "90": 388.2
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 45,
+      "age_max": 49,
+      "percentiles": {
+        "10": 667.1,
+        "25": 588.9,
+        "50": 519.3,
+        "75": 458.8,
+        "90": 409.2
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 50,
+      "age_max": 54,
+      "percentiles": {
+        "10": 689.6,
+        "25": 609.3,
+        "50": 538.6,
+        "75": 475.2,
+        "90": 432.6
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 55,
+      "age_max": 59,
+      "percentiles": {
+        "10": 714.6,
+        "25": 636.9,
+        "50": 564.6,
+        "75": 496.8,
+        "90": 453.7
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 60,
+      "age_max": 64,
+      "percentiles": {
+        "10": 741.5,
+        "25": 667.1,
+        "50": 593.2,
+        "75": 520.4,
+        "90": 477.0
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 65,
+      "age_max": 69,
+      "percentiles": {
+        "10": 769.3,
+        "25": 695.4,
+        "50": 620.9,
+        "75": 547.0,
+        "90": 494.8
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 70,
+      "age_max": 74,
+      "percentiles": {
+        "10": 799.3,
+        "25": 726.2,
+        "50": 651.3,
+        "75": 576.5,
+        "90": 513.9
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 75,
+      "age_max": 79,
+      "percentiles": {
+        "10": 830.3,
+        "25": 757.5,
+        "50": 682.9,
+        "75": 607.8,
+        "90": 542.8
+      }
+    },
+    {
+      "sex": "M",
+      "age_min": 80,
+      "age_max": 84,
+      "percentiles": {
+        "10": 863.9,
+        "25": 791.6,
+        "50": 717.7,
+        "75": 642.8,
+        "90": 575.2
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 20,
+      "age_max": 24,
+      "percentiles": {
+        "10": 636.1,
+        "25": 564.6,
+        "50": 503.4,
+        "75": 445.9,
+        "90": 404.2
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 25,
+      "age_max": 29,
+      "percentiles": {
+        "10": 658.2,
+        "25": 589.6,
+        "50": 522.6,
+        "75": 464.0,
+        "90": 419.0
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 30,
+      "age_max": 34,
+      "percentiles": {
+        "10": 681.9,
+        "25": 617.0,
+        "50": 543.4,
+        "75": 483.6,
+        "90": 434.9
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 35,
+      "age_max": 39,
+      "percentiles": {
+        "10": 703.4,
+        "25": 640.2,
+        "50": 567.2,
+        "75": 501.9,
+        "90": 451.7
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 40,
+      "age_max": 44,
+      "percentiles": {
+        "10": 726.2,
+        "25": 665.3,
+        "50": 593.2,
+        "75": 521.5,
+        "90": 469.8
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 45,
+      "age_max": 49,
+      "percentiles": {
+        "10": 755.2,
+        "25": 691.5,
+        "50": 619.3,
+        "75": 547.6,
+        "90": 495.8
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 50,
+      "age_max": 54,
+      "percentiles": {
+        "10": 786.6,
+        "25": 719.8,
+        "50": 647.8,
+        "75": 576.5,
+        "90": 524.9
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 55,
+      "age_max": 59,
+      "percentiles": {
+        "10": 812.5,
+        "25": 743.8,
+        "50": 677.2,
+        "75": 605.6,
+        "90": 545.8
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 60,
+      "age_max": 64,
+      "percentiles": {
+        "10": 840.3,
+        "25": 769.3,
+        "50": 709.5,
+        "75": 637.8,
+        "90": 568.5
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 65,
+      "age_max": 69,
+      "percentiles": {
+        "10": 870.0,
+        "25": 798.0,
+        "50": 736.0,
+        "75": 664.4,
+        "90": 599.0
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 70,
+      "age_max": 74,
+      "percentiles": {
+        "10": 901.9,
+        "25": 828.9,
+        "50": 764.6,
+        "75": 693.5,
+        "90": 632.8
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 75,
+      "age_max": 79,
+      "percentiles": {
+        "10": 932.6,
+        "25": 860.8,
+        "50": 795.5,
+        "75": 723.0,
+        "90": 660.9
+      }
+    },
+    {
+      "sex": "F",
+      "age_min": 80,
+      "age_max": 84,
+      "percentiles": {
+        "10": 965.5,
+        "25": 895.3,
+        "50": 828.9,
+        "75": 755.2,
+        "90": 691.5
+      }
+    }
+  ]
+}

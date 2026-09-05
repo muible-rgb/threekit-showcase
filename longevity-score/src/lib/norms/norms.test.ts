@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { NORMS_V1, normsRegistry } from "./registry";
+import { NORMS, normsRegistry } from "./registry";
 import { validateNormsFile } from "./schema";
-import { OPEN_V1_TESTS } from "@/lib/battery";
+import { BATTERY_TESTS } from "@/lib/battery";
 import { scoreBattery } from "@/lib/scoring/composite";
 import { percentileFor } from "@/lib/scoring/percentile";
 
@@ -14,32 +14,32 @@ import { percentileFor } from "@/lib/scoring/percentile";
 describe("shipped norms files", () => {
   it("ships one file per test in the battery, and no orphans", () => {
     const slugs = normsRegistry.slugs().sort();
-    const battery = OPEN_V1_TESTS.map((t) => t.slug).sort();
+    const battery = BATTERY_TESTS.map((t) => t.slug).sort();
     expect(slugs).toEqual(battery);
   });
 
   it("validates structurally, with no errors", () => {
-    const errors = NORMS_V1.flatMap((f) =>
+    const errors = NORMS.flatMap((f) =>
       validateNormsFile(f, f.test_variant).filter((i) => i.level === "error"),
     );
     expect(errors).toEqual([]);
   });
 
   it("carries a citation on every file, provisional or not", () => {
-    for (const f of NORMS_V1) {
+    for (const f of NORMS) {
       expect(f.source.citation.length).toBeGreaterThan(20);
     }
   });
 
   it("explains itself on every provisional file", () => {
-    for (const f of NORMS_V1.filter((n) => n.source.provisional)) {
+    for (const f of NORMS.filter((n) => n.source.provisional)) {
       expect(f.source.notes, `${f.test_variant} is provisional with no notes`).toBeTruthy();
       expect(f.source.notes!.length).toBeGreaterThan(80);
     }
   });
 
   it("agrees with the battery definition on unit, capacity and direction", () => {
-    for (const t of OPEN_V1_TESTS) {
+    for (const t of BATTERY_TESTS) {
       const f = normsRegistry.get(t.slug)!;
       expect(f.unit, t.slug).toBe(t.unit);
       expect(f.capacity, t.slug).toBe(t.capacity);
@@ -48,7 +48,7 @@ describe("shipped norms files", () => {
   });
 
   it("covers the whole 20-84 range for both sexes", () => {
-    for (const f of NORMS_V1) {
+    for (const f of NORMS) {
       for (const sex of ["M", "F"] as const) {
         const bands = f.cohorts.filter((c) => c.sex === sex);
         expect(bands.length, `${f.test_variant} ${sex}`).toBe(13);
@@ -58,15 +58,17 @@ describe("shipped norms files", () => {
     }
   });
 
-  it("has exactly one lower-is-better test", () => {
-    const lower = NORMS_V1.filter((f) => f.direction === "lower_better");
-    expect(lower.map((f) => f.test_variant)).toEqual(["run_400m"]);
+  it("knows which tests are lower-is-better", () => {
+    const lower = NORMS.filter((f) => f.direction === "lower_better")
+      .map((f) => f.test_variant)
+      .sort();
+    expect(lower).toEqual(["agility_5_10_5", "mile_run"]);
   });
 });
 
 describe("real norms produce sane percentiles", () => {
   it("puts an average 42-year-old man near the 50th on every test", () => {
-    for (const f of NORMS_V1) {
+    for (const f of NORMS) {
       const cohort = f.cohorts.find(
         (c) => c.sex === "M" && c.age_min === 40,
       )!;
@@ -78,7 +80,7 @@ describe("real norms produce sane percentiles", () => {
   });
 
   it("moves in the right direction on every test", () => {
-    for (const f of NORMS_V1) {
+    for (const f of NORMS) {
       const cohort = f.cohorts.find((c) => c.sex === "M" && c.age_min === 40)!;
       const mid = cohort.mean ?? cohort.percentiles!["50"];
       const better = f.direction === "higher_better" ? mid * 1.2 : mid * 0.8;
@@ -91,7 +93,7 @@ describe("real norms produce sane percentiles", () => {
   });
 
   it("makes an identical raw result score higher at an older age", () => {
-    for (const f of NORMS_V1) {
+    for (const f of NORMS) {
       const cohort = f.cohorts.find((c) => c.sex === "M" && c.age_min === 40)!;
       const mid = cohort.mean ?? cohort.percentiles!["50"];
       const at42 = percentileFor(f, mid, "M", 42).percentile;
@@ -101,11 +103,11 @@ describe("real norms produce sane percentiles", () => {
   });
 });
 
-describe("the whole open-v1 battery, end to end", () => {
-  const battery = OPEN_V1_TESTS.map((t) => t.slug);
+describe("the whole battery, end to end", () => {
+  const battery = BATTERY_TESTS.map((t) => t.slug);
 
   function medianResults(sex: "M" | "F", ageBandMin: number) {
-    return OPEN_V1_TESTS.map((t) => {
+    return BATTERY_TESTS.map((t) => {
       const f = normsRegistry.get(t.slug)!;
       const c = f.cohorts.find((x) => x.sex === sex && x.age_min === ageBandMin)!;
       return {
@@ -128,7 +130,7 @@ describe("the whole open-v1 battery, end to end", () => {
     expect(score.composite!).toBeGreaterThan(45);
     expect(score.composite!).toBeLessThan(55);
     expect(score.band).toBe("Solid");
-    expect(score.tests).toHaveLength(10);
+    expect(score.tests).toHaveLength(BATTERY_TESTS.length);
   });
 
   it("gives a dead-average person a fitness age near their own age", () => {
@@ -147,7 +149,7 @@ describe("the whole open-v1 battery, end to end", () => {
 
   it("lets a 78-year-old woman outscore a 32-year-old man - the whole point", () => {
     // She posts her own cohort's 90th percentile. He posts his cohort's 25th.
-    const her = OPEN_V1_TESTS.map((t) => {
+    const her = BATTERY_TESTS.map((t) => {
       const f = normsRegistry.get(t.slug)!;
       const c = f.cohorts.find((x) => x.sex === "F" && x.age_min === 75)!;
       const value = c.mean !== undefined
@@ -156,12 +158,20 @@ describe("the whole open-v1 battery, end to end", () => {
       return { testVariant: t.slug, value, recordedAt: "2026-06-01T10:00:00.000Z" };
     });
 
-    const him = OPEN_V1_TESTS.map((t) => {
+    const him = BATTERY_TESTS.map((t) => {
       const f = normsRegistry.get(t.slug)!;
       const c = f.cohorts.find((x) => x.sex === "M" && x.age_min === 30)!;
+      // Cut-point files do not all publish the same percentiles - pull-ups
+      // anchors its lowest point at the zero mass - so take the lowest
+      // published point rather than assuming a 25th exists.
+      const lowest = c.percentiles
+        ? Object.entries(c.percentiles).sort(
+            (a, b) => Number(a[0]) - Number(b[0]),
+          )[0][1]
+        : 0;
       const value = c.mean !== undefined
         ? c.mean + (f.direction === "higher_better" ? -0.67 * c.sd! : 0.67 * c.sd!)
-        : c.percentiles!["25"];
+        : lowest;
       return { testVariant: t.slug, value, recordedAt: "2026-06-01T10:00:00.000Z" };
     });
 
@@ -185,9 +195,9 @@ describe("the whole open-v1 battery, end to end", () => {
     expect(his.composite!).toBeLessThan(40);
   });
 
-  it("refuses a composite when the Cooper run is missing", () => {
+  it("refuses a composite when one test is missing", () => {
     const nine = medianResults("M", 40).filter(
-      (r) => r.testVariant !== "cooper_12min_run",
+      (r) => r.testVariant !== "mile_run",
     );
     const score = scoreBattery({
       sex: "M",
@@ -197,7 +207,7 @@ describe("the whole open-v1 battery, end to end", () => {
       norms: normsRegistry,
     });
     expect(score.composite).toBeNull();
-    expect(score.testsCompleted).toBe(9);
-    expect(score.missing).toEqual(["cooper_12min_run"]);
+    expect(score.testsCompleted).toBe(BATTERY_TESTS.length - 1);
+    expect(score.missing).toEqual(["mile_run"]);
   });
 });

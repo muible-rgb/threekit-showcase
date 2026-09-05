@@ -8,7 +8,6 @@ import {
   Copy,
   Lock,
   MapPin,
-  Pencil,
   Plus,
   Trophy,
   UserPlus,
@@ -20,7 +19,7 @@ import { ProfileGate } from "@/components/profile-gate";
 import { AddGuestForm } from "@/components/add-guest-form";
 import { ClaimPrompt } from "@/components/claim-prompt";
 import { useDb, useStore } from "@/lib/data/store-context";
-import { OPEN_V1_TEST_SLUGS } from "@/lib/battery";
+import { BATTERY_TEST_COUNT } from "@/lib/battery";
 import { priorCompleteBefore, sessionScoreFor } from "@/lib/batteries";
 import { liveBoard, mostImproved, rankBoard } from "@/lib/scoring/board";
 import { formatDate, oneDecimal } from "@/lib/utils";
@@ -159,7 +158,7 @@ export default function SessionPage() {
 
       {!locked && (
         <div className="grid gap-3">
-          <Link href={`/test?session=${session.id}`}>
+          <Link href="/">
             <Button size="lg" className="w-full justify-between">
               <span className="flex items-center gap-2">
                 <Plus size={20} /> Enter my results
@@ -193,7 +192,7 @@ export default function SessionPage() {
         />
       )}
 
-      {live && <LiveBoard rows={live} sessionId={session.id} isHost={isHost} meId={me.id} />}
+      {live && <LiveBoard rows={live} meId={me.id} />}
 
       {board && <FinalBoard rows={board} />}
 
@@ -236,13 +235,9 @@ export default function SessionPage() {
 
 function LiveBoard({
   rows,
-  sessionId,
-  isHost,
   meId,
 }: {
   rows: ReturnType<typeof liveBoard>;
-  sessionId: string;
-  isHost: boolean;
   meId: string;
 }) {
   return (
@@ -274,12 +269,12 @@ function LiveBoard({
                   <div
                     className="h-full rounded-full bg-signal"
                     style={{
-                      width: `${(row.testsCompleted / OPEN_V1_TEST_SLUGS.length) * 100}%`,
+                      width: `${(row.testsCompleted / BATTERY_TEST_COUNT) * 100}%`,
                     }}
                   />
                 </div>
                 <span className="tnum text-[11px] text-paper-faint">
-                  {row.testsCompleted}/{OPEN_V1_TEST_SLUGS.length}
+                  {row.testsCompleted}/{BATTERY_TEST_COUNT}
                 </span>
               </div>
             </div>
@@ -291,15 +286,6 @@ function LiveBoard({
                 running avg
               </span>
             </div>
-            {isHost && (
-              <Link
-                href={`/test?session=${sessionId}&for=${row.participantId}`}
-                aria-label={`Enter results for ${row.displayName}`}
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink-raised text-paper-faint ring-1 ring-ink-line hover:text-paper"
-              >
-                <Pencil size={14} />
-              </Link>
-            )}
           </div>
         ))}
       </CardBody>

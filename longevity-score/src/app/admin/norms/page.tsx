@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { NORMS_V1 } from "@/lib/norms/registry";
+import { NORMS } from "@/lib/norms/registry";
 import { validateNormsFile } from "@/lib/norms/schema";
-import { OPEN_V1_TESTS } from "@/lib/battery";
+import { BATTERY_TESTS } from "@/lib/battery";
 
 export const metadata: Metadata = {
   title: "Norms status",
@@ -18,11 +18,11 @@ export const metadata: Metadata = {
  * for that reason; when this grows anything that writes, it needs a real gate.
  */
 export default function AdminNormsPage() {
-  const rows = NORMS_V1.map((file) => {
+  const rows = NORMS.map((file) => {
     const issues = validateNormsFile(file, file.test_variant);
     return {
       file,
-      inBattery: OPEN_V1_TESTS.some((t) => t.slug === file.test_variant),
+      inBattery: BATTERY_TESTS.some((t) => t.slug === file.test_variant),
       errors: issues.filter((i) => i.level === "error"),
       warnings: issues.filter((i) => i.level === "warning"),
     };
@@ -39,7 +39,7 @@ export default function AdminNormsPage() {
       <header>
         <h1 className="text-2xl font-bold tracking-tight">Norms status</h1>
         <p className="mt-1 text-sm text-paper-dim">
-          {rows.length} files loaded from /data/norms/v1.
+          {rows.length} files loaded from /data/norms/v2.
         </p>
       </header>
 

@@ -1,24 +1,24 @@
 {
-  "test_variant": "standing_broad_jump",
+  "test_variant": "broad_jump",
   "capacity": "leg_power",
-  "unit": "cm",
+  "unit": "in",
   "direction": "higher_better",
-  "norms_version": "v1",
+  "norms_version": "v2",
   "source": {
-    "citation": "Patterson P, Rethwisch N, Wiksten D. Reliability of the standing long jump. Eurofit test battery reference values, Council of Europe (1993); plus ratings tables compiled in Mackenzie B, 101 Performance Evaluation Tests (2005).",
+    "citation": "Standing long jump ratings compiled in Mackenzie B, 101 Performance Evaluation Tests (2005), and Eurofit reference values, Council of Europe (1993). Age decline from published countermovement-jump power literature.",
     "url": "https://www.topendsports.com/testing/tests/longjump.htm",
-    "population": "Published tables are dominated by school-age and young athletic populations. Adult 30-55 norms are thin.",
+    "population": "Published tables are dominated by school-age and young athletic groups. Adult 30-55 norms are thin.",
     "provisional": true,
     "transcription_verified": false,
-    "notes": "PROVISIONAL. Broad jump norms for adults over 30 are essentially unpublished; the widely circulated ratings tables are for 16-19 year olds and do not carry age adjustment. The anchor of 198 cm (men) / 148 cm (women) at age 42 sits at the boundary the ratings tables label 'average to above average' for young adults, discounted for age. The 7.5% per decade decline follows published countermovement-jump power decline, which is steeper than strength decline. Coefficient of variation of 0.14 is from reported jump-test variability, not from a normative sample.",
+    "notes": "PROVISIONAL. Broad jump norms for adults over 30 are essentially unpublished - the widely circulated ratings tables are for 16-19 year olds and carry no age adjustment. The anchors, 78 inches for men and 58 for women at age 42, sit around what those tables call average-to-above-average for young adults, discounted for age. The 7.5 per cent per decade decline follows published jump-power decline, which is steeper than strength decline. The 0.14 coefficient of variation comes from reported jump-test variability, not from a normative sample.",
     "generated_by": "scripts/generate-provisional-norms.ts",
     "model": {
-      "form": "mean(age) = anchor42 * (1 -/+ declinePerDecade) ^ ((max(age, peakAge) - 42) / 10)",
+      "form": "mean(age) = anchor42 * (1 -/+ declinePerDecade) ^ ((max(bandMid, peakAge) - 42) / 10)",
       "peak_age": 25,
       "decline_per_decade": 0.075,
       "anchor_age_42": {
-        "M": 198,
-        "F": 148
+        "M": 78,
+        "F": 58
       },
       "coefficient_of_variation": 0.14
     }
@@ -28,183 +28,183 @@
       "sex": "M",
       "age_min": 20,
       "age_max": 24,
-      "mean": 226,
-      "sd": 31.6
+      "mean": 89.0,
+      "sd": 12.5
     },
     {
       "sex": "M",
       "age_min": 25,
       "age_max": 29,
-      "mean": 223,
-      "sd": 31.2
+      "mean": 88.0,
+      "sd": 12.3
     },
     {
       "sex": "M",
       "age_min": 30,
       "age_max": 34,
-      "mean": 214,
-      "sd": 30
+      "mean": 84.0,
+      "sd": 11.8
     },
     {
       "sex": "M",
       "age_min": 35,
       "age_max": 39,
-      "mean": 206,
-      "sd": 28.8
+      "mean": 81.0,
+      "sd": 11.4
     },
     {
       "sex": "M",
       "age_min": 40,
       "age_max": 44,
-      "mean": 198,
-      "sd": 27.7
+      "mean": 78.0,
+      "sd": 10.9
     },
     {
       "sex": "M",
       "age_min": 45,
       "age_max": 49,
-      "mean": 190,
-      "sd": 26.7
+      "mean": 75.0,
+      "sd": 10.5
     },
     {
       "sex": "M",
       "age_min": 50,
       "age_max": 54,
-      "mean": 183,
-      "sd": 25.6
+      "mean": 72.0,
+      "sd": 10.1
     },
     {
       "sex": "M",
       "age_min": 55,
       "age_max": 59,
-      "mean": 176,
-      "sd": 24.7
+      "mean": 69.0,
+      "sd": 9.7
     },
     {
       "sex": "M",
       "age_min": 60,
       "age_max": 64,
-      "mean": 169,
-      "sd": 23.7
+      "mean": 67.0,
+      "sd": 9.3
     },
     {
       "sex": "M",
       "age_min": 65,
       "age_max": 69,
-      "mean": 163,
-      "sd": 22.8
+      "mean": 64.0,
+      "sd": 9.0
     },
     {
       "sex": "M",
       "age_min": 70,
       "age_max": 74,
-      "mean": 157,
-      "sd": 21.9
+      "mean": 62.0,
+      "sd": 8.6
     },
     {
       "sex": "M",
       "age_min": 75,
       "age_max": 79,
-      "mean": 151,
-      "sd": 21.1
+      "mean": 59.0,
+      "sd": 8.3
     },
     {
       "sex": "M",
       "age_min": 80,
       "age_max": 84,
-      "mean": 145,
-      "sd": 20.3
+      "mean": 57.0,
+      "sd": 8.0
     },
     {
       "sex": "F",
       "age_min": 20,
       "age_max": 24,
-      "mean": 169,
-      "sd": 23.7
+      "mean": 66.0,
+      "sd": 9.3
     },
     {
       "sex": "F",
       "age_min": 25,
       "age_max": 29,
-      "mean": 166,
-      "sd": 23.3
+      "mean": 65.0,
+      "sd": 9.1
     },
     {
       "sex": "F",
       "age_min": 30,
       "age_max": 34,
-      "mean": 160,
-      "sd": 22.4
+      "mean": 63.0,
+      "sd": 8.8
     },
     {
       "sex": "F",
       "age_min": 35,
       "age_max": 39,
-      "mean": 154,
-      "sd": 21.5
+      "mean": 60.0,
+      "sd": 8.4
     },
     {
       "sex": "F",
       "age_min": 40,
       "age_max": 44,
-      "mean": 148,
-      "sd": 20.7
+      "mean": 58.0,
+      "sd": 8.1
     },
     {
       "sex": "F",
       "age_min": 45,
       "age_max": 49,
-      "mean": 142,
-      "sd": 19.9
+      "mean": 56.0,
+      "sd": 7.8
     },
     {
       "sex": "F",
       "age_min": 50,
       "age_max": 54,
-      "mean": 137,
-      "sd": 19.2
+      "mean": 54.0,
+      "sd": 7.5
     },
     {
       "sex": "F",
       "age_min": 55,
       "age_max": 59,
-      "mean": 132,
-      "sd": 18.4
+      "mean": 52.0,
+      "sd": 7.2
     },
     {
       "sex": "F",
       "age_min": 60,
       "age_max": 64,
-      "mean": 127,
-      "sd": 17.7
+      "mean": 50.0,
+      "sd": 6.9
     },
     {
       "sex": "F",
       "age_min": 65,
       "age_max": 69,
-      "mean": 122,
-      "sd": 17.1
+      "mean": 48.0,
+      "sd": 6.7
     },
     {
       "sex": "F",
       "age_min": 70,
       "age_max": 74,
-      "mean": 117,
-      "sd": 16.4
+      "mean": 46.0,
+      "sd": 6.4
     },
     {
       "sex": "F",
       "age_min": 75,
       "age_max": 79,
-      "mean": 113,
-      "sd": 15.8
+      "mean": 44.0,
+      "sd": 6.2
     },
     {
       "sex": "F",
       "age_min": 80,
       "age_max": 84,
-      "mean": 108,
-      "sd": 15.2
+      "mean": 42.0,
+      "sd": 5.9
     }
   ]
 }

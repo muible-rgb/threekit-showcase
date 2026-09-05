@@ -33,21 +33,72 @@ export function oneDecimal(n: number): string {
   return n.toFixed(1);
 }
 
+/**
+ * Raw results, imperial. Every unit gets the shape people actually say out
+ * loud: a mile is 7:42, an agility shuttle is 5.62s, a jump is 78".
+ */
 export function formatRaw(value: number, unit: string): string {
-  if (unit === "s") {
-    if (value >= 60) {
-      const m = Math.floor(value / 60);
-      const s = value - m * 60;
-      return `${m}:${s.toFixed(1).padStart(4, "0")}`;
+  switch (unit) {
+    case "s":
+      // Anything over a minute is a running time; under it is a stopwatch
+      // reading, and the decimal matters.
+      if (value >= 60) {
+        const m = Math.floor(value / 60);
+        const sec = Math.round(value - m * 60);
+        return `${m}:${sec.toString().padStart(2, "0")}`;
+      }
+      return `${value.toFixed(2).replace(/\.?0+$/, "")}s`;
+    case "reps":
+      return String(Math.round(value));
+    case "in": {
+      const feet = Math.floor(value / 12);
+      const inches = Math.round(value - feet * 12);
+      return feet > 0 ? `${feet}'${inches}"` : `${Math.round(value)}"`;
     }
-    return `${value.toFixed(1)}s`;
+    case "ft":
+      return `${Math.round(value)} ft`;
+    case "lb":
+      return `${Math.round(value)} lb`;
+    case "points":
+      return value.toFixed(1);
+    default:
+      return `${value} ${unit}`;
   }
-  if (unit === "points") return value.toFixed(1);
-  if (unit === "reps") return String(Math.round(value));
-  if (unit === "kg") return `${value.toFixed(1)} kg`;
-  if (unit === "cm") return `${Math.round(value)} cm`;
-  if (unit === "m") return `${Math.round(value)} m`;
-  return `${value} ${unit}`;
+}
+
+/**
+ * A change, in the unit it was measured in. A 148-second mile improvement is
+ * "-2:28", not "-148.0" - the raw number is technically right and tells you
+ * nothing at a glance.
+ */
+export function formatRawDelta(delta: number, unit: string): string {
+  const sign = delta > 0 ? "+" : "-";
+  const abs = Math.abs(delta);
+  switch (unit) {
+    case "s":
+      if (abs >= 60) {
+        const m = Math.floor(abs / 60);
+        const sec = Math.round(abs - m * 60);
+        return `${sign}${m}:${sec.toString().padStart(2, "0")}`;
+      }
+      return `${sign}${abs.toFixed(abs < 10 ? 2 : 1).replace(/\.?0+$/, "")}s`;
+    case "reps":
+      return `${sign}${Math.round(abs)}`;
+    case "in":
+      return `${sign}${Math.round(abs)}"`;
+    case "ft":
+      return `${sign}${Math.round(abs)} ft`;
+    case "points":
+      return `${sign}${abs.toFixed(1)}`;
+    default:
+      return `${sign}${abs}`;
+  }
+}
+
+/** Seconds to m:ss, for the mile input. */
+export function secondsToClock(total: number): { minutes: number; seconds: number } {
+  const minutes = Math.floor(total / 60);
+  return { minutes, seconds: Math.round(total - minutes * 60) };
 }
 
 export function formatClock(seconds: number): string {

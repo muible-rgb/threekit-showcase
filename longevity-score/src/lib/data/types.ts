@@ -1,5 +1,4 @@
 import type { Sex } from "@/lib/scoring/types";
-import type { UnscoredKind } from "@/lib/battery";
 
 export interface Participant {
   id: string;
@@ -29,6 +28,7 @@ export interface CrewSession {
 export interface SessionParticipant {
   sessionId: string;
   participantId: string;
+  /** Pounds. Drives the carry load; never scored. */
   bodyweightKg: number | null;
   joinedAt: string;
 }
@@ -50,7 +50,7 @@ export interface UnscoredMeasurement {
   id: string;
   participantId: string;
   sessionId: string | null;
-  kind: UnscoredKind;
+  kind: string;
   value: number;
   recordedAt: string;
 }

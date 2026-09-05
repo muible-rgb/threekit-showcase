@@ -1,17 +1,17 @@
 {
-  "test_variant": "single_leg_balance_eyes_closed",
+  "test_variant": "balance_eyes_closed",
   "capacity": "balance",
   "unit": "s",
   "direction": "higher_better",
-  "norms_version": "v1",
+  "norms_version": "v2",
   "value_cap": 60,
   "source": {
     "citation": "Springer BA, Marin R, Cyhan T, Roberts H, Gill NW. Normative Values for the Unipedal Stance Test with Eyes Open and Closed. J Geriatr Phys Ther. 2007;30(1):8-15.",
     "url": "https://doi.org/10.1519/00139143-200704000-00003",
-    "population": "Convenience sample of 549 healthy US adults 18-99, eyes-closed unipedal stance, hands on hips, best of multiple trials.",
+    "population": "Convenience sample of 549 healthy US adults 18-99. Eyes-closed unipedal stance, hands on hips, best of several trials.",
     "provisional": true,
     "transcription_verified": false,
-    "notes": "PROVISIONAL for two reasons, both about dispersion rather than centre. The published means by age and sex are used as-is and are the reliable part of this file. But the source reports ranges rather than usable SDs for every band, so the SD here is set at 0.75 x mean (capped at 18s) - that is an inference, not a published number. Second, and more important: eyes-closed balance times are strongly right-skewed and this battery caps the test at 60 seconds, so a normal model misbehaves at both ends. In practice that means the difference between a 45-second hold and a 60-second hold is compressed near the top of the scale, and anyone capping out at 60s is reported at the 99th percentile ceiling. Balance is the test where a percentile is least likely to move on retest."
+    "notes": "PROVISIONAL for two reasons, both about spread rather than centre. The published means by age and sex are used as-is and are the reliable part of this file. But the source reports ranges rather than usable standard deviations for every band, so the SD here is set at 0.75 times the mean and capped at 18 seconds - an inference, not a published number. Second and more important: eyes-closed balance times are strongly right-skewed and this battery caps the test at 60 seconds, so a normal model misbehaves at both ends. In practice the gap between a 45-second hold and a 60-second hold is compressed, and anyone reaching the cap is reported at the 99th percentile ceiling. Balance is the test where a percentile is least likely to move on a retest."
   },
   "cohorts": [
     {

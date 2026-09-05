@@ -13,7 +13,7 @@ import {
   useSessions,
   useStore,
 } from "@/lib/data/store-context";
-import { OPEN_V1_SLUG } from "@/lib/battery";
+import { BATTERY_SLUG } from "@/lib/battery";
 import { formatDate } from "@/lib/utils";
 
 export default function CrewPage() {
@@ -59,7 +59,7 @@ export default function CrewPage() {
           onCreate={async (input) => {
             const session = await store.createSession({
               hostParticipantId: me.id,
-              batteryVersion: OPEN_V1_SLUG,
+              batteryVersion: BATTERY_SLUG,
               name: input.name,
               startsAt: input.startsAt,
               locationText: input.locationText,

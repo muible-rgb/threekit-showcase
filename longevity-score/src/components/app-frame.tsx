@@ -2,22 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, BookOpen, Home, Users } from "lucide-react";
+import { BookOpen, ClipboardList, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SyncIndicator } from "@/components/sync-indicator";
 
 const TABS = [
-  { href: "/", label: "Home", icon: Home },
+  { href: "/", label: "Score", icon: ClipboardList },
   { href: "/crew", label: "Crew", icon: Users },
-  { href: "/score", label: "Score", icon: Activity },
   { href: "/methodology", label: "Method", icon: BookOpen },
 ];
 
-/**
- * Test mode and the public pages run full-bleed with no chrome - a tab bar
- * during a wall sit is a way to lose a result.
- */
-const FULL_BLEED = [/^\/test/, /^\/s\//, /^\/join/];
+/** Public pages run full-bleed - they are not the app, they are a link. */
+const FULL_BLEED = [/^\/s\//, /^\/join/];
 
 export function AppFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
@@ -42,7 +38,7 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
       <main className="flex-1 px-5 pb-28 pt-5">{children}</main>
 
       <nav className="pb-safe fixed inset-x-0 bottom-0 z-20 mx-auto w-full max-w-lg border-t border-ink-line-soft bg-ink/95 backdrop-blur">
-        <ul className="grid grid-cols-4">
+        <ul className="grid grid-cols-3">
           {TABS.map((tab) => {
             const active =
               tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);

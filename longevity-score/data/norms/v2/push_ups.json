@@ -3,14 +3,14 @@
   "capacity": "push_endurance",
   "unit": "reps",
   "direction": "higher_better",
-  "norms_version": "v1",
+  "norms_version": "v2",
   "source": {
-    "citation": "Canadian Society for Exercise Physiology. Canadian Standardized Test of Fitness (CSTF) Operations Manual, 3rd ed. Ottawa, 1986; reproduced as the push-up norms in ACSM's Guidelines for Exercise Testing and Prescription, 10th ed. Wolters Kluwer, 2018, Table 4.9.",
+    "citation": "Canadian Society for Exercise Physiology, Canadian Standardized Test of Fitness Operations Manual, 3rd ed., 1986; reproduced as the push-up norms in ACSM's Guidelines for Exercise Testing and Prescription, 10th ed., Table 4.9.",
     "url": "https://www.acsm.org/education-resources/books/guidelines-exercise-testing-prescription",
-    "population": "General Canadian adult population, 20-69. Men perform the full push-up; women perform the modified (knee) push-up.",
+    "population": "General Canadian adults 20-69. Men perform the full push-up; women perform the modified knee push-up.",
     "provisional": true,
     "transcription_verified": false,
-    "notes": "PROVISIONAL FOR ONE SPECIFIC REASON: the male cut-points are used as published and match this battery's protocol exactly, but the published female norms are for the MODIFIED knee push-up, which this battery does not use. Female cut-points here are the published modified-push-up values multiplied by 0.62, a conversion factor from small published comparisons of knee versus full push-up capacity. That factor is the provisional part. Consequence to be aware of: a woman's push-up percentile in v1 is the least trustworthy number on her score card, and it is one of ten inputs to her composite. The 70-79 and 80-84 bands extrapolate past the source's 69-year ceiling. Fix by re-fitting strict push-ups from app data - this is the second file to replace after dead hang."
+    "notes": "PROVISIONAL for one specific reason. The male cut-points are used as published and match this battery exactly. The published female norms are for the MODIFIED knee push-up, which this battery does not use, so female values here are the published numbers multiplied by 0.62 - a conversion factor from small published comparisons of knee versus full push-up capacity. That factor is the provisional part, and it makes push-ups the least trustworthy number on a woman's card. The 70-79 and 80-84 bands extrapolate past the source's 69-year ceiling."
   },
   "cohorts": [
     {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { OPEN_V1_TESTS, UNSCORED_MEASUREMENTS } from "@/lib/battery";
+import { BATTERY_TESTS } from "@/lib/battery";
 import { normsRegistry } from "@/lib/norms/registry";
 import { BANDS } from "@/lib/scoring/composite";
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
  * /data/norms, this page changes with it.
  */
 export default function MethodologyPage() {
-  const files = OPEN_V1_TESTS.map((test) => ({
+  const files = BATTERY_TESTS.map((test) => ({
     test,
     norms: normsRegistry.get(test.slug)!,
   }));
@@ -42,17 +42,17 @@ export default function MethodologyPage() {
         </h2>
         <div className="space-y-3 text-sm leading-relaxed text-paper-dim">
           <p>
-            You do ten tests. Each raw result is compared to published norms for
+            You do eight tests. Each raw result is compared to published norms for
             people of your sex in your five-year age band. That comparison gives
             a percentile between 1 and 99.
           </p>
           <p className="font-medium text-paper">
-            Your Longevity Score is the average of those ten percentiles. Nothing
+            Your Longevity Score is the average of those eight percentiles. Nothing
             is weighted. A 78-year-old woman can outscore a 30-year-old man,
             because both are measured against their own cohort.
           </p>
           <p>
-            All ten are required. Nine tests gives you nine percentiles and no
+            All eight are required. Seven tests gives you seven percentiles and no
             score, because a partial average would let you drop the test you are
             worst at and call the result an improvement.
           </p>
@@ -109,7 +109,7 @@ export default function MethodologyPage() {
         <div className="space-y-3 text-sm leading-relaxed text-paper-dim">
           <p>
             For each test, we find the age at which your raw result would be
-            exactly average for your sex, then take the median of those ten ages.
+            exactly average for your sex, then take the median of those eight ages.
           </p>
           <p>
             It has a known limit in v1, and it is worth understanding before you
@@ -120,7 +120,7 @@ export default function MethodologyPage() {
             youngest band the norms cover.
           </p>
           <p className="font-medium text-paper">
-            When that happens on more than three of your ten tests, the number is
+            When that happens on more than three of your eight tests, the number is
             shown as a floor - &quot;22 or under&quot; - and tagged approx. It is
             not a more precise answer being rounded. It is the edge of what these
             norms can resolve.
@@ -152,7 +152,7 @@ export default function MethodologyPage() {
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-widest text-paper-faint">
-          The ten tests
+          The eight tests
         </h2>
 
         {files.map(({ test, norms }, i) => (
@@ -232,27 +232,6 @@ export default function MethodologyPage() {
             </dl>
           </div>
         ))}
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-paper-faint">
-          Measured but not scored
-        </h2>
-        <p className="text-sm leading-relaxed text-paper-dim">
-          Captured in the same flow, stored, and shown on your score - but kept
-          out of the composite, because there is no age-and-sex norm for them we
-          would stand behind.
-        </p>
-        <ul className="space-y-2">
-          {UNSCORED_MEASUREMENTS.map((m) => (
-            <li key={m.kind} className="rounded-xl bg-ink-raised p-3 ring-1 ring-ink-line">
-              <p className="text-sm font-semibold">
-                {m.name} <span className="text-paper-faint">({m.unit})</span>
-              </p>
-              <p className="mt-0.5 text-xs text-paper-dim">{m.when}</p>
-            </li>
-          ))}
-        </ul>
       </section>
 
       <section className="space-y-3">

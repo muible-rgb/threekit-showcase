@@ -1,7 +1,14 @@
-# Longevity Score v1
+# Longevity Score
 
-Ten physical tests, one score, graded against people your own age and sex. Test
-with a crew, compare on a shared board.
+Eight physical tests, one score, graded against people your own age and sex.
+Imperial units. Test with a crew, compare on a shared board.
+
+**Mile - Pull-ups - Push-ups - Broad jump - Carry - Agility - Balance -
+Sit-to-rise.**
+
+It is a scorecard, not a coach. There is no guided mode, no fixed order, no
+stopwatch and no rest timer: you do the tests outside and tap a row to type in
+what you got.
 
 The thing to protect: **scoring is cohort-relative**. A 78-year-old woman can
 outscore a 30-year-old man, because both are measured against their own sex and
@@ -20,7 +27,7 @@ entirely on local storage, seeded with a demo crew of eight across two
 quarterly sessions, so every screen renders on a fresh checkout.
 
 ```bash
-npm test             # 153 unit tests, scoring engine + norms + seed
+npm test             # unit tests: scoring engine, norms, seed, formatting
 npm run typecheck
 npm run lint
 npm run norms:validate      # structural check on every norms file
@@ -37,10 +44,10 @@ environment variables needed - it deploys and runs on the seeded demo data.
 ## How it fits together
 
 ```
-data/norms/v1/*.json          the numbers. no norm lives in TypeScript.
+data/norms/v2/*.json          the numbers. no norm lives in TypeScript.
 src/lib/scoring/              pure engine. no I/O. takes norms as an argument.
 src/lib/norms/                loads and validates the JSON
-src/lib/battery.ts            open-v1 definition, mirrors migration 0002
+src/lib/battery.ts            the eight tests, mirrors migration 0002
 src/lib/data/                 DataStore: LocalStore + SupabaseStore
 src/app/                      five screens, public score page, share card
 supabase/migrations/          schema, RLS, reference data
@@ -63,8 +70,8 @@ Three layers: raw result → cohort percentile → composite.
   of the board - the one place a crew cares about ordering. Extrapolated results
   are flagged.
 - Floor 1, cap 99. Nobody scores 0 and nobody scores 100.
-- The composite is the unweighted mean of ten percentiles, to one decimal, and
-  it is **null until all ten are there**. Enforced in the engine, not the UI, so
+- The composite is the unweighted mean of eight percentiles, to one decimal,
+  and it is **null until all eight are there**. Enforced in the engine, not the UI, so
   no surface can leak a partial one.
 
 ### Local-first storage
@@ -106,7 +113,7 @@ Two separate claims are tracked per file, and they are not the same thing:
   against the source document. Currently `false` on all ten. See
   `VERIFY_NORMS.md`.
 
-Two files are sourced (grip, Cooper); eight are provisional. The provisional
+All eight files are currently provisional, for reasons stated per file. The provisional
 curves come from `scripts/generate-provisional-norms.ts`, so the anchor, the
 decline rate and the coefficient of variation are all readable and arguable
 rather than hand-waved. `TODO_RENORM.md` has the re-fit plan and the priority
@@ -127,12 +134,23 @@ precision, but the number carries less signal for fit users than the concept
 implies. Fixing it properly needs a fitter reference population, not a code
 change.
 
-**Female push-up norms are the weakest number on a woman's score card.** The
-published source uses the modified knee push-up, which is not this battery's
-protocol. The values are converted at 0.62 and the file is marked provisional.
-First thing to re-fit after dead hang.
+**Pull-ups are the hardest test to norm honestly.** They are zero-inflated: a
+majority of women past 40 cannot do one, so a mean and SD are meaningless. The
+file uses cut-points and places the 0-rep point at half the estimated zero
+share, because a zero cannot be resolved any finer than "somewhere in that
+share". A zero therefore scores generously against a true ranking, and the
+first rep moves the percentile a long way.
 
-**Balance and sit-rising are compressed at the ceiling.** Both are capped
+**Female push-up norms are the second weakest.** The published source uses the
+modified knee push-up, which is not this battery's protocol. Values are
+converted at 0.62 and the file is marked provisional.
+
+**The mile passes through two conversions.** Published VO2max percentiles →
+Cooper 12-minute distance → mile time. Each step is a documented equation and
+each adds error. Percentile ordering survives because every step is monotone,
+so the ranking is sounder than the absolute time.
+
+**Balance and sit-to-rise are compressed at the ceiling.** Both are capped
 scales (60 seconds, 10 points) with right-skewed distributions, and a normal
 model misbehaves at the top. Anyone capping out lands at the 99th percentile.
 
@@ -145,8 +163,8 @@ above ran on.
 
 A fresh install seeds eight people over two quarterly sessions with a
 deterministic PRNG, built so the awkward states are on screen rather than only
-the happy path: one participant walks off after seven tests (null composite,
-"7/10 incomplete"), one misses the first session (first-timer on the
+the happy path: one participant is missing two tests (null composite,
+"6/8"), one misses the first session (first-timer on the
 most-improved board, which is not the same as finishing last), the oldest member
 outranks most of the crew on cohort, and two participants are guests with no
 account so the claim flow has something to claim.

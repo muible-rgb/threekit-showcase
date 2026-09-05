@@ -3,6 +3,7 @@ import {
   ageBandLabel,
   betterThanSentence,
   formatRaw,
+  formatRawDelta,
   formatSigned,
   oneDecimal,
   ordinal,
@@ -28,18 +29,26 @@ describe("rawImproved", () => {
 });
 
 describe("formatRaw", () => {
-  it("shows times under a minute in seconds", () => {
-    expect(formatRaw(44.6, "s")).toBe("44.6s");
+  it("shows a running time as minutes and seconds", () => {
+    expect(formatRaw(462, "s")).toBe("7:42");
+    expect(formatRaw(605, "s")).toBe("10:05");
   });
-  it("shows times over a minute as minutes and seconds", () => {
-    expect(formatRaw(66.5, "s")).toBe("1:06.5");
-    expect(formatRaw(125.4, "s")).toBe("2:05.4");
+  it("shows a stopwatch reading under a minute with its decimal", () => {
+    expect(formatRaw(5.62, "s")).toBe("5.62s");
+    expect(formatRaw(44.5, "s")).toBe("44.5s");
+    expect(formatRaw(30, "s")).toBe("30s");
   });
-  it("rounds reps to whole numbers", () => {
+  it("shows a jump in feet and inches", () => {
+    expect(formatRaw(78, "in")).toBe(`6'6"`);
+    expect(formatRaw(96, "in")).toBe(`8'0"`);
+    expect(formatRaw(11, "in")).toBe(`11"`);
+  });
+  it("rounds reps and distances to whole numbers", () => {
     expect(formatRaw(29, "reps")).toBe("29");
+    expect(formatRaw(280, "ft")).toBe("280 ft");
+    expect(formatRaw(182.4, "lb")).toBe("182 lb");
   });
-  it("keeps a decimal on kilos and points", () => {
-    expect(formatRaw(57.5, "kg")).toBe("57.5 kg");
+  it("keeps a decimal on points", () => {
     expect(formatRaw(9.5, "points")).toBe("9.5");
   });
 });
@@ -83,5 +92,24 @@ describe("ordinal", () => {
     expect(ordinal(12)).toBe("12th");
     expect(ordinal(13)).toBe("13th");
     expect(ordinal(21)).toBe("21st");
+  });
+});
+
+describe("formatRawDelta", () => {
+  it("shows a big time change as minutes and seconds", () => {
+    // A 148-second mile improvement read as "-148.0" before. Nobody thinks
+    // about a mile that way.
+    expect(formatRawDelta(-148, "s")).toBe("-2:28");
+    expect(formatRawDelta(75, "s")).toBe("+1:15");
+  });
+  it("keeps a small time change on the stopwatch scale", () => {
+    expect(formatRawDelta(-0.34, "s")).toBe("-0.34s");
+    expect(formatRawDelta(12.5, "s")).toBe("+12.5s");
+  });
+  it("uses each unit's own shape", () => {
+    expect(formatRawDelta(3, "reps")).toBe("+3");
+    expect(formatRawDelta(-9, "in")).toBe(`-9"`);
+    expect(formatRawDelta(50, "ft")).toBe("+50 ft");
+    expect(formatRawDelta(-0.5, "points")).toBe("-0.5");
   });
 });
