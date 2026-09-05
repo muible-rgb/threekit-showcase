@@ -52,11 +52,6 @@ export function RestTimer({
         <h1 className="mt-2 text-2xl font-bold tracking-tight">
           {justFinished.shortName} recorded
         </h1>
-        <p className="mt-1 text-sm text-paper-dim">
-          {seconds >= 300
-            ? "Five minutes here. The next one needs you fresh."
-            : "Take the rest. It is part of the protocol."}
-        </p>
       </div>
 
       <div className="flex flex-col items-center">
@@ -89,14 +84,9 @@ export function RestTimer({
 
       <div className="space-y-2">
         <Button size="lg" className="w-full justify-between" onClick={onContinue}>
-          <span>{ready ? `Start ${next.shortName}` : "Skip the rest, start now"}</span>
+          <span>{ready ? `Start ${next.shortName}` : "Skip the rest"}</span>
           <ArrowRight size={20} />
         </Button>
-        {!ready && (
-          <p className="text-center text-xs text-paper-faint">
-            Going early makes this result harder to compare with your last one.
-          </p>
-        )}
       </div>
     </div>
   );

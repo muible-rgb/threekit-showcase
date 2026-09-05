@@ -24,7 +24,7 @@ import { bandFor } from "@/lib/scoring/composite";
 export function CapacityRadar({
   tests,
   previous,
-  height = 300,
+  height = 280,
 }: {
   tests: TestPercentile[];
   previous?: TestPercentile[];
@@ -44,11 +44,11 @@ export function CapacityRadar({
   return (
     <div style={{ height }} className="w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data} outerRadius="72%">
+        <RadarChart data={data} outerRadius="62%" margin={{ top: 6, right: 6, bottom: 6, left: 6 }}>
           <PolarGrid stroke="#232932" strokeWidth={1} />
           <PolarAngleAxis
             dataKey="axis"
-            tick={{ fill: "#98a2b3", fontSize: 10, fontWeight: 600 }}
+            tick={{ fill: "#98a2b3", fontSize: 9, fontWeight: 600 }}
           />
           <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
 

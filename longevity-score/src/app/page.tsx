@@ -10,13 +10,7 @@ import { useResultsFor, useStore } from "@/lib/data/store-context";
 import { historyFor } from "@/lib/batteries";
 import { ageAt } from "@/lib/scoring/cohort";
 import { retestDelta } from "@/lib/scoring/board";
-import {
-  ageBandLabel,
-  betterThanSentence,
-  formatDate,
-  formatSigned,
-  oneDecimal,
-} from "@/lib/utils";
+import { betterThanSentence, formatDate, formatSigned, oneDecimal } from "@/lib/utils";
 import { ProfileGate } from "@/components/profile-gate";
 import { DemoBanner } from "@/components/demo-banner";
 
@@ -38,17 +32,12 @@ export default function HomePage() {
 
   return (
     <div className="space-y-5">
-      <p className="text-sm text-paper-dim">
-        {latest ? `Hello ${me.name.split(" ")[0]}.` : `Welcome, ${me.name.split(" ")[0]}.`}
-      </p>
-
       {latest ? (
         <ScoreHeroCard
           composite={latest.score.composite!}
           band={latest.score.band!}
           sex={me.sex}
           age={ageAt(me.birthDate, latest.completedAt)}
-          completedAt={latest.completedAt}
           fitnessAge={latest.score.fitnessAge}
           delta={previous ? retestDelta(latest.score, previous.score) : null}
         />
@@ -62,8 +51,7 @@ export default function HomePage() {
             <div>
               <p className="text-sm font-semibold">Battery in progress</p>
               <p className="mt-0.5 text-xs text-paper-dim">
-                {inProgress.score.testsCompleted} of {inProgress.score.testsRequired}{" "}
-                tests done. No composite until all ten are in.
+                {inProgress.score.testsCompleted} of {inProgress.score.testsRequired} done.
               </p>
             </div>
             <Link href="/test">
@@ -96,12 +84,6 @@ export default function HomePage() {
 
       <DemoBanner />
 
-      <p className="pt-2 text-center text-xs leading-relaxed text-paper-faint">
-        Your score is graded against people your own age and sex.{" "}
-        <Link href="/methodology" className="text-paper-dim underline underline-offset-2">
-          How it works
-        </Link>
-      </p>
     </div>
   );
 }
@@ -111,7 +93,6 @@ function ScoreHeroCard({
   band,
   sex,
   age,
-  completedAt,
   fitnessAge,
   delta,
 }: {
@@ -119,8 +100,7 @@ function ScoreHeroCard({
   band: "Elite" | "Strong" | "Solid" | "Below average" | "At risk";
   sex: "M" | "F";
   age: number;
-  completedAt: string;
-  fitnessAge: { years: number; approx: boolean } | null;
+  fitnessAge: { years: number; approx: boolean; outOfRangeCount: number } | null;
   delta: ReturnType<typeof retestDelta>;
 }) {
   return (
@@ -137,43 +117,47 @@ function ScoreHeroCard({
 
           <p className="mt-3 text-sm text-paper-dim">
             {betterThanSentence(composite, sex)}
+            {delta?.compositeDelta != null && (
+              <span
+                className={
+                  delta.compositeDelta >= 0
+                    ? "tnum font-semibold text-up"
+                    : "tnum font-semibold text-down"
+                }
+              >
+                {"  "}
+                {formatSigned(delta.compositeDelta)}
+              </span>
+            )}
           </p>
-          {delta?.compositeDelta != null && (
-            <p
-              className={
-                delta.compositeDelta >= 0
-                  ? "tnum mt-1 text-sm font-semibold text-up"
-                  : "tnum mt-1 text-sm font-semibold text-down"
-              }
-            >
-              {formatSigned(delta.compositeDelta)} since your last battery
-            </p>
-          )}
 
           <div className="mt-5 flex items-end justify-between border-t border-ink-line-soft pt-4">
-            <div>
-              <p className="text-[11px] uppercase tracking-wider text-paper-faint">
-                Fitness age
-              </p>
-              <p className="tnum mt-0.5 text-2xl font-bold">
-                {fitnessAge ? Math.round(fitnessAge.years) : "-"}
-                {fitnessAge?.approx && (
-                  <span className="ml-1.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-below">
-                    approx
-                  </span>
-                )}
-              </p>
-              <p className="mt-0.5 text-xs text-paper-faint">Actual {age}</p>
+            <div className="flex items-end gap-6">
+              <div>
+                <p className="text-[11px] uppercase tracking-wider text-paper-faint">
+                  Fitness age
+                </p>
+                <p className="tnum mt-0.5 text-2xl font-bold">
+                  {fitnessAge
+                    ? `${fitnessAge.outOfRangeCount >= 5 ? "\u2264" : ""}${Math.round(fitnessAge.years)}`
+                    : "-"}
+                  {fitnessAge?.approx && (
+                    <span className="ml-1 align-middle text-[10px] font-semibold uppercase tracking-wider text-below">
+                      approx
+                    </span>
+                  )}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-wider text-paper-faint">
+                  Actual
+                </p>
+                <p className="tnum mt-0.5 text-2xl font-bold text-paper-dim">{age}</p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-[11px] uppercase tracking-wider text-paper-faint">
-                {ageBandLabel(age, sex)}
-              </p>
-              <p className="mt-0.5 text-xs text-paper-dim">{formatDate(completedAt)}</p>
-              <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-signal">
-                Full breakdown <ArrowRight size={13} />
-              </p>
-            </div>
+            <p className="inline-flex items-center gap-1 pb-1 text-xs font-semibold text-signal">
+              Breakdown <ArrowRight size={13} />
+            </p>
           </div>
         </CardBody>
       </Card>
@@ -187,19 +171,10 @@ function FirstRunCard() {
       <CardHeader>
         <CardTitle>No score yet</CardTitle>
       </CardHeader>
-      <CardBody className="space-y-3 text-sm leading-relaxed text-paper-dim">
-        <p>
-          Ten tests, in a fixed order, ending with a 12-minute run. Grip, balance,
-          mobility, push-ups, jump, hang, carry, wall sit, 400m, Cooper.
-        </p>
-        <p>
-          Each result is graded against people of your age and sex, not against a
-          flat standard. Your score is the average of those ten percentiles.
-        </p>
-        <p>
-          Budget about 90 minutes and bring a friend to count for you. The whole
-          thing works with no signal.
-        </p>
+      <CardBody className="space-y-2 text-sm text-paper-dim">
+        <p>Ten tests, fixed order, ending with a 12-minute run.</p>
+        <p>Each one graded against people your age and sex.</p>
+        <p>About 90 minutes. Bring someone to count.</p>
       </CardBody>
     </Card>
   );
@@ -223,8 +198,9 @@ function RecentHistory({ history }: { history: ReturnType<typeof historyFor> }) 
             <div>
               <p className="text-sm font-medium">{formatDate(a.completedAt)}</p>
               <p className="text-xs text-paper-faint">
-                {a.sessionId ? "Crew session" : "Solo"} -{" "}
-                {a.score.testsCompleted}/{a.score.testsRequired} tests
+                {a.sessionId ? "Crew session" : "Solo"}
+                {a.score.composite === null &&
+                  ` - ${a.score.testsCompleted}/${a.score.testsRequired}`}
               </p>
             </div>
             {a.score.composite !== null ? (
@@ -235,9 +211,7 @@ function RecentHistory({ history }: { history: ReturnType<typeof historyFor> }) 
                 <BandBadge band={a.score.band!} size="sm" />
               </div>
             ) : (
-              <span className="text-xs font-medium text-paper-faint">
-                Incomplete - no score
-              </span>
+              <span className="text-xs font-medium text-paper-faint">No score</span>
             )}
           </div>
         ))}

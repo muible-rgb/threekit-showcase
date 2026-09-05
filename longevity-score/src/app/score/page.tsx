@@ -54,7 +54,7 @@ export default function ScorePage() {
   const sessionUnscored = unscored.filter((m) => m.sessionId === latest.sessionId);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <Card>
         <CardBody className="pt-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-paper-faint">
@@ -67,51 +67,34 @@ export default function ScorePage() {
 
           <p className="mt-3 text-sm text-paper-dim">
             {betterThanSentence(latest.score.composite!, me.sex)}
+            {delta?.compositeDelta != null && (
+              <span
+                className={
+                  delta.compositeDelta >= 0
+                    ? "tnum font-semibold text-up"
+                    : "tnum font-semibold text-down"
+                }
+              >
+                {"  "}
+                {formatSigned(delta.compositeDelta)}
+              </span>
+            )}
           </p>
 
-          {delta?.compositeDelta != null && (
-            <p
-              className={
-                delta.compositeDelta >= 0
-                  ? "tnum mt-1 text-sm font-semibold text-up"
-                  : "tnum mt-1 text-sm font-semibold text-down"
-              }
-            >
-              {formatSigned(delta.compositeDelta)} since {formatDate(previous!.completedAt)}
-            </p>
-          )}
+          <FitnessAgeRow attempt={latest} actualAge={age} />
 
-          {delta?.bandChanged && (
-            <p className="mt-3 rounded-xl bg-signal/10 px-3 py-2 text-sm font-medium text-signal ring-1 ring-signal/25">
-              {delta.previousBand} to {delta.currentBand}.
-            </p>
-          )}
-
-          <div className="mt-5 flex flex-wrap gap-2 border-t border-ink-line-soft pt-4">
-            <Chip>{ageBandLabel(age, me.sex)}</Chip>
-            <Chip>{formatDate(latest.completedAt)}</Chip>
-            <Chip>{latest.sessionId ? "Crew session" : "Solo"}</Chip>
-            <Chip>Norms {latest.score.normsVersion}</Chip>
-          </div>
+          <p className="mt-3 text-xs text-paper-faint">
+            {ageBandLabel(age, me.sex)} - {formatDate(latest.completedAt)}
+          </p>
         </CardBody>
       </Card>
 
-      <FitnessAgeCard attempt={latest} actualAge={age} />
-
       <Card>
-        <CardHeader>
-          <CardTitle>Ten capacities</CardTitle>
-        </CardHeader>
-        <CardBody>
+        <CardBody className="pt-5">
           <CapacityRadar
             tests={latest.score.tests}
             previous={previous?.score.tests}
           />
-          <p className="text-center text-xs text-paper-faint">
-            Every axis is a percentile against {me.sex === "M" ? "men" : "women"} aged{" "}
-            {Math.floor(age / 5) * 5}-{Math.floor(age / 5) * 5 + 4}.
-            {previous && " Dashed line is your last battery."}
-          </p>
         </CardBody>
       </Card>
 
@@ -119,26 +102,12 @@ export default function ScorePage() {
 
       {sessionUnscored.length > 0 && <UnscoredSection measurements={sessionUnscored} />}
 
-      <ShareCard
-        name={me.name}
-        sex={me.sex}
-        age={age}
-        attempt={latest}
-      />
-
-      <p className="pb-4 text-center text-xs leading-relaxed text-paper-faint">
-        Percentiles come from published norms where they exist and from clearly
-        labelled provisional curves where they do not.{" "}
-        <Link href="/methodology" className="text-paper-dim underline underline-offset-2">
-          Every source is listed here
-        </Link>
-        .
-      </p>
+      <ShareCard name={me.name} sex={me.sex} age={age} attempt={latest} />
     </div>
   );
 }
 
-function FitnessAgeCard({
+function FitnessAgeRow({
   attempt,
   actualAge,
 }: {
@@ -149,47 +118,36 @@ function FitnessAgeCard({
   if (!fa) return null;
 
   const years = Math.round(fa.years);
-  const younger = actualAge - years;
-  // When most tests clamped, the number is a floor rather than an estimate,
-  // and saying "22" flat would be overclaiming.
+  // Most tests clamped: the number is a floor, not an estimate. Saying "28"
+  // flat would be overclaiming. The reason lives on /methodology.
   const floored = fa.outOfRangeCount >= 5;
 
   return (
-    <Card>
-      <CardBody className="flex items-center justify-between pt-5">
-        <div>
-          <p className="text-[11px] uppercase tracking-wider text-paper-faint">
-            Fitness age
-          </p>
-          <p className="tnum mt-1 text-4xl font-bold">
-            {floored ? `${years} or under` : years}
-          </p>
-          <p className="mt-1 text-xs text-paper-dim">
-            {younger > 0
-              ? `${younger} year${younger === 1 ? "" : "s"} under your actual age of ${actualAge}.`
-              : younger === 0
-                ? `Level with your actual age of ${actualAge}.`
-                : `${-younger} year${younger === -1 ? "" : "s"} over your actual age of ${actualAge}.`}
-          </p>
-        </div>
-        {fa.approx && (
-          <span className="rounded-lg bg-below/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-below ring-1 ring-below/30">
-            approx
-          </span>
-        )}
-      </CardBody>
-      {(fa.approx || floored) && (
-        <CardBody className="pt-0">
-          <p className="text-xs leading-relaxed text-paper-faint">
-            {fa.outOfRangeCount} of your {attempt.score.tests.length} results are
-            better than the youngest cohort the norms cover, so this is a floor
-            rather than an estimate. Published norms describe the general
-            population, and a trained adult often clears the median{" "}
-            {years}-year-old.
-          </p>
-        </CardBody>
-      )}
-    </Card>
+    <div className="mt-5 flex items-end gap-6 border-t border-ink-line-soft pt-4">
+      <div>
+        <p className="text-[11px] uppercase tracking-wider text-paper-faint">
+          Fitness age
+        </p>
+        <p className="tnum mt-0.5 text-3xl font-bold">
+          {floored ? `\u2264${years}` : years}
+          {fa.approx && (
+            <Link
+              href="/methodology#fitness-age"
+              title="More than three tests fall outside the norms range"
+              className="ml-1.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-below"
+            >
+              approx
+            </Link>
+          )}
+        </p>
+      </div>
+      <div>
+        <p className="text-[11px] uppercase tracking-wider text-paper-faint">
+          Actual
+        </p>
+        <p className="tnum mt-0.5 text-3xl font-bold text-paper-dim">{actualAge}</p>
+      </div>
+    </div>
   );
 }
 
@@ -289,11 +247,7 @@ function UnscoredSection({
         />
       </summary>
       <div className="mt-2 rounded-2xl bg-ink-raised px-5 py-4 ring-1 ring-ink-line">
-        <p className="text-xs leading-relaxed text-paper-faint">
-          Kept out of the composite on purpose. Useful to track, not gradeable
-          against norms we would stand behind.
-        </p>
-        <dl className="mt-4 space-y-3">
+        <dl className="space-y-3">
           {UNSCORED_MEASUREMENTS.map((field) => {
             const value = byKind.get(field.kind);
             if (value === undefined) return null;
@@ -368,22 +322,17 @@ function ShareCard({
   }
 
   return (
-    <div className="grid gap-2">
-      <Button size="lg" variant="secondary" className="w-full" onClick={share}>
-        {copied ? (
-          <>
-            <Check size={18} /> Link copied
-          </>
-        ) : (
-          <>
-            <Share2 size={18} /> Share your score card
-          </>
-        )}
-      </Button>
-      <Link href={`/s/${token}`} className="text-center text-xs text-paper-faint underline underline-offset-2">
-        Preview the public page
-      </Link>
-    </div>
+    <Button size="lg" variant="secondary" className="w-full" onClick={share}>
+      {copied ? (
+        <>
+          <Check size={18} /> Link copied
+        </>
+      ) : (
+        <>
+          <Share2 size={18} /> Share
+        </>
+      )}
+    </Button>
   );
 }
 
@@ -396,11 +345,9 @@ function NoScoreYet({ inProgress }: { inProgress: BatteryAttempt | null }) {
       <CardBody className="space-y-4">
         {inProgress ? (
           <>
-            <p className="text-sm leading-relaxed text-paper-dim">
-              You are {inProgress.score.testsCompleted} of{" "}
-              {inProgress.score.testsRequired} tests in. There is no composite
-              until all ten are recorded - a partial score would just let people
-              skip the test they are worst at.
+            <p className="text-sm text-paper-dim">
+              {inProgress.score.testsCompleted} of{" "}
+              {inProgress.score.testsRequired} done. No score until all ten are in.
             </p>
             <div className="flex flex-wrap gap-1.5">
               {inProgress.score.missing.map((slug) => (
@@ -413,8 +360,8 @@ function NoScoreYet({ inProgress }: { inProgress: BatteryAttempt | null }) {
           </>
         ) : (
           <>
-            <p className="text-sm leading-relaxed text-paper-dim">
-              Run the ten-test battery and your score shows up here.
+            <p className="text-sm text-paper-dim">
+              Run the battery and your score lands here.
             </p>
             <Link href="/test">
               <Button className="w-full">Start a test</Button>

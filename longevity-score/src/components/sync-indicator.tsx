@@ -39,10 +39,6 @@ export function SyncIndicator({ className }: { className?: string }) {
       {expanded && (
         <div className="absolute right-0 top-full z-30 mt-2 w-64 rounded-xl bg-ink-raised p-3 text-xs leading-relaxed text-paper-dim shadow-xl ring-1 ring-ink-line">
           {sync.message}
-          <p className="mt-2 text-paper-faint">
-            Results are written to this device the moment you tap Save. Nothing
-            waits on the network.
-          </p>
         </div>
       )}
     </div>

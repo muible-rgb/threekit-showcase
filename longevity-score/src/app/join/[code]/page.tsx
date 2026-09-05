@@ -80,8 +80,7 @@ export default function JoinPage() {
               {code}
             </p>
             <p className="mt-3 text-sm text-paper-dim">
-              No session with that code. Codes are six characters and never use
-              O, 0, I or 1 - check it with whoever is hosting.
+              No session with that code.
             </p>
           </CardBody>
         </Card>
@@ -103,8 +102,7 @@ export default function JoinPage() {
 
             {session.status === "locked" ? (
               <p className="rounded-xl bg-ink px-4 py-3 text-sm text-paper-dim ring-1 ring-ink-line">
-                This session is locked. The board is final and no new results can
-                be added.
+                Locked. The board is final.
               </p>
             ) : (
               <>
@@ -139,10 +137,8 @@ export default function JoinPage() {
                   onChange={(e) => setBirthDate(e.target.value)}
                   className="h-12 w-full rounded-xl bg-ink px-4 ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
                 />
-                <p className="text-xs leading-relaxed text-paper-faint">
-                  Your results are graded against people of your own age and sex.
-                  That is the only reason these are asked for. You can attach an
-                  account afterwards.
+                <p className="text-xs text-paper-faint">
+                  Needed to score you against your own age and sex.
                 </p>
                 <Button
                   size="lg"

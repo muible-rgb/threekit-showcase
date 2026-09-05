@@ -67,8 +67,7 @@ export function AddGuestForm({
           className="h-12 w-full rounded-xl bg-ink px-4 ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
         />
         <p className="text-xs text-paper-faint">
-          Needed to pick their cohort. They can claim these results by email once
-          you lock the session.
+          They can claim these results by email once you lock.
         </p>
         <div className="flex gap-3">
           <Button variant="ghost" className="flex-1" onClick={onCancel}>

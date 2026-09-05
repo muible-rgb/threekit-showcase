@@ -29,13 +29,7 @@ export default function CrewPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Crew</h1>
-        <p className="mt-1 text-sm text-paper-dim">
-          Test together, compare on a shared board. Crew rank is a different
-          number from your Longevity Score, and they never get mixed.
-        </p>
-      </div>
+      <h1 className="text-2xl font-bold tracking-tight">Crew</h1>
 
       {mode === "idle" && (
         <div className="grid gap-3">
@@ -90,9 +84,7 @@ export default function CrewPage() {
         </CardHeader>
         <CardBody className="space-y-0">
           {sessions.length === 0 && (
-            <p className="py-2 text-sm text-paper-faint">
-              Nothing yet. Host one, or join with a six-character code.
-            </p>
+            <p className="py-2 text-sm text-paper-faint">Nothing yet.</p>
           )}
           {sessions.map((s) => {
             const count =

@@ -22,10 +22,8 @@ export function DemoBanner() {
       <p className="flex items-center gap-2 text-sm font-semibold text-solid">
         <FlaskConical size={15} /> Demo data
       </p>
-      <p className="mt-1.5 text-xs leading-relaxed text-paper-dim">
-        Everything on screen is a made-up crew of eight over two quarterly
-        sessions, so you can see how each screen behaves before you test. Clear
-        it when you want to start your own.
+      <p className="mt-1 text-xs text-paper-dim">
+        A made-up crew of eight, so nothing is empty before you test.
       </p>
       <div className="mt-3 flex gap-2">
         <Button
@@ -37,7 +35,7 @@ export function DemoBanner() {
             refresh();
           }}
         >
-          Clear it, this is me now
+          Clear it
         </Button>
         <Button
           size="sm"

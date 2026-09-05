@@ -28,10 +28,9 @@ export function ClaimPrompt({
         <CardTitle>Claim your results</CardTitle>
       </CardHeader>
       <CardBody className="space-y-4">
-        <p className="text-xs leading-relaxed text-paper-dim">
+        <p className="text-xs text-paper-dim">
           {guests.length === 1 ? "One person" : `${guests.length} people`} tested
-          today without an account. Enter an email and they get a link that
-          attaches today&apos;s results to their own history.
+          without an account. Send them a link.
         </p>
 
         {guests.map((guest) => (

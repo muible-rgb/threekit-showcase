@@ -107,10 +107,6 @@ export default async function PublicScorePage({ params }: Props) {
       </div>
 
       <div className="mt-6 space-y-3 text-center">
-        <p className="text-xs leading-relaxed text-paper-faint">
-          Ten tests, each graded against published norms for the same age and
-          sex. The score is the average of the ten percentiles.
-        </p>
         <Link
           href="/"
           className="inline-flex h-12 items-center justify-center rounded-xl bg-signal px-6 font-semibold text-ink"

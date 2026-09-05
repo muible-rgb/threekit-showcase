@@ -23,7 +23,7 @@ import { useDb, useStore } from "@/lib/data/store-context";
 import { OPEN_V1_TEST_SLUGS } from "@/lib/battery";
 import { priorCompleteBefore, sessionScoreFor } from "@/lib/batteries";
 import { liveBoard, mostImproved, rankBoard } from "@/lib/scoring/board";
-import { formatDate, oneDecimal, ordinal } from "@/lib/utils";
+import { formatDate, oneDecimal } from "@/lib/utils";
 import type { BoardEntry } from "@/lib/scoring/board";
 
 export default function SessionPage() {
@@ -153,10 +153,6 @@ export default function SessionPage() {
                 {copied ? "Copied" : "Share link"}
               </Button>
             </div>
-            <p className="mt-2 text-xs text-paper-faint">
-              Anyone with the link can join, enter a name and birth date, and be
-              scored. No account needed until afterwards.
-            </p>
           </CardBody>
         </Card>
       )}
@@ -178,7 +174,7 @@ export default function SessionPage() {
               onClick={() => setAddingGuest(true)}
             >
               <span className="flex items-center gap-2">
-                <UserPlus size={20} /> Add someone without the app
+                <UserPlus size={20} /> Add someone
               </span>
             </Button>
           )}
@@ -217,14 +213,12 @@ export default function SessionPage() {
         <Card className="ring-ink-line">
           <CardBody className="pt-5">
             <p className="text-sm font-semibold">Lock the session</p>
-            <p className="mt-1 text-xs leading-relaxed text-paper-dim">
-              Freezes the board and works out the final placings, the tie-break
-              and most improved. Results already recorded stay exactly as they
-              are - locking does not change anyone&apos;s score.
+            <p className="mt-1 text-xs text-paper-dim">
+              Freezes the board. No score changes.
             </p>
             <Button
               variant="secondary"
-              className="mt-4 w-full"
+              className="mt-3 w-full"
               onClick={async () => {
                 await store.lockSession(session.id);
                 refresh();
@@ -236,11 +230,6 @@ export default function SessionPage() {
         </Card>
       )}
 
-      <p className="pb-4 text-center text-xs text-paper-faint">
-        Board placings compare this crew to each other. Your Longevity Score
-        compares you to published population norms. Two different denominators,
-        never blended.
-      </p>
     </div>
   );
 }
@@ -260,13 +249,11 @@ function LiveBoard({
     <Card>
       <CardHeader>
         <CardTitle>Live board</CardTitle>
+        <p className="mt-1 text-[11px] text-paper-faint">
+          Running average so far. Not a Longevity Score.
+        </p>
       </CardHeader>
       <CardBody className="space-y-0">
-        <p className="pb-3 text-xs leading-relaxed text-paper-faint">
-          Sorted by how far through everyone is. The number on the right is a
-          running average of the tests done so far - it is not a Longevity
-          Score, and it will move as the harder tests land.
-        </p>
         {rows.map((row) => (
           <div
             key={row.participantId}
@@ -337,16 +324,14 @@ function FinalBoard({ rows }: { rows: ReturnType<typeof rankBoard> }) {
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{row.displayName}</p>
-              {row.score.composite === null ? (
+              {row.score.composite === null && (
                 <p className="text-xs text-paper-faint">
-                  {row.score.testsCompleted}/{row.score.testsRequired} tests - no
-                  score
+                  {row.score.testsCompleted}/{row.score.testsRequired} - no score
                 </p>
-              ) : (
+              )}
+              {row.tieBroken && (
                 <p className="text-xs text-paper-faint">
-                  {row.tieBroken
-                    ? "Tie on composite, split on best single test"
-                    : `${ordinal(row.rank)} on composite`}
+                  Tie, split on best single test
                 </p>
               )}
             </div>
@@ -376,8 +361,7 @@ function MostImprovedBoard({ result }: { result: ReturnType<typeof mostImproved>
       <CardBody className="space-y-0">
         {result.ranked.length === 0 && (
           <p className="pb-2 text-sm text-paper-faint">
-            Nobody has a prior completed battery to compare against yet. Next
-            quarter this board fills up.
+            Nothing to compare against yet. Next quarter.
           </p>
         )}
         {result.ranked.map((row) => (
@@ -408,10 +392,6 @@ function MostImprovedBoard({ result }: { result: ReturnType<typeof mostImproved>
           <div className="mt-4 border-t border-ink-line-soft pt-3">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-paper-faint">
               First battery
-            </p>
-            <p className="mt-1 text-xs leading-relaxed text-paper-dim">
-              Not ranked here because there is nothing to improve on yet, which
-              is different from finishing last.
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {result.firstTimers.map((f) => (

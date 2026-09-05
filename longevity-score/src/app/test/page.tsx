@@ -268,8 +268,7 @@ function TestMode() {
 
         {doneSlugs.has(test.slug) && (
           <p className="mt-4 flex items-center gap-1.5 text-xs text-paper-faint">
-            <Check size={13} className="text-signal" />
-            Already recorded. Saving again replaces it - the old entry is kept.
+            <Check size={13} className="text-signal" /> Already recorded
           </p>
         )}
       </div>
@@ -301,7 +300,7 @@ function TestMode() {
             onClick={skip}
             className="flex items-center gap-1 py-2 text-xs text-paper-faint hover:text-paper-dim"
           >
-            Skip - no score without all ten <SkipForward size={14} />
+            Skip <SkipForward size={14} />
           </button>
         </div>
       </div>

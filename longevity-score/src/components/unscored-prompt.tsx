@@ -52,9 +52,8 @@ export function UnscoredPrompt({
         Warm-down
       </p>
       <h1 className="mt-2 text-2xl font-bold tracking-tight">Three extra numbers</h1>
-      <p className="mt-2 text-sm leading-relaxed text-paper-dim">
-        These are stored and shown on your score, but they are not part of it.
-        There is no age-and-sex norm we trust enough to grade them against.
+      <p className="mt-2 text-sm text-paper-dim">
+        Tracked, not scored.
       </p>
 
       <div className="mt-6 flex-1 space-y-5">

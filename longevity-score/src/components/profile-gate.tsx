@@ -42,9 +42,9 @@ export function ProfileGate({ onDone }: { onDone?: () => void }) {
           <CardTitle>Set up</CardTitle>
         </CardHeader>
         <CardBody className="space-y-5">
-          <p className="text-sm leading-relaxed text-paper-dim">
-            Your score is worked out against people of your own age and sex, so
-            these two are required. Nothing else is.
+          <p className="text-sm text-paper-dim">
+            You are scored against people your own age and sex. That is why
+            these are needed.
           </p>
 
           <label className="block">
@@ -81,9 +81,6 @@ export function ProfileGate({ onDone }: { onDone?: () => void }) {
                 </button>
               ))}
             </div>
-            <p className="mt-1.5 text-xs text-paper-faint">
-              Used only to pick which published norms table applies.
-            </p>
           </div>
 
           <label className="block">
@@ -97,10 +94,6 @@ export function ProfileGate({ onDone }: { onDone?: () => void }) {
               onChange={(e) => setBirthDate(e.target.value)}
               className="mt-1.5 h-12 w-full rounded-xl bg-ink px-4 text-base ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
             />
-            <span className="mt-1.5 block text-xs text-paper-faint">
-              Your age is taken at the time of each test, so a birthday mid-battery
-              does not shift your cohort halfway through.
-            </span>
           </label>
         </CardBody>
       </Card>

@@ -27,10 +27,8 @@ export function BodyweightPrompt({
           Before you start
         </p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight">Bodyweight</h1>
-        <p className="mt-2 text-sm leading-relaxed text-paper-dim">
-          The farmer carry is loaded at half your bodyweight in each hand, so the
-          app needs this to tell you what to pick up. It is not part of your
-          score.
+        <p className="mt-2 text-sm text-paper-dim">
+          Sets your farmer carry load. Not part of your score.
         </p>
       </div>
 
@@ -68,7 +66,7 @@ export function BodyweightPrompt({
           onClick={onSkip}
           className="w-full py-3 text-xs text-paper-faint hover:text-paper-dim"
         >
-          Skip - I will work the carry load out myself
+          Skip
         </button>
       </div>
     </div>
