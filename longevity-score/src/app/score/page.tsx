@@ -284,6 +284,10 @@ function ShareCard({
   attempt: BatteryAttempt;
 }) {
   const [copied, setCopied] = React.useState(false);
+  // Clipboard access is blocked in plenty of real places - an iframe, Safari
+  // without a user-gesture grant, a locked-down browser. Failing silently
+  // leaves someone tapping a dead button, so the link gets shown instead.
+  const [fallbackUrl, setFallbackUrl] = React.useState<string | null>(null);
 
   const token = React.useMemo(() => {
     const payload = buildSharePayload({
@@ -309,30 +313,51 @@ function ShareCard({
         });
         return;
       } catch {
-        // Share sheet dismissed. Fall through to copying.
+        // Share sheet dismissed or unavailable. Fall through to copying.
       }
     }
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      setFallbackUrl(null);
       setTimeout(() => setCopied(false), 2200);
     } catch {
-      setCopied(false);
+      setFallbackUrl(url);
     }
   }
 
   return (
-    <Button size="lg" variant="secondary" className="w-full" onClick={share}>
-      {copied ? (
-        <>
-          <Check size={18} /> Link copied
-        </>
-      ) : (
-        <>
-          <Share2 size={18} /> Share
-        </>
+    <div className="space-y-2">
+      <Button size="lg" variant="secondary" className="w-full" onClick={share}>
+        {copied ? (
+          <>
+            <Check size={18} /> Link copied
+          </>
+        ) : (
+          <>
+            <Share2 size={18} /> Share
+          </>
+        )}
+      </Button>
+
+      {fallbackUrl && (
+        <div className="rounded-xl bg-ink-raised p-3 ring-1 ring-ink-line">
+          <p className="text-xs text-paper-faint">Copy this link</p>
+          <input
+            readOnly
+            value={fallbackUrl}
+            onFocus={(e) => e.currentTarget.select()}
+            className="mt-1.5 w-full rounded-lg bg-ink px-3 py-2 text-xs text-paper-dim ring-1 ring-ink-line-soft"
+          />
+          <Link
+            href={`/s/${token}`}
+            className="mt-2 inline-block text-xs font-semibold text-signal"
+          >
+            Open it here instead
+          </Link>
+        </div>
       )}
-    </Button>
+    </div>
   );
 }
 
