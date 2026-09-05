@@ -329,4 +329,8 @@ export class SupabaseStore implements DataStore {
   async reset(): Promise<void> {
     await this.local.reset();
   }
+
+  async clearDemo(): Promise<void> {
+    await this.local.clearDemo();
+  }
 }

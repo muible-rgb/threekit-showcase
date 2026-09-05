@@ -77,6 +77,11 @@ export class LocalStore implements DataStore {
     }
   }
 
+  /** The first real write means this is no longer a demo. */
+  private endDemo(): void {
+    if (this.db.isDemo) this.db.isDemo = false;
+  }
+
   private persist(): void {
     this.listeners.forEach((fn) => fn());
     if (!this.hasStorage()) return;
@@ -206,6 +211,7 @@ export class LocalStore implements DataStore {
    */
   async addResult(input: Omit<Result, "id">): Promise<Result> {
     const created: Result = { ...input, id: this.newId("r") };
+    this.endDemo();
     this.db.results.push(created);
     this.enqueue({ kind: "result", payload: created });
     this.persist();
@@ -369,6 +375,26 @@ export class LocalStore implements DataStore {
 
   async reset(): Promise<void> {
     this.db = buildSeedDatabase();
+    this.outbox = [];
+    this.persist();
+  }
+
+  /**
+   * Throw the demo dataset away. Separate from reset() on purpose: reset puts
+   * the demo back, this gets rid of it. Someone who has just installed the app
+   * to test on Saturday should not have to scroll past eight strangers.
+   */
+  async clearDemo(): Promise<void> {
+    this.db = {
+      version: 1,
+      isDemo: false,
+      meId: null,
+      participants: [],
+      sessions: [],
+      sessionParticipants: [],
+      results: [],
+      unscored: [],
+    };
     this.outbox = [];
     this.persist();
   }

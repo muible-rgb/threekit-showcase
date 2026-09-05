@@ -250,6 +250,7 @@ export function buildSeedDatabase(): Database {
 
   return {
     version: 1,
+    isDemo: true,
     meId: id("p", "you"),
     participants,
     sessions,

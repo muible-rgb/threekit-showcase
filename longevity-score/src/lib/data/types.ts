@@ -57,6 +57,12 @@ export interface UnscoredMeasurement {
 
 export interface Database {
   version: number;
+  /**
+   * True while the database is still the shipped demo dataset. Set at seed
+   * time and cleared the moment someone starts their own data, so the app can
+   * be honest on screen about whose numbers are on display.
+   */
+  isDemo?: boolean;
   meId: string | null;
   participants: Participant[];
   sessions: CrewSession[];
@@ -135,6 +141,8 @@ export interface DataStore {
   syncStatus(): Promise<SyncStatus>;
   flush(): Promise<SyncStatus>;
 
-  /** Wipe everything and re-seed. Used by the "reset demo data" control. */
+  /** Wipe everything and re-seed the demo dataset. */
   reset(): Promise<void>;
+  /** Throw the demo dataset away and start empty. */
+  clearDemo(): Promise<void>;
 }

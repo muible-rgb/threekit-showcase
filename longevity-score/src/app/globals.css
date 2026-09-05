@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/*
+ * Built for a phone held at arm's length in a park in daylight, by someone
+ * who is out of breath. That drives most of what follows: dark ground so the
+ * screen is readable in sun without blasting white, oversized numerals,
+ * touch targets that survive shaky hands, and no thin grey-on-grey type.
+ */
+
+@theme {
+  --color-ink: #0a0c0f;
+  --color-ink-raised: #14181e;
+  --color-ink-line: #232932;
+  --color-ink-line-soft: #1a1f26;
+
+  --color-paper: #f2f4f7;
+  --color-paper-dim: #98a2b3;
+  --color-paper-faint: #667085;
+
+  --color-signal: #d6ff3f;
+  --color-signal-dim: #a8cc22;
+
+  --color-elite: #d6ff3f;
+  --color-strong: #6ee7a8;
+  --color-solid: #7cc3ff;
+  --color-below: #ffb86b;
+  --color-risk: #ff7a7a;
+
+  --color-up: #6ee7a8;
+  --color-down: #ff7a7a;
+
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-display);
+  /* Nobody should be able to accidentally scroll the page sideways mid-test. */
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+}
+
+/* Tabular figures everywhere a number can change, so digits do not jitter. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* The composite. One job: be readable across a park bench. */
+.score-hero {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+}
+
+.hairline {
+  border-color: var(--color-ink-line);
+}
+
+/* Safe-area padding so the sticky Save button clears the home indicator. */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgb(214 255 63 / 0.45); }
+  70% { box-shadow: 0 0 0 18px rgb(214 255 63 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(214 255 63 / 0); }
+}
+.running {
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .running {
+    animation: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Recharts leaves a focus outline on the svg wrapper; it is not focusable. */
+.recharts-wrapper:focus {
+  outline: none;
+}
