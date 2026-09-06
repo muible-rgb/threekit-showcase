@@ -17,7 +17,6 @@ import { ageAt } from "@/lib/scoring/cohort";
 import {
   BAND_LABELS,
   EMPTY,
-  ageBandLabel,
   cn,
   formatDate,
   formatResult,
@@ -83,7 +82,7 @@ export default function DeepDivePage() {
       <header className="border-b border-rule-2 pb-4 pt-4">
         <h1 className="name text-[22px]">You</h1>
         <p className="meta mt-1">
-          {ageBandLabel(age, me.sex)}
+          vs {me.sex === "M" ? "men" : "women"} age {age}
           {card!.updatedAt ? ` · ${formatDate(card!.updatedAt)}` : ""}
         </p>
       </header>

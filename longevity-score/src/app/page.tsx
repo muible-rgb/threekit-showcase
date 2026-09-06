@@ -23,7 +23,6 @@ import {
   BAND_LABELS,
   COMPOSITE_CAPTION,
   EMPTY,
-  ageBandLabel,
   formatDate,
   formatRawDelta,
   formatResult,
@@ -112,8 +111,7 @@ export default function ScorecardPage() {
 
         <div className="mt-4 flex gap-6">
           <Stat label="Fitness age" value={fitnessAgeText(score)} />
-          <Stat label="Age" value={String(age)} />
-          <Stat label="Cohort" value={ageBandLabel(age, me.sex)} />
+          <Stat label="Scored against" value={`${me.sex === "M" ? "Men" : "Women"} ${age}`} />
         </div>
       </header>
 
