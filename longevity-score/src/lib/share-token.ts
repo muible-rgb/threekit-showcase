@@ -26,6 +26,8 @@ export interface SharePayload {
   a: number;
   /** Composite, one decimal. A mean of percentiles, not a percentile. */
   c: number;
+  /** Estimated population percentile of the composite, or null. */
+  pp?: number | null;
   /** Fitness age, or null. */
   f: number | null;
   /** True when fitness age is approximate. */
@@ -79,6 +81,7 @@ export function buildSharePayload(input: {
     s: input.sex,
     a: Math.floor(input.age / 5) * 5,
     c: input.score.composite,
+    pp: input.score.populationPercentile,
     f: input.score.fitnessAge ? Math.round(input.score.fitnessAge.years) : null,
     fa: input.score.fitnessAge?.approx ?? false,
     t: Math.floor(Date.parse(input.completedAt) / 1000),
@@ -91,6 +94,7 @@ export interface DecodedShare {
   sex: Sex;
   ageBand: string;
   composite: number;
+  populationPercentile: number | null;
   band: BandLabel;
   fitnessAge: number | null;
   fitnessAgeApprox: boolean;
@@ -143,6 +147,8 @@ export function parseShareToken(token: string): DecodedShare | null {
     sex: payload.s,
     ageBand: `${payload.s} ${ageMin}-${ageMin + 4}`,
     composite: payload.c,
+    populationPercentile:
+      typeof payload.pp === "number" && payload.pp >= 0 && payload.pp <= 100 ? payload.pp : null,
     band: bandFor(payload.c),
     fitnessAge:
       typeof payload.f === "number" && payload.f > 0 && payload.f < 120 ? payload.f : null,

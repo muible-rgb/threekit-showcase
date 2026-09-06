@@ -4,15 +4,15 @@ import * as React from "react";
 import Link from "next/link";
 import { Register } from "@/components/register";
 import { SectionLabel } from "@/components/ui/row";
-import { useResultsFor, useStore } from "@/lib/data/store-context";
-import { currentCard, historyFor, previousCard } from "@/lib/batteries";
+import { useDb, useResultsFor, useStore } from "@/lib/data/store-context";
+import { currentCard, historyFor, previousCard, boardEntries } from "@/lib/batteries";
 import {
   BATTERY_TEST_COUNT,
   CARRY_LOAD_TOLERANCE,
   carryLoadDrift,
   testBySlug,
 } from "@/lib/battery";
-import { retestDelta } from "@/lib/scoring/board";
+import { retestDelta, appStanding } from "@/lib/scoring/board";
 import { ageAt } from "@/lib/scoring/cohort";
 import {
   BAND_LABELS,
@@ -23,6 +23,7 @@ import {
   formatRawDelta,
   formatSigned,
   oneDecimal,
+  ordinal,
   rawImproved,
 } from "@/lib/utils";
 
@@ -48,6 +49,11 @@ export default function DeepDivePage() {
   const history = React.useMemo(
     () => (me ? historyFor(me, results) : null),
     [me, results],
+  );
+  const db = useDb();
+  const standing = React.useMemo(
+    () => (me && db ? appStanding(me.id, boardEntries(db)) : null),
+    [me, db],
   );
 
   if (!ready) return null;
@@ -161,6 +167,24 @@ export default function DeepDivePage() {
 
       <SectionLabel>Read</SectionLabel>
       <div className="hairline-grid grid-cols-2">
+        <Cell
+          label="Population"
+          value={
+            score.populationPercentile !== null
+              ? ordinal(Math.round(score.populationPercentile))
+              : EMPTY
+          }
+          note={
+            score.populationPercentile !== null
+              ? `est. percentile, ${me.sex === "M" ? "men" : "women"} ${age}`
+              : "needs all eight"
+          }
+        />
+        <Cell
+          label="On the app"
+          value={standing ? `#${standing.rank} / ${standing.of}` : EMPTY}
+          note={standing ? (standing.of === 1 ? "only you so far" : `top ${standing.topShare}%`) : "needs all eight"}
+        />
         <Cell
           label="Spread"
           value={`${Math.round(spread)}`}

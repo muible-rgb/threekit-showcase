@@ -1,6 +1,7 @@
 import { BATTERY_BINDINGS, BATTERY_TEST_SLUGS } from "@/lib/battery";
 import { currentBenchmark } from "@/lib/benchmarks/registry";
-import type { Participant, Result } from "@/lib/data/types";
+import type { Database, Participant, Result } from "@/lib/data/types";
+import type { BoardEntry } from "@/lib/scoring/board";
 import { scoreBattery } from "@/lib/scoring/composite";
 import type { BatteryScore } from "@/lib/scoring/types";
 
@@ -265,4 +266,20 @@ export function previousCard(
     })),
     lookup: currentBenchmark,
   });
+}
+
+/**
+ * Everyone on this device's copy of the app with at least one result, as
+ * board entries scored on their current card. The board page and the
+ * scorecard header both rank from this, so "3 of 8" means the same thing on
+ * both screens.
+ */
+export function boardEntries(db: Database): BoardEntry[] {
+  return db.participants
+    .map((p) => ({
+      participantId: p.id,
+      displayName: p.name,
+      score: currentCard(p, db.results.filter((r) => r.participantId === p.id)).score,
+    }))
+    .filter((e) => e.score.testsCompleted > 0);
 }

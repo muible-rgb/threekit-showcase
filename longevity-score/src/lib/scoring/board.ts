@@ -40,6 +40,33 @@ function compareVectors(a: number[], b: number[]): number {
   return 0;
 }
 
+export interface AppStanding {
+  /** 1 is the top. */
+  rank: number;
+  /** How many people on the app have a complete card, you included. */
+  of: number;
+  /** rank / of, as a percentage: "top 38%". 100 when you are last. */
+  topShare: number;
+}
+
+/**
+ * Your place among everyone on the app with a complete card. Because every
+ * composite is already relative to its owner's age and sex, this is a fair
+ * ranking across a 28-year-old and a 71-year-old: it asks who is doing better
+ * for their age, not who is fitter in absolute terms. Null with no complete
+ * card of your own.
+ */
+export function appStanding(participantId: string, entries: BoardEntry[]): AppStanding | null {
+  const complete = rankBoard(entries.filter((e) => e.score.composite !== null));
+  const mine = complete.find((e) => e.participantId === participantId);
+  if (!mine) return null;
+  return {
+    rank: mine.rank,
+    of: complete.length,
+    topShare: Math.round((100 * mine.rank) / complete.length),
+  };
+}
+
 /**
  * Final board. Only completed batteries carry a composite, so incomplete
  * participants sort below everyone complete, ordered by how far they got.

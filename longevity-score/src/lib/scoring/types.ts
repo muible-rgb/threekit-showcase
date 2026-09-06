@@ -125,6 +125,13 @@ export interface BatteryScore {
    * strong, 80 is the top tenth, 90 the top few percent.
    */
   composite: number | null;
+  /**
+   * Where the composite sits among people of this sex and age, 0.5-99.5, one
+   * decimal. Estimated: the population distribution of a mean of eight
+   * correlated percentiles is modelled, not measured (see composite.ts). Null
+   * whenever the composite is.
+   */
+  populationPercentile: number | null;
   band: BandLabel | null;
   testsCompleted: number;
   testsRequired: number;

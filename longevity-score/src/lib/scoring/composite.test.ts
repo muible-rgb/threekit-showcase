@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { bandFor, runningAverage, scoreBattery } from "./composite";
+import {
+  COMPOSITE_SD,
+  bandFor,
+  populationPercentile,
+  runningAverage,
+  scoreBattery,
+} from "./composite";
 import { eightTestFixture } from "./__fixtures__/lookup";
 import type { RawResult, TestPercentile } from "./types";
 
@@ -145,6 +151,39 @@ describe("composite", () => {
     expect(() => scoreBattery({ ...BASE, tests: bad, results: results(eight(76)) })).toThrow(
       /unknown benchmark event: nope/,
     );
+  });
+});
+
+describe("populationPercentile", () => {
+  it("models the mean of eight correlated percentiles with SD near 20", () => {
+    expect(COMPOSITE_SD).toBeCloseTo(19.9, 1);
+  });
+
+  it("puts an average score at the median", () => {
+    expect(populationPercentile(50)).toBe(50);
+  });
+
+  it("is much tighter than the score itself - 90 is the top 2%, not the top 10%", () => {
+    expect(populationPercentile(70)).toBe(84.3);
+    expect(populationPercentile(80)).toBe(93.4);
+    expect(populationPercentile(90)).toBe(97.8);
+    expect(populationPercentile(30)).toBe(15.7);
+  });
+
+  it("never reaches 0 or 100 - a perfect card is z = 2.5, the 99.4th", () => {
+    expect(populationPercentile(100)).toBe(99.4);
+    expect(populationPercentile(0)).toBe(0.6);
+  });
+
+  it("is null without a composite", () => {
+    expect(populationPercentile(null)).toBeNull();
+    const partial = scoreBattery({ ...BASE, results: results(Array(4).fill(76)) });
+    expect(partial.populationPercentile).toBeNull();
+  });
+
+  it("rides along on the battery score", () => {
+    const score = scoreBattery({ ...BASE, results: results(eight(76)) });
+    expect(score.populationPercentile).toBe(50);
   });
 });
 

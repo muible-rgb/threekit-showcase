@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { liveBoard, mostImproved, rankBoard, retestDelta, tieBreakVector } from "./board";
+import { appStanding, liveBoard, mostImproved, rankBoard, retestDelta, tieBreakVector } from "./board";
 import { bandFor } from "./composite";
 import type { BatteryScore, TestPercentile } from "./types";
 
@@ -27,6 +27,7 @@ function score(percentiles: number[], required = 10): BatteryScore {
     : null;
   return {
     composite,
+    populationPercentile: composite === null ? null : 50,
     band: composite === null ? null : bandFor(composite),
     testsCompleted: tests.length,
     testsRequired: required,
@@ -304,5 +305,33 @@ describe("mostImproved", () => {
     expect(r.ranked).toHaveLength(0);
     expect(r.firstTimers).toHaveLength(2);
     expect(r.ineligible).toHaveLength(0);
+  });
+});
+
+describe("appStanding", () => {
+  const entries = [
+    { participantId: "a", displayName: "A", score: score(ten(50)) },
+    { participantId: "b", displayName: "B", score: score(ten(80)) },
+    { participantId: "c", displayName: "C", score: score(ten(65)) },
+    { participantId: "d", displayName: "D", score: score(ten(40)) },
+    { participantId: "e", displayName: "E", score: score([70, 70, 70], 10) }, // incomplete
+  ];
+
+  it("ranks you among everyone with a complete card, and says how many that is", () => {
+    expect(appStanding("b", entries)).toEqual({ rank: 1, of: 4, topShare: 25 });
+    expect(appStanding("c", entries)).toEqual({ rank: 2, of: 4, topShare: 50 });
+    expect(appStanding("d", entries)).toEqual({ rank: 4, of: 4, topShare: 100 });
+  });
+
+  it("leaves incomplete cards out of the count and gives them no standing", () => {
+    expect(appStanding("e", entries)).toBeNull();
+  });
+
+  it("is null for someone not on the board", () => {
+    expect(appStanding("zz", entries)).toBeNull();
+  });
+
+  it("handles being the only one", () => {
+    expect(appStanding("a", [entries[0]])).toEqual({ rank: 1, of: 1, topShare: 100 });
   });
 });

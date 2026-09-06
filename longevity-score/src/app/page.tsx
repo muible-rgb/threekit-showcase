@@ -14,20 +14,20 @@ import {
   carryLoadDrift,
   type BatteryTest,
 } from "@/lib/battery";
-import { useResultsFor, useStore } from "@/lib/data/store-context";
-import { currentCard, previousCard } from "@/lib/batteries";
-import { retestDelta } from "@/lib/scoring/board";
+import { useDb, useResultsFor, useStore } from "@/lib/data/store-context";
+import { boardEntries, currentCard, previousCard } from "@/lib/batteries";
+import { appStanding, retestDelta } from "@/lib/scoring/board";
 import { ageAt } from "@/lib/scoring/cohort";
 import { buildSharePayload, encodeShareToken } from "@/lib/share-token";
 import {
   BAND_LABELS,
-  COMPOSITE_CAPTION,
   EMPTY,
   formatDate,
   formatRawDelta,
   formatResult,
   formatSigned,
   oneDecimal,
+  ordinal,
   rawImproved,
 } from "@/lib/utils";
 import type { BatteryScore, Sex, TestPercentile } from "@/lib/scoring/types";
@@ -47,6 +47,13 @@ export default function ScorecardPage() {
   const previous = React.useMemo(
     () => (me ? previousCard(me, results) : null),
     [me, results],
+  );
+  const db = useDb();
+  // Where you stand among everyone on the app. Every composite is already
+  // relative to its owner's age and sex, so this is a fair ranking.
+  const standing = React.useMemo(
+    () => (me && db ? appStanding(me.id, boardEntries(db)) : null),
+    [me, db],
   );
 
   if (!ready) return null;
@@ -95,7 +102,10 @@ export default function ScorecardPage() {
                 </p>
               )}
             </div>
-            <p className="meta mt-2">{COMPOSITE_CAPTION}</p>
+            <p className="meta mt-2">
+              Est. {ordinal(Math.round(score.populationPercentile!))} percentile ·{" "}
+              {me.sex === "M" ? "men" : "women"} {age}
+            </p>
           </>
         ) : (
           <>
@@ -110,8 +120,20 @@ export default function ScorecardPage() {
         )}
 
         <div className="mt-4 flex gap-6">
-          <Stat label="Fitness age" value={fitnessAgeText(score)} />
-          <Stat label="Scored against" value={`${me.sex === "M" ? "Men" : "Women"} ${age}`} />
+          <Stat
+            label="On the app"
+            value={standing ? `#${standing.rank} / ${standing.of}` : EMPTY}
+            note={
+              standing
+                ? standing.of === 1
+                  ? "only you so far"
+                  : `top ${standing.topShare}%`
+                : complete
+                  ? ""
+                  : "needs all eight"
+            }
+          />
+          <Stat label="Fitness age" value={fitnessAgeText(score)} note={complete ? `actual ${age}` : ""} />
         </div>
       </header>
 
@@ -174,11 +196,12 @@ function fitnessAgeText(score: BatteryScore): string {
     : String(years);
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
     <div>
       <p className="label">{label}</p>
       <p className="num mt-0.5 text-name">{value}</p>
+      {note && <p className="meta mt-0.5">{note}</p>}
     </div>
   );
 }

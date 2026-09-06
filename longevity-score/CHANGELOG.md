@@ -4,6 +4,24 @@ All notable changes to The Long Game.
 
 ## [Unreleased]
 
+### Added - an overall percentile, and where you stand on the app
+
+- **Estimated population percentile for the composite.** The score is a mean
+  of eight percentiles, which is tighter than a percentile. Its spread is
+  modelled: eight uniforms with pairwise correlation 0.4 (the report's
+  figure for adult physical capacities) give a mean with SD 19.9, close to
+  normal, so 70 reads as the 84th percentile, 80 the 93rd, 90 the 98th.
+  Shown as "Est. 84th percentile · men 43" under the score, on the deep dive,
+  on the public page and in the share metadata. Marked estimated everywhere;
+  to be replaced by the observed distribution once there is enough app data.
+  `populationPercentile` on `BatteryScore`; `normal.ts` returns for this one
+  job.
+- **On the app: #3 / 8 · top 38%.** Your rank among everyone with a complete
+  card, on the card header, the deep dive and the board. Fair across ages and
+  sexes because every composite is already relative to its owner's cohort
+  (`appStanding`, `boardEntries`).
+- The card header says "Scored against · Men 43" instead of a five-year band.
+
 ### Changed - scoring runs on population benchmarks v1.0.0
 
 The provisional mean/SD norms are gone. Scoring now uses a precomputed

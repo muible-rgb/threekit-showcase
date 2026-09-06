@@ -1,6 +1,7 @@
 import { createScorer } from "./benchmark";
 import { ageAt } from "./cohort";
 import { computeFitnessAge } from "./fitness-age";
+import { normalCdf } from "./normal";
 import type {
   BandLabel,
   BatteryScore,
@@ -28,6 +29,31 @@ export function bandFor(percentile: number): BandLabel {
   if (percentile >= 50) return "Solid";
   if (percentile >= 25) return "Below average";
   return "At risk";
+}
+
+/**
+ * The composite as a percentile of the population.
+ *
+ * Each of the eight inputs is a percentile, so uniform on 0-100 with variance
+ * 100^2 / 12. The mean of eight such variables with pairwise correlation r has
+ * variance (100^2 / 12) / 8 * (1 + 7r). The methodology report puts r at
+ * about 0.4 for physical capacities in adults, which gives a standard
+ * deviation near 20, and by the central limit theorem the mean is close to
+ * normal. So an overall of 90 is about the top 2%, not the top 10%.
+ *
+ * This is a model, not a measurement, and it is the same at every age because
+ * every input is already age- and sex-adjusted. It is labelled estimated
+ * wherever it appears, and the plan is to replace it with an empirical
+ * re-normalisation once the app has enough real results.
+ */
+export const COMPOSITE_CORRELATION = 0.4;
+export const COMPOSITE_SD = Math.sqrt(((100 * 100) / 12 / 8) * (1 + 7 * COMPOSITE_CORRELATION));
+
+export function populationPercentile(composite: number | null): number | null {
+  if (composite === null) return null;
+  const p = 100 * normalCdf((composite - 50) / COMPOSITE_SD);
+  // Same convention as the table: off the end reads 0.5 or 99.5.
+  return Math.min(99.5, Math.max(0.5, Math.round(p * 10) / 10));
 }
 
 export interface ScoreBatteryInput {
@@ -123,6 +149,7 @@ export function scoreBattery(input: ScoreBatteryInput): BatteryScore {
 
   return {
     composite,
+    populationPercentile: populationPercentile(composite),
     band: composite === null ? null : bandFor(composite),
     testsCompleted: tests.length,
     testsRequired: bindings.length,

@@ -108,10 +108,15 @@ composite.
   got the same. The UI says DNF or max rather than showing a number that looks
   like a bad one.
 - The composite is the unweighted mean of eight percentiles, to one decimal,
-  and it is **null until all eight are there**. It is not itself a percentile
-  and is never described as "better than X%": a mean of correlated percentiles
-  is tighter than a percentile, so roughly 70 is strong, 80 the top tenth, 90
-  the top few percent.
+  and it is **null until all eight are there**. It is a mean, not a percentile,
+  so to place it against the population its spread is modelled: eight uniforms
+  with pairwise correlation 0.4 give a mean with SD 19.9, near normal. That
+  turns 70 into the 84th percentile, 80 into the 93rd, 90 into the 98th. It
+  is shown as an **estimated** percentile and will be replaced by the observed
+  distribution once there is enough app data.
+- **On the app** ranks you against everyone with a complete card. It is fair
+  across a 28-year-old and a 71-year-old because every composite is already
+  relative to its owner's age and sex.
 
 Units: the app stores what people say out loud (feet, inches, seconds, reps)
 and converts to the table's unit at the scoring boundary (`benchmark.factor`

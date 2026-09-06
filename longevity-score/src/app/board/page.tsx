@@ -72,7 +72,7 @@ export default function BoardPage() {
         <h1 className="name text-[22px]">Board</h1>
         {mine && mine.score.composite !== null && (
           <p className="meta mt-2">
-            You are {mine.rank} of {scored}
+            You are {mine.rank} of {scored} · top {Math.round((100 * mine.rank) / scored)}%
           </p>
         )}
       </header>

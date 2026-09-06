@@ -59,10 +59,11 @@ export default function MethodologyPage() {
             because both are measured against their own age and sex.
           </p>
           <p>
-            The score itself is not a percentile. Averaging eight related
-            percentiles gives a tighter number than any one of them: roughly, 70
-            is strong, 80 is the top tenth, 90 the top few percent. It is never
-            described as &quot;better than X% of people&quot;.
+            The score itself is a mean, not a percentile: averaging eight related
+            percentiles gives a tighter number than any one of them. To place it
+            against the population we model the spread of that mean (below) and
+            show the result as an <em>estimated</em> percentile. Roughly, a score
+            of 70 is the 84th percentile, 80 the 93rd, 90 the 98th.
           </p>
           <p>
             All eight are required. Seven tests gives you seven percentiles and no
@@ -76,6 +77,34 @@ export default function MethodologyPage() {
             A did-not-finish on the mile or the shuttle is scored with everyone
             who could not finish. Reaching the balance cap or a perfect
             sit-to-rise ties you with everyone else at the cap.
+          </p>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="label border-b border-rule-2 pb-2">Overall percentile</h2>
+        <div className="space-y-3 text-[13px] leading-relaxed text-chalk-dim">
+          <p>
+            Each of the eight inputs is a percentile, so spread evenly from 0 to
+            100. The mean of eight such numbers is narrower, and how much narrower
+            depends on how correlated the capacities are: the report puts the
+            correlation between physical capacities in adults at about 0.4, which
+            gives the mean a standard deviation near 20 and a shape close to the
+            normal curve. Your overall percentile is where your score falls on
+            that curve.
+          </p>
+          <p>
+            It is the same at every age and for both sexes because every input is
+            already adjusted for age and sex. It is a model, not a measurement,
+            so it is marked estimated. Once enough real results exist the plan is
+            to replace it with the observed distribution of scores.
+          </p>
+          <p>
+            <span className="font-medium text-chalk">On the app</span> is a
+            different question: your place among everyone with a complete card,
+            ranked on score. Because scores are already relative to age and sex,
+            a 28-year-old and a 71-year-old are ranked on who is doing better for
+            their age, not on who is fitter in absolute terms.
           </p>
         </div>
       </section>
