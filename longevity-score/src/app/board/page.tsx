@@ -1,28 +1,26 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardBody } from "@/components/ui/card";
-import { BandBadge } from "@/components/ui/badge";
 import { Register } from "@/components/register";
+import { SectionLabel } from "@/components/ui/row";
 import { useDb, useStore } from "@/lib/data/store-context";
 import { currentCard } from "@/lib/batteries";
 import { rankBoard, type BoardEntry } from "@/lib/scoring/board";
 import { ageAt } from "@/lib/scoring/cohort";
 import { BATTERY_TEST_COUNT } from "@/lib/battery";
-import { ageBandLabel, cn, oneDecimal } from "@/lib/utils";
+import { BAND_LABELS, EMPTY, ageBandLabel, cn, oneDecimal } from "@/lib/utils";
 
 type Filter = "all" | "cohort";
 
 /**
- * The leaderboard.
+ * The board.
  *
- * Ranked on composite, which is already cohort-relative - so a 60-year-old
- * woman and a 30-year-old man on this board are being compared on how far
- * above their own population each of them sits, not on raw output. That is the
- * whole reason this ranking is worth anything.
+ * Ranked on composite, which is already cohort-relative - a 60-year-old woman
+ * and a 30-year-old man are compared on how far each sits above their own
+ * population, not on raw output. That is the only reason this ranking means
+ * anything.
  *
- * "My band" narrows it to your own sex and five-year band, which is the
- * strictly-like-for-like view. Both are honest; they answer different questions.
+ * The accent appears once: your row.
  */
 export default function BoardPage() {
   const { me, ready } = useStore();
@@ -46,7 +44,7 @@ export default function BoardPage() {
       .filter((r) => r.card.score.testsCompleted > 0);
   }, [db]);
 
-  if (!ready) return <div className="h-96 animate-pulse rounded-2xl bg-ink-raised" />;
+  if (!ready) return null;
   if (!me) return <Register />;
 
   const myAge = ageAt(me.birthDate, new Date().toISOString());
@@ -56,9 +54,7 @@ export default function BoardPage() {
     filter === "all"
       ? rows
       : rows.filter(
-          (r) =>
-            r.participant.sex === me.sex &&
-            Math.floor(r.age / 5) * 5 === myBandMin,
+          (r) => r.participant.sex === me.sex && Math.floor(r.age / 5) * 5 === myBandMin,
         );
 
   const entries: BoardEntry[] = filtered.map((r) => ({
@@ -68,29 +64,35 @@ export default function BoardPage() {
   }));
   const board = rankBoard(entries);
   const mine = board.find((b) => b.participantId === me.id);
+  const scored = board.filter((b) => b.score.composite !== null).length;
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Board</h1>
-        <p className="mt-1 text-sm text-paper-dim">
-          Everyone is ranked on how far they sit above their own cohort.
-        </p>
-      </div>
+    <div>
+      <header className="border-b border-rule-2 pb-4 pt-4">
+        <h1 className="name text-[22px]">Board</h1>
+        {mine && mine.score.composite !== null && (
+          <p className="meta mt-2">
+            You are {mine.rank} of {scored}
+          </p>
+        )}
+      </header>
 
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-ink-raised p-1 ring-1 ring-ink-line">
+      <div className="mt-4 flex">
         {(
           [
             ["all", "Everyone"],
-            ["cohort", `My band (${ageBandLabel(myAge, me.sex)})`],
+            ["cohort", ageBandLabel(myAge, me.sex)],
           ] as const
         ).map(([key, label]) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
             className={cn(
-              "h-10 rounded-lg text-xs font-semibold transition-colors",
-              filter === key ? "bg-signal text-ink" : "text-paper-dim",
+              "label flex-1 border py-2.5",
+              filter === key
+                ? "border-chalk text-chalk"
+                : "border-rule-2 text-chalk-off",
+              key === "cohort" && "-ml-px",
             )}
           >
             {label}
@@ -98,85 +100,61 @@ export default function BoardPage() {
         ))}
       </div>
 
-      {mine && mine.score.composite !== null && (
-        <Card className="ring-signal/40">
-          <CardBody className="flex items-center justify-between pt-5">
-            <div>
-              <p className="text-[11px] uppercase tracking-wider text-paper-faint">
-                You
-              </p>
-              <p className="tnum mt-0.5 text-3xl font-bold">
-                {mine.rank}
-                <span className="text-base font-medium text-paper-faint">
-                  {" "}
-                  of {board.filter((b) => b.score.composite !== null).length}
-                </span>
-              </p>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <span className="tnum text-2xl font-bold">
-                {oneDecimal(mine.score.composite)}
-              </span>
-              <BandBadge band={mine.score.band!} size="sm" />
-            </div>
-          </CardBody>
-        </Card>
-      )}
+      <SectionLabel>
+        {filter === "all" ? "All comers" : "Your cohort"}
+      </SectionLabel>
 
-      <div className="overflow-hidden rounded-2xl bg-ink-raised ring-1 ring-ink-line">
+      <div>
         {board.length === 0 && (
-          <p className="px-4 py-6 text-sm text-paper-faint">
-            Nobody in this band has posted a result yet.
-          </p>
+          <p className="meta py-row">Nobody here has posted a result.</p>
         )}
         {board.map((row) => {
           const meta = filtered.find((r) => r.participant.id === row.participantId)!;
           const isMe = row.participantId === me.id;
+          const composite = row.score.composite;
+
           return (
             <div
               key={row.participantId}
               className={cn(
-                "flex items-center gap-3 border-t border-ink-line-soft px-4 py-3 first:border-t-0",
-                isMe && "bg-signal/5",
+                "grid grid-cols-[26px_1fr_auto] items-center gap-gap border-b border-rule py-row",
+                isMe && "-mx-pad border-l-[3px] border-l-accent bg-board-2 px-pad",
               )}
             >
-              <span className="tnum w-6 text-base font-bold text-paper-faint">
-                {row.score.composite === null ? "-" : row.rank}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">
-                  {row.displayName}
-                  {isMe && (
-                    <span className="ml-1.5 text-[10px] uppercase tracking-wider text-signal">
-                      you
-                    </span>
-                  )}
-                </p>
-                <p className="text-xs text-paper-faint">
+              <span className="meta">{composite === null ? EMPTY : row.rank}</span>
+
+              <div className="min-w-0">
+                <p className="name truncate text-name">{row.displayName}</p>
+                <p className="meta mt-0.5">
                   {ageBandLabel(meta.age, meta.participant.sex)}
-                  {row.score.composite === null &&
-                    ` - ${row.score.testsCompleted}/${BATTERY_TEST_COUNT}`}
-                  {row.tieBroken && " - tie, split on best test"}
+                  {composite === null &&
+                    ` · ${row.score.testsCompleted}/${BATTERY_TEST_COUNT}`}
+                  {row.tieBroken && " · tie"}
                 </p>
               </div>
-              {row.score.composite !== null ? (
-                <div className="flex shrink-0 items-center gap-2.5">
-                  <span className="tnum text-lg font-bold">
-                    {oneDecimal(row.score.composite)}
-                  </span>
-                  <BandBadge band={row.score.band!} size="sm" />
-                </div>
-              ) : (
-                <span className="shrink-0 text-xs text-paper-faint">No score</span>
-              )}
+
+              <div className="text-right">
+                <p
+                  className={cn(
+                    "num text-score font-500",
+                    isMe && "text-accent",
+                    composite === null && "text-chalk-off",
+                  )}
+                >
+                  {composite === null ? EMPTY : oneDecimal(composite)}
+                </p>
+                {composite !== null && (
+                  <p className="label mt-0.5">{BAND_LABELS[row.score.band!]}</p>
+                )}
+              </div>
             </div>
           );
         })}
       </div>
 
-      <p className="px-1 text-xs leading-relaxed text-paper-faint">
-        Incomplete cards sit below everyone with a score. Eight of eight or you
-        are not ranked.
+      <p className="meta mt-5">
+        Incomplete cards rank below every scored one. Eight of eight or you are
+        not ranked.
       </p>
     </div>
   );

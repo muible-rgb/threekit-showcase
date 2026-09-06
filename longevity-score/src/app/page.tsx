@@ -2,10 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Check, ChevronRight, Plus, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardBody } from "@/components/ui/card";
-import { BandBadge } from "@/components/ui/badge";
+import { SectionLabel } from "@/components/ui/row";
 import { EntrySheet } from "@/components/entry-sheet";
 import { Register } from "@/components/register";
 import { DemoBanner } from "@/components/demo-banner";
@@ -23,6 +21,8 @@ import { retestDelta } from "@/lib/scoring/board";
 import { ageAt } from "@/lib/scoring/cohort";
 import { buildSharePayload, encodeShareToken } from "@/lib/share-token";
 import {
+  BAND_LABELS,
+  EMPTY,
   ageBandLabel,
   betterThanSentence,
   formatDate,
@@ -37,30 +37,25 @@ import type { BatteryScore, TestPercentile } from "@/lib/scoring/types";
 /**
  * The scorecard. Eight rows, one per test.
  *
- * This is the whole app: you see what you have and what you are missing, you
- * tap a row, you type a number. There is no guided mode and no fixed order,
- * because the testing happens outside and the phone's only job is to hold the
- * results and tell you what they mean.
+ * You see what you have and what you are missing, you tap a row, you type the
+ * number you got outside. The accent appears exactly once - on the score.
  */
 export default function ScorecardPage() {
   const { me, ready, store, refresh, db } = useStore();
   const results = useResultsFor(me?.id);
   const [editing, setEditing] = React.useState<BatteryTest | null>(null);
 
-  const card = React.useMemo(
-    () => (me ? currentCard(me, results) : null),
-    [me, results],
-  );
+  const card = React.useMemo(() => (me ? currentCard(me, results) : null), [me, results]);
   const previous = React.useMemo(
     () => (me ? previousCard(me, results) : null),
     [me, results],
   );
-  if (!ready) return <Skeleton />;
+
+  if (!ready) return null;
   if (!me) return <Register />;
 
   const score = card!.score;
   const complete = score.composite != null;
-
   const byTest = new Map<string, TestPercentile>(
     score.tests.map((t) => [t.testVariant, t]),
   );
@@ -85,58 +80,47 @@ export default function ScorecardPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardBody className="pt-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-paper-faint">
-            Longevity Score
-          </p>
-
-          {complete ? (
-            <>
-              <div className="mt-2 flex items-start justify-between gap-4">
-                <p className="score-hero text-[80px]">{oneDecimal(score.composite!)}</p>
-                <BandBadge band={score.band!} className="mt-3 shrink-0" />
-              </div>
-              <p className="mt-3 text-sm text-paper-dim">
-                {betterThanSentence(score.composite!, me.sex)}
-                {delta?.compositeDelta != null && (
-                  <span
-                    className={
-                      delta.compositeDelta >= 0
-                        ? "tnum font-semibold text-up"
-                        : "tnum font-semibold text-down"
-                    }
-                  >
-                    {"  "}
-                    {formatSigned(delta.compositeDelta)}
-                  </span>
-                )}
+    <div>
+      <header className="border-b border-rule-2 pb-5 pt-4">
+        <p className="label">Longevity score</p>
+        {complete ? (
+          <>
+            <div className="mt-2 flex items-baseline gap-3">
+              <p className="figure text-accent text-[64px]">
+                {oneDecimal(score.composite!)}
               </p>
-              <FitnessAgeRow score={score} actualAge={age} />
-            </>
-          ) : (
-            <>
-              <div className="mt-2 flex items-end gap-3">
-                <p className="score-hero text-[72px] text-paper-faint">
-                  {score.testsCompleted}
-                  <span className="text-[40px]">/{BATTERY_TEST_COUNT}</span>
+              <p className="name text-name text-chalk-dim">
+                {BAND_LABELS[score.band!]}
+              </p>
+              {delta?.compositeDelta != null && (
+                <p className="num text-meta text-chalk-dim">
+                  {formatSigned(delta.compositeDelta)}
                 </p>
-              </div>
-              <p className="mt-2 text-sm text-paper-dim">
-                No score until all {BATTERY_TEST_COUNT} are in.
-              </p>
-            </>
-          )}
+              )}
+            </div>
+            <p className="meta mt-2">{betterThanSentence(score.composite!, me.sex)}</p>
+          </>
+        ) : (
+          <>
+            <p className="figure mt-2 text-[64px] text-chalk-off">
+              {score.testsCompleted}
+              <span className="text-[36px]">/{BATTERY_TEST_COUNT}</span>
+            </p>
+            <p className="meta mt-2">
+              No score until all {BATTERY_TEST_COUNT} are in
+            </p>
+          </>
+        )}
 
-          <p className="mt-3 text-xs text-paper-faint">
-            {ageBandLabel(age, me.sex)}
-            {card!.updatedAt ? ` - updated ${formatDate(card!.updatedAt)}` : ""}
-          </p>
-        </CardBody>
-      </Card>
+        <div className="mt-4 flex gap-6">
+          <Stat label="Fitness age" value={fitnessAgeText(score)} />
+          <Stat label="Age" value={String(age)} />
+          <Stat label="Cohort" value={ageBandLabel(age, me.sex)} />
+        </div>
+      </header>
 
-      <div className="overflow-hidden rounded-2xl bg-ink-raised ring-1 ring-ink-line">
+      <SectionLabel>The eight</SectionLabel>
+      <div>
         {BATTERY_TESTS.map((test) => (
           <TestRow
             key={test.slug}
@@ -150,21 +134,8 @@ export default function ScorecardPage() {
         ))}
       </div>
 
-      {complete && (
-        <>
-          <Link
-            href="/you"
-            className="flex items-center justify-between rounded-2xl bg-ink-raised px-4 py-3.5 ring-1 ring-ink-line"
-          >
-            <span className="text-sm font-semibold">
-              Break it down
-              <span className="ml-2 font-normal text-paper-faint">
-                strengths, gaps, what moved
-              </span>
-            </span>
-            <ChevronRight size={16} className="text-paper-faint" />
-          </Link>
-
+      <div className="mt-5 flex flex-wrap gap-2">
+        {complete && (
           <ShareButton
             name={me.name}
             sex={me.sex}
@@ -172,10 +143,17 @@ export default function ScorecardPage() {
             score={score}
             completedAt={card!.updatedAt ?? new Date().toISOString()}
           />
-        </>
-      )}
+        )}
+        <Link href="/you">
+          <Button size="md">Break it down</Button>
+        </Link>
+      </div>
 
       <BodyweightRow current={bodyweight} />
+
+      <p className="meta mt-6">
+        {card!.updatedAt ? `Updated ${formatDate(card!.updatedAt)}` : "Nothing entered"}
+      </p>
 
       <DemoBanner />
 
@@ -189,6 +167,24 @@ export default function ScorecardPage() {
           onClose={() => setEditing(null)}
         />
       )}
+    </div>
+  );
+}
+
+function fitnessAgeText(score: BatteryScore): string {
+  const fa = score.fitnessAge;
+  if (!fa) return EMPTY;
+  const years = Math.round(fa.years);
+  return fa.outOfRangeCount >= Math.ceil(score.tests.length / 2)
+    ? `≤${years}`
+    : String(years);
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="label">{label}</p>
+      <p className="num mt-0.5 text-name">{value}</p>
     </div>
   );
 }
@@ -208,8 +204,6 @@ function TestRow({
   delta?: { delta: number; rawDelta: number };
   onTap: () => void;
 }) {
-  const done = entry !== undefined;
-
   // The entry sheet promises an off-protocol load gets marked. This is the mark.
   const drift = test.secondary
     ? carryLoadDrift(entry?.secondaryValue, bodyweightLb)
@@ -219,111 +213,40 @@ function TestRow({
   return (
     <button
       onClick={onTap}
-      className="flex w-full items-center gap-3 border-t border-ink-line-soft px-4 py-3.5 text-left first:border-t-0 active:bg-ink-line/40"
+      className="grid w-full grid-cols-[1fr_auto_auto] items-center gap-gap border-b border-rule py-row text-left"
     >
-      <div className="min-w-0 flex-1">
-        <span className="text-sm font-semibold">{test.name}</span>
-        <p className="tnum mt-0.5 text-xs text-paper-faint">
-          {done ? (
+      <div className="min-w-0">
+        <p className="name text-name">{test.name}</p>
+        <p className="meta mt-0.5 truncate">
+          {entry ? (
             <>
-              <span className="text-paper-dim">{formatRaw(entry!.value, test.unit)}</span>
-              {entry!.secondaryValue != null && (
-                <span className="text-paper-faint">
-                  {" "}
-                  at {Math.round(entry!.secondaryValue)} lb
-                </span>
-              )}
+              {formatRaw(entry.value, test.unit)}
+              {entry.secondaryValue != null && ` @ ${Math.round(entry.secondaryValue)}lb`}
               {delta && delta.rawDelta !== 0 && (
-                <span
-                  className={
-                    rawImproved(test.direction, delta.rawDelta) ? "text-up" : "text-down"
-                  }
-                >
+                <span className={rawImproved(test.direction, delta.rawDelta) ? "text-chalk" : "text-chalk-off"}>
                   {" "}
                   {formatRawDelta(delta.rawDelta, test.unit)}
                 </span>
               )}
+              {offProtocol && <span className="text-chalk-off"> off-protocol</span>}
             </>
           ) : (
-            test.standard
+            <span className="text-chalk-off">{EMPTY}</span>
           )}
         </p>
-        {offProtocol && (
-          <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-below">
-            Off-protocol load
-          </p>
-        )}
       </div>
 
-      {scored ? (
-        <div className="flex shrink-0 items-center gap-2.5">
-          {delta && (
-            <span
-              className={
-                delta.delta >= 0
-                  ? "tnum text-xs font-semibold text-up"
-                  : "tnum text-xs font-semibold text-down"
-              }
-            >
-              {formatSigned(delta.delta)}
-            </span>
-          )}
-          <div className="w-[68px] text-right">
-            <span className="tnum block text-lg font-bold leading-none">
-              {scored.percentile.toFixed(0)}
-            </span>
-            <BandBadge band={scored.band} size="sm" className="mt-1" />
-          </div>
-        </div>
-      ) : (
-        <span className="flex shrink-0 items-center gap-1 rounded-full bg-signal/10 px-3 py-1.5 text-xs font-semibold text-signal ring-1 ring-signal/25">
-          <Plus size={13} /> Enter
-        </span>
-      )}
-      <ChevronRight size={16} className="shrink-0 text-paper-faint" />
+      <p className="label w-14 text-right">
+        {scored ? BAND_LABELS[scored.band] : ""}
+      </p>
+
+      <p className="num w-9 text-right text-score">
+        {scored ? scored.percentile.toFixed(0) : <span className="text-chalk-off">{EMPTY}</span>}
+      </p>
     </button>
   );
 }
 
-function FitnessAgeRow({
-  score,
-  actualAge,
-}: {
-  score: BatteryScore;
-  actualAge: number;
-}) {
-  const fa = score.fitnessAge;
-  if (!fa) return null;
-  const years = Math.round(fa.years);
-  const floored = fa.outOfRangeCount >= Math.ceil(score.tests.length / 2);
-
-  return (
-    <div className="mt-5 flex items-end gap-6 border-t border-ink-line-soft pt-4">
-      <div>
-        <p className="text-[11px] uppercase tracking-wider text-paper-faint">
-          Fitness age
-        </p>
-        <p className="tnum mt-0.5 text-3xl font-bold">
-          {floored ? `≤${years}` : years}
-          {fa.approx && (
-            <Link
-              href="/methodology#fitness-age"
-              className="ml-1.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-below"
-            >
-              approx
-            </Link>
-          )}
-        </p>
-      </div>
-      <div>
-        <p className="text-[11px] uppercase tracking-wider text-paper-faint">Actual</p>
-        <p className="tnum mt-0.5 text-3xl font-bold text-paper-dim">{actualAge}</p>
-      </div>
-    </div>
-  );
-}
-
-/** Not scored. It is here because the carry load comes out of it. */
 /**
  * Read bodyweight back from the row it is written to. Matching "any row for
  * this participant" picked up whichever session happened to be first, which
@@ -339,7 +262,6 @@ function bodyweightFor(
   );
   const solo = rows.find((sp) => sp.sessionId === SOLO_SESSION_ID);
   if (solo) return solo.bodyweightKg;
-  // Otherwise the most recent one on file.
   return (
     [...rows].sort((a, b) => Date.parse(b.joinedAt) - Date.parse(a.joinedAt))[0]
       ?.bodyweightKg ?? null
@@ -361,7 +283,7 @@ function BodyweightRow({ current }: { current: number | null }) {
   }
 
   return (
-    <div className="rounded-2xl bg-ink-raised px-4 py-3 ring-1 ring-ink-line">
+    <div className="mt-6 border-t border-rule-2 pt-4">
       {editing ? (
         <form className="flex items-center gap-2" onSubmit={save}>
           <input
@@ -369,12 +291,11 @@ function BodyweightRow({ current }: { current: number | null }) {
             inputMode="decimal"
             value={text}
             onChange={(e) => setText(e.target.value.replace(/[^\d.]/g, ""))}
-            placeholder="lb"
             aria-label="Bodyweight in pounds"
-            className="tnum h-11 w-full min-w-0 flex-1 rounded-xl bg-ink px-3 text-lg ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
+            className="num h-10 w-full min-w-0 flex-1 border border-rule-2 bg-board px-3 text-name text-chalk focus:border-chalk focus:outline-none"
           />
-          <Button size="sm" type="submit" className="h-11 shrink-0" aria-label="Save bodyweight">
-            <Check size={15} />
+          <Button size="md" type="submit" className="shrink-0">
+            Set
           </Button>
         </form>
       ) : (
@@ -382,19 +303,17 @@ function BodyweightRow({ current }: { current: number | null }) {
           onClick={() => setEditing(true)}
           className="flex w-full items-center justify-between text-left"
         >
-          <span className="text-sm text-paper-dim">Bodyweight</span>
-          <span className="tnum text-sm font-semibold">
+          <span className="label">Bodyweight</span>
+          <span className="num text-name">
             {current === null ? (
-              <span className="text-signal">Set it</span>
+              <span className="text-chalk-off">{EMPTY}</span>
             ) : (
               `${Math.round(current)} lb`
             )}
           </span>
         </button>
       )}
-      <p className="mt-1 text-[11px] text-paper-faint">
-        Sets your carry load. Not scored.
-      </p>
+      <p className="meta mt-1">Sets your carry load. Not scored.</p>
     </div>
   );
 }
@@ -426,7 +345,7 @@ function ShareButton({
   async function share() {
     if (navigator.share) {
       try {
-        await navigator.share({ title: "My Longevity Score", url });
+        await navigator.share({ title: "The Long Game", url });
         return;
       } catch {
         // Dismissed or unavailable. Fall through to copying.
@@ -438,51 +357,30 @@ function ShareButton({
       setFallbackUrl(null);
       setTimeout(() => setCopied(false), 2200);
     } catch {
-      // Clipboard is blocked in iframes and in Safari without a gesture
-      // grant. Show the link rather than leaving a dead button.
+      // Clipboard is blocked in iframes and in Safari without a gesture grant.
       setFallbackUrl(url);
     }
   }
 
   return (
-    <div className="space-y-2">
-      <Button size="lg" variant="secondary" className="w-full" onClick={share}>
-        {copied ? (
-          <>
-            <Check size={18} /> Link copied
-          </>
-        ) : (
-          <>
-            <Share2 size={18} /> Share
-          </>
-        )}
+    <>
+      <Button size="md" onClick={share}>
+        {copied ? "Copied" : "Share"}
       </Button>
       {fallbackUrl && (
-        <div className="rounded-xl bg-ink-raised p-3 ring-1 ring-ink-line">
-          <p className="text-xs text-paper-faint">Copy this link</p>
+        <div className="mt-2 w-full border border-rule-2 p-3">
+          <p className="label">Copy this link</p>
           <input
             readOnly
             value={fallbackUrl}
             onFocus={(e) => e.currentTarget.select()}
-            className="mt-1.5 w-full rounded-lg bg-ink px-3 py-2 text-xs text-paper-dim ring-1 ring-ink-line-soft"
+            className="num mt-1.5 w-full border border-rule bg-board px-2 py-1.5 text-meta text-chalk-dim"
           />
-          <Link
-            href={`/s/${token}`}
-            className="mt-2 inline-block text-xs font-semibold text-signal"
-          >
+          <Link href={`/s/${token}`} className="label mt-2 inline-block text-chalk">
             Open it here instead
           </Link>
         </div>
       )}
-    </div>
-  );
-}
-
-function Skeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="h-52 animate-pulse rounded-2xl bg-ink-raised" />
-      <div className="h-96 animate-pulse rounded-2xl bg-ink-raised" />
-    </div>
+    </>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { ArrowRight, Check, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/data/store-context";
 import type { Sex } from "@/lib/scoring/types";
@@ -26,26 +25,27 @@ export function Register({ onDone }: { onDone?: () => void }) {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Longevity Score</h1>
-        <p className="mt-1 text-sm text-paper-dim">
-          Eight tests, graded against people your own age and sex.
+      <div className="border-b border-rule-2 pb-5">
+        <h1 className="name text-[26px]">The Long Game</h1>
+        <p className="meta mt-1">
+          Eight tests, graded against people your own age and sex
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-ink-raised p-1 ring-1 ring-ink-line">
+      <div className="flex">
         {(
           [
             ["new", "I'm new"],
             ["returning", "I have an account"],
           ] as const
-        ).map(([key, label]) => (
+        ).map(([key, label], i) => (
           <button
             key={key}
             onClick={() => setMode(key)}
             className={cn(
-              "h-10 rounded-lg text-sm font-semibold transition-colors",
-              mode === key ? "bg-signal text-ink" : "text-paper-dim",
+              "label flex-1 border py-2.5",
+              mode === key ? "border-chalk text-chalk" : "border-rule-2 text-chalk-off",
+              i === 1 && "-ml-px",
             )}
           >
             {label}
@@ -106,21 +106,19 @@ function NewAccount({
 
   return (
     <form onSubmit={submit} className="space-y-5">
-      <div className="rounded-2xl bg-ink-raised p-5 ring-1 ring-ink-line">
+      <div className="border border-rule-2 p-pad">
         <Field label="Name">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoComplete="name"
             placeholder="What your crew calls you"
-            className="h-12 w-full rounded-xl bg-ink px-4 text-base ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
+            className="h-12 w-full border border-rule-2 bg-board px-3 text-name text-chalk focus:border-chalk focus:outline-none"
           />
         </Field>
 
         <div className="mt-5">
-          <span className="text-xs font-semibold uppercase tracking-wider text-paper-faint">
-            Sex
-          </span>
+          <span className="label">Sex</span>
           <div className="mt-1.5 grid grid-cols-2 gap-3">
             {(["F", "M"] as const).map((option) => (
               <button
@@ -128,10 +126,10 @@ function NewAccount({
                 type="button"
                 onClick={() => setSex(option)}
                 className={cn(
-                  "h-12 rounded-xl text-base font-semibold ring-1 transition-colors",
+                  "label h-12 border",
                   sex === option
-                    ? "bg-signal text-ink ring-signal"
-                    : "bg-ink text-paper-dim ring-ink-line",
+                    ? "border-chalk text-chalk"
+                    : "border-rule-2 text-chalk-off",
                 )}
               >
                 {option === "F" ? "Female" : "Male"}
@@ -147,19 +145,19 @@ function NewAccount({
               value={birthDate}
               max={new Date().toISOString().slice(0, 10)}
               onChange={(e) => setBirthDate(e.target.value)}
-              className="h-12 w-full rounded-xl bg-ink px-4 text-base ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
+              className="h-12 w-full border border-rule-2 bg-board px-3 text-name text-chalk focus:border-chalk focus:outline-none"
             />
           </Field>
         </div>
 
-        <p className="mt-3 text-xs leading-relaxed text-paper-faint">
+        <p className="mt-3 text-[12px] leading-relaxed text-chalk-dim">
           These two set your cohort. Your score is a percentile against people
           of the same sex in your five-year age band, so there is no score
           without them.
         </p>
       </div>
 
-      <div className="rounded-2xl bg-ink-raised p-5 ring-1 ring-ink-line">
+      <div className="border border-rule-2 p-pad">
         <Field label="Email (optional)">
           <input
             type="email"
@@ -168,22 +166,21 @@ function NewAccount({
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
             placeholder="you@example.com"
-            className="h-12 w-full rounded-xl bg-ink px-4 text-base ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
+            className="h-12 w-full border border-rule-2 bg-board px-3 text-name text-chalk focus:border-chalk focus:outline-none"
           />
         </Field>
-        <p className="mt-2 text-xs leading-relaxed text-paper-faint">
+        <p className="mt-2 text-[12px] leading-relaxed text-chalk-dim">
           Buys two things: your results follow you to another phone, and you
-          show up on the board. Leave it blank and everything still works - it
-          just lives on this device only.
+          show up on the board. Leave it blank and everything still works, on
+          this device only.
         </p>
         {!emailLooksReal && (
-          <p className="mt-2 text-xs text-risk">That does not look like an email.</p>
+          <p className="meta mt-2">That does not look like an email.</p>
         )}
       </div>
 
-      <Button type="submit" size="lg" className="w-full justify-between" disabled={!valid || saving}>
-        <span>{saving ? "Setting up..." : "Start"}</span>
-        <ArrowRight size={18} />
+      <Button type="submit" size="lg" variant="accent" className="w-full" disabled={!valid || saving}>
+        {saving ? "Setting up" : "Start"}
       </Button>
     </form>
   );
@@ -203,14 +200,11 @@ function ReturningAccount({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl bg-ink-raised p-5 ring-1 ring-ink-line">
+      <div className="border border-rule-2 p-pad">
         {sent ? (
-          <p className="flex items-start gap-2 text-sm text-strong">
-            <Check size={16} className="mt-0.5 shrink-0" />
-            <span>
-              Link sent to {email}. Open it on this phone and your results come
-              with you.
-            </span>
+          <p className="text-[13px] leading-relaxed text-chalk-dim">
+            Link sent to {email}. Open it on this phone and your results come
+            with you.
           </p>
         ) : (
           <>
@@ -222,14 +216,14 @@ function ReturningAccount({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="h-12 w-full rounded-xl bg-ink px-4 text-base ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
+                className="h-12 w-full border border-rule-2 bg-board px-3 text-name text-chalk focus:border-chalk focus:outline-none"
               />
             </Field>
-            <p className="mt-2 text-xs leading-relaxed text-paper-faint">
+            <p className="mt-2 text-[12px] leading-relaxed text-chalk-dim">
               No password. We send a link; opening it signs you in.
             </p>
             {local && (
-              <p className="mt-3 rounded-xl bg-below/10 px-3 py-2 text-xs leading-relaxed text-below ring-1 ring-below/25">
+              <p className="mt-3 border border-rule-2 p-3 text-[12px] leading-relaxed text-chalk-dim">
                 This build has no server attached, so no link can actually be
                 sent. Accounts need the Supabase project wiring up first - see
                 DEPLOY.md.
@@ -247,7 +241,7 @@ function ReturningAccount({
                 setBusy(false);
               }}
             >
-              <Mail size={16} /> {busy ? "Sending..." : "Send me a link"}
+              {busy ? "Sending" : "Send me a link"}
             </Button>
           </>
         )}
@@ -259,9 +253,7 @@ function ReturningAccount({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs font-semibold uppercase tracking-wider text-paper-faint">
-        {label}
-      </span>
+      <span className="label">{label}</span>
       <div className="mt-1.5">{children}</div>
     </label>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, formatRaw, secondsToClock } from "@/lib/utils";
 import { CARRY_LOAD_TOLERANCE, carryLoadDrift } from "@/lib/battery";
@@ -64,7 +63,7 @@ export function EntrySheet({
   const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end bg-ink/70 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex flex-col justify-end bg-board/85">
       {/* Tap-outside-to-dismiss. Not a button: the header already has a real
           Close control, and two things announced as "Close" is worse than one. */}
       <div className="flex-1" role="presentation" onClick={onClose} />
@@ -72,23 +71,23 @@ export function EntrySheet({
       <div
         role="dialog"
         aria-label={test.name}
-        className="pb-safe max-h-[92dvh] overflow-y-auto rounded-t-3xl bg-ink-raised ring-1 ring-ink-line"
+        className="pb-safe max-h-[92dvh] overflow-y-auto border-t border-rule-2 bg-board"
       >
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-3 bg-ink-raised px-5 pb-3 pt-5">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-rule bg-board px-pad pb-3 pt-5">
           <div className="min-w-0">
-            <h2 className="text-xl font-bold tracking-tight">{test.name}</h2>
-            <p className="mt-0.5 text-sm text-signal">{test.standard}</p>
+            <h2 className="name text-[22px]">{test.name}</h2>
+            <p className="meta mt-1">{test.standard}</p>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-paper-faint hover:bg-ink-line"
+            className="label shrink-0 px-1 py-1 text-chalk-dim hover:text-chalk"
           >
-            <X size={18} />
+            Close
           </button>
         </div>
 
-        <div className="px-5 pb-5">
+        <div className="px-pad pb-5 pt-4">
           {test.secondary && (
             <SecondaryInput
               test={test}
@@ -101,7 +100,7 @@ export function EntrySheet({
           <ValueInput test={test} value={value} onChange={setValue} />
 
           {offProtocol && (
-            <p className="mt-3 rounded-xl bg-below/10 px-4 py-3 text-xs leading-relaxed text-below ring-1 ring-below/25">
+            <p className="mt-3 border border-rule-2 p-3 text-[12px] leading-relaxed text-chalk-dim">
               That is {Math.abs(Math.round(drift! * 100))}%{" "}
               {drift! > 0 ? "heavier" : "lighter"} than half your bodyweight.
               The norms assume half, so your percentile will be marked
@@ -110,18 +109,17 @@ export function EntrySheet({
           )}
 
           <details className="mt-5">
-            <summary className="cursor-pointer text-xs font-semibold text-paper-faint">
-              Full protocol
-            </summary>
-            <p className="mt-2 text-sm leading-relaxed text-paper-dim">
+            <summary className="label cursor-pointer">Full protocol</summary>
+            <p className="mt-2 text-[13px] leading-relaxed text-chalk-dim">
               {test.protocol}
             </p>
           </details>
         </div>
 
-        <div className="sticky bottom-0 space-y-2 border-t border-ink-line-soft bg-ink-raised px-5 py-4">
+        <div className="sticky bottom-0 space-y-2 border-t border-rule-2 bg-board px-pad py-4">
           <Button
             size="lg"
+            variant="accent"
             className="w-full"
             disabled={!valid || saving}
             onClick={async () => {
@@ -133,9 +131,8 @@ export function EntrySheet({
             {saving ? "Saving..." : current === null ? "Save" : "Update"}
           </Button>
           {current !== null && (
-            <p className="text-center text-xs text-paper-faint">
-              Currently {formatRaw(current, test.unit)}. Saving keeps the old
-              entry in your history.
+            <p className="meta">
+              Now {formatRaw(current, test.unit)}. The old entry is kept.
             </p>
           )}
         </div>
@@ -172,9 +169,7 @@ function SecondaryInput({
   return (
     <div className="mb-5">
       <label className="block">
-        <span className="text-xs font-semibold uppercase tracking-wider text-paper-faint">
-          {spec.label}
-        </span>
+        <span className="label">{spec.label}</span>
         <div className="mt-1.5 flex items-center gap-2">
           <input
             inputMode="decimal"
@@ -182,24 +177,22 @@ function SecondaryInput({
             onChange={(e) => setText(e.target.value.replace(/[^\d.]/g, ""))}
             placeholder={suggested === null ? "0" : String(suggested)}
             aria-label={spec.label}
-            className="tnum h-14 w-full min-w-0 flex-1 rounded-xl bg-ink px-4 text-2xl font-semibold ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
+            className="num h-14 w-full min-w-0 flex-1 border border-rule-2 bg-board px-3 text-[24px] text-chalk focus:border-chalk focus:outline-none"
           />
-          <span className="w-7 shrink-0 text-sm text-paper-faint">{spec.unitLabel}</span>
+          <span className="label w-7 shrink-0">{spec.unitLabel}</span>
         </div>
       </label>
       {suggested !== null && Number(text) !== suggested && (
         <button
           type="button"
           onClick={() => setText(String(suggested))}
-          className="mt-2 text-xs font-semibold text-signal"
+          className="label mt-2 text-chalk"
         >
           Use half bodyweight ({suggested} lb)
         </button>
       )}
       {suggested === null && (
-        <p className="mt-2 text-xs text-paper-faint">
-          Set your bodyweight on the scorecard and this fills itself in.
-        </p>
+        <p className="meta mt-2">Set bodyweight on the scorecard to prefill this.</p>
       )}
     </div>
   );
@@ -248,7 +241,7 @@ function TimeInput({
 
   return (
     <div>
-      <div className="flex items-center justify-center gap-2 rounded-3xl bg-ink py-7 ring-1 ring-ink-line">
+      <div className="flex items-center justify-center gap-2 border border-rule-2 py-6">
         <input
           inputMode="numeric"
           autoFocus
@@ -256,9 +249,9 @@ function TimeInput({
           onChange={(e) => setMin(e.target.value.replace(/\D/g, "").slice(0, 2))}
           placeholder="0"
           aria-label="Minutes"
-          className="score-hero tnum w-24 bg-transparent text-right text-[60px] outline-none placeholder:text-paper-faint"
+          className="figure w-24 bg-transparent text-right text-[56px] text-chalk outline-none placeholder:text-chalk-off"
         />
-        <span className="score-hero text-[52px] text-paper-faint">:</span>
+        <span className="figure text-[48px] text-chalk-off">:</span>
         <input
           inputMode="numeric"
           value={sec}
@@ -269,10 +262,10 @@ function TimeInput({
           onBlur={() => setSec((s) => (s === "" ? "00" : s.padStart(2, "0")))}
           placeholder="00"
           aria-label="Seconds"
-          className="score-hero tnum w-24 bg-transparent text-left text-[60px] outline-none placeholder:text-paper-faint"
+          className="figure w-24 bg-transparent text-left text-[56px] text-chalk outline-none placeholder:text-chalk-off"
         />
       </div>
-      <p className="mt-2 text-center text-xs text-paper-faint">minutes : seconds</p>
+      <p className="label mt-2">Minutes : seconds</p>
     </div>
   );
 }
@@ -295,17 +288,17 @@ function RepsInput({
         <button
           onClick={() => set(current - 1)}
           aria-label="One fewer"
-          className="h-16 w-16 rounded-2xl bg-ink text-3xl font-semibold ring-1 ring-ink-line active:bg-ink-line"
+          className="num h-16 w-16 border border-rule-2 text-[28px] text-chalk active:bg-board-2"
         >
           −
         </button>
-        <div className="flex h-28 w-32 items-center justify-center rounded-3xl bg-ink ring-1 ring-ink-line">
-          <span className="score-hero tnum text-[60px]">{current}</span>
+        <div className="flex h-28 w-32 items-center justify-center border border-rule-2">
+          <span className="figure text-[56px]">{current}</span>
         </div>
         <button
           onClick={() => set(current + 1)}
           aria-label="One more"
-          className="h-16 w-16 rounded-2xl bg-signal text-3xl font-semibold text-ink active:bg-signal-dim"
+          className="num h-16 w-16 border border-chalk text-[28px] text-chalk active:bg-board-2"
         >
           +
         </button>
@@ -316,10 +309,10 @@ function RepsInput({
             key={n}
             onClick={() => set(n)}
             className={cn(
-              "h-11 rounded-xl text-sm font-semibold ring-1 transition-colors",
+              "num h-11 border text-[13px]",
               current === n
-                ? "bg-signal text-ink ring-signal"
-                : "bg-ink text-paper-dim ring-ink-line",
+                ? "border-chalk text-chalk"
+                : "border-rule-2 text-chalk-dim",
             )}
           >
             {n}
@@ -361,19 +354,15 @@ function NumberInput({
 
   return (
     <div className="space-y-3">
-      <div className="flex h-24 items-center justify-center gap-2 rounded-3xl bg-ink ring-1 ring-ink-line">
-        <span className="score-hero tnum text-[56px]">
-          {text === "" ? <span className="text-paper-faint">0</span> : text}
+      <div className="flex h-24 items-center justify-center gap-2 border border-rule-2">
+        <span className="figure text-[52px]">
+          {text === "" ? <span className="text-chalk-off">0</span> : text}
         </span>
-        <span className="self-end pb-5 text-base text-paper-faint">
-          {test.unitLabel}
-        </span>
+        <span className="label self-end pb-5">{test.unitLabel}</span>
       </div>
 
       {low && (
-        <p className="text-center text-xs text-below">
-          Below the plausible range ({test.min}-{test.max}). Check it.
-        </p>
+        <p className="meta">Below the plausible range ({test.min}-{test.max}).</p>
       )}
 
       <div className="grid grid-cols-3 gap-2">
@@ -385,7 +374,7 @@ function NumberInput({
               <button
                 key={key}
                 onClick={() => press(key)}
-                className="h-14 rounded-xl bg-ink text-2xl font-semibold ring-1 ring-ink-line active:bg-ink-line"
+                className="num h-14 border border-rule-2 text-[22px] text-chalk active:bg-board-2"
               >
                 {key === "del" ? "⌫" : key}
               </button>
@@ -413,11 +402,9 @@ function HalfStepInput({
 
   return (
     <div className="space-y-4">
-      <div className="flex h-24 items-center justify-center rounded-3xl bg-ink ring-1 ring-ink-line">
-        <span className="score-hero tnum text-[52px]">
-          {(sitting + rising).toFixed(1)}
-        </span>
-        <span className="ml-2 self-end pb-4 text-base text-paper-faint">/ 10</span>
+      <div className="flex h-24 items-center justify-center border border-rule-2">
+        <span className="figure text-[48px]">{(sitting + rising).toFixed(1)}</span>
+        <span className="label ml-2 self-end pb-4">/ 10</span>
       </div>
 
       {(
@@ -428,8 +415,8 @@ function HalfStepInput({
       ).map(([label, val, set]) => (
         <div key={label}>
           <div className="mb-1.5 flex items-baseline justify-between">
-            <span className="text-sm text-paper-dim">{label}</span>
-            <span className="tnum text-base font-bold">{val.toFixed(1)}</span>
+            <span className="label">{label}</span>
+            <span className="num text-name">{val.toFixed(1)}</span>
           </div>
           <div className="grid grid-cols-11 gap-1">
             {Array.from({ length: 11 }, (_, i) => i * 0.5).map((n) => (
@@ -437,10 +424,10 @@ function HalfStepInput({
                 key={n}
                 onClick={() => set(n)}
                 className={cn(
-                  "h-10 rounded-lg text-[10px] font-semibold ring-1 transition-colors",
+                  "num h-10 border text-[10px]",
                   val === n
-                    ? "bg-signal text-ink ring-signal"
-                    : "bg-ink text-paper-faint ring-ink-line",
+                    ? "border-chalk text-chalk"
+                    : "border-rule-2 text-chalk-off",
                 )}
               >
                 {n % 1 === 0 ? n : "½"}

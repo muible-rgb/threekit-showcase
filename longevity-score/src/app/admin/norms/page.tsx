@@ -37,8 +37,8 @@ export default function AdminNormsPage() {
   return (
     <div className="space-y-6 pb-6">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight">Norms status</h1>
-        <p className="mt-1 text-sm text-paper-dim">
+        <h1 className="name text-[26px]">Norms status</h1>
+        <p className="mt-1 meta">
           {rows.length} files loaded from /data/norms/v2.
         </p>
       </header>
@@ -53,36 +53,36 @@ export default function AdminNormsPage() {
         {rows.map(({ file, inBattery, errors, warnings }) => (
           <div
             key={file.test_variant}
-            className="rounded-2xl bg-ink-raised p-4 ring-1 ring-ink-line"
+            className="border-b border-rule py-4"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="truncate font-mono text-sm font-semibold">
+                <p className="num truncate text-name">
                   {file.test_variant}.json
                 </p>
-                <p className="mt-0.5 text-xs text-paper-faint">
+                <p className="mt-0.5 meta">
                   {file.capacity} - {file.unit} - {file.direction} -{" "}
                   {file.cohorts.length} cohorts -{" "}
                   {file.cohorts[0]?.mean !== undefined ? "mean/sd" : "cut-points"}
                 </p>
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-1 text-[10px] font-semibold uppercase tracking-wider">
+              <div className="flex shrink-0 flex-col items-end gap-1 label">
                 <span
                   className={
                     file.source.provisional
-                      ? "rounded px-2 py-0.5 text-below ring-1 ring-below/30"
-                      : "rounded px-2 py-0.5 text-strong ring-1 ring-strong/30"
+                      ? "border border-rule-2 px-2 py-0.5"
+                      : "border border-rule-2 px-2 py-0.5"
                   }
                 >
                   {file.source.provisional ? "provisional" : "sourced"}
                 </span>
                 {file.source.transcription_verified !== true && (
-                  <span className="rounded px-2 py-0.5 text-paper-faint ring-1 ring-ink-line">
+                  <span className="border border-rule-2 px-2 py-0.5">
                     unverified
                   </span>
                 )}
                 {!inBattery && (
-                  <span className="rounded px-2 py-0.5 text-risk ring-1 ring-risk/30">
+                  <span className="border border-chalk px-2 py-0.5">
                     orphan
                   </span>
                 )}
@@ -92,12 +92,12 @@ export default function AdminNormsPage() {
             {(errors.length > 0 || warnings.length > 0) && (
               <ul className="mt-3 space-y-1 border-t border-ink-line-soft pt-3">
                 {errors.map((issue, i) => (
-                  <li key={`e${i}`} className="text-xs text-risk">
+                  <li key={`e${i}`} className="meta">
                     error: {issue.message}
                   </li>
                 ))}
                 {warnings.map((issue, i) => (
-                  <li key={`w${i}`} className="text-xs text-below">
+                  <li key={`w${i}`} className="meta">
                     warning: {issue.message}
                   </li>
                 ))}
@@ -107,7 +107,7 @@ export default function AdminNormsPage() {
         ))}
       </div>
 
-      <p className="text-xs leading-relaxed text-paper-faint">
+      <p className="text-[12px] leading-relaxed text-chalk-dim">
         Fixing an unverified file means opening the cited source and checking
         each cohort row by hand, then setting transcription_verified to true.
         See VERIFY_NORMS.md. Do not clear these in bulk.
@@ -125,12 +125,12 @@ function Stat({
   value: number;
   tone: "good" | "warn" | "bad";
 }) {
-  const colour =
-    tone === "bad" ? "text-risk" : tone === "warn" ? "text-below" : "text-strong";
+  // One accent per screen, and this screen is a checklist. Words, not colour.
+  const colour = tone === "bad" ? "text-chalk" : "text-chalk-dim";
   return (
-    <div className="rounded-2xl bg-ink-raised p-4 ring-1 ring-ink-line">
-      <dd className={`tnum text-3xl font-bold ${colour}`}>{value}</dd>
-      <dt className="mt-0.5 text-[10px] uppercase tracking-wider text-paper-faint">
+    <div className="border-b border-rule py-4">
+      <dd className={`num text-[28px] ${colour}`}>{value}</dd>
+      <dt className="label mt-0.5">
         {label}
       </dt>
     </div>

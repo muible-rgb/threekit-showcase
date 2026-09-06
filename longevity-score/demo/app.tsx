@@ -90,13 +90,13 @@ function Router() {
   return (
     <AppFrame>
       <div className="space-y-4 pt-6">
-        <h1 className="text-2xl font-bold">Not here</h1>
-        <p className="text-sm text-paper-dim">
-          No screen at <code className="text-paper">{pathname}</code>.
+        <h1 className="name text-[22px]">Not here</h1>
+        <p className="meta">
+          No screen at <code className="num text-chalk">{pathname}</code>.
         </p>
         <button
           onClick={() => navigate("/")}
-          className="h-12 rounded-xl bg-signal px-5 font-semibold text-ink"
+          className="btn h-12 px-5 text-[12px]"
         >
           Back to the app
         </button>
@@ -122,9 +122,9 @@ class Boundary extends React.Component<
   render() {
     if (!this.state.error) return this.props.children;
     return (
-      <div className="mx-auto max-w-lg px-5 py-10">
-        <h1 className="text-xl font-bold text-risk">This screen threw</h1>
-        <pre className="mt-3 overflow-x-auto rounded-xl bg-ink-raised p-4 text-xs text-paper-dim ring-1 ring-ink-line">
+      <div className="mx-auto max-w-lg px-pad py-10">
+        <h1 className="name text-[20px]">This screen threw</h1>
+        <pre className="num mt-3 overflow-x-auto border border-rule-2 p-3 text-[11px] text-chalk-dim">
           {this.state.error.message}
         </pre>
         <button
@@ -132,7 +132,7 @@ class Boundary extends React.Component<
             this.setState({ error: null });
             navigate("/");
           }}
-          className="mt-4 h-12 rounded-xl bg-signal px-5 font-semibold text-ink"
+          className="btn mt-4 h-12 px-5 text-[12px]"
         >
           Back to the app
         </button>
@@ -146,8 +146,8 @@ function PreviewBanner() {
   return (
     <div className="pointer-events-none fixed bottom-[4.25rem] right-3 z-40 flex w-[min(100%-1.5rem,22rem)] flex-col items-end">
       {open && (
-        <div className="pointer-events-auto mb-2 rounded-xl bg-ink-raised p-4 text-left text-xs leading-relaxed text-paper-dim shadow-2xl ring-1 ring-ink-line">
-          <p className="font-semibold text-paper">Preview build</p>
+        <div className="pointer-events-auto mb-2 border border-rule-2 bg-board p-3 text-left text-[11px] leading-relaxed text-chalk-dim">
+          <p className="label text-chalk">Preview build</p>
           <p className="mt-1.5">
             The real app, bundled to run without a server. Same scoring engine,
             same norms files, same screens.
@@ -161,7 +161,7 @@ function PreviewBanner() {
       )}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="pointer-events-auto rounded-full bg-ink-raised px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-paper-faint shadow-lg ring-1 ring-ink-line"
+        className="label pointer-events-auto border border-rule-2 bg-board px-2 py-1"
       >
         {open ? "Hide" : "Preview"}
       </button>

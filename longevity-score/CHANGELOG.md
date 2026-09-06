@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Longevity Score.
+All notable changes to The Long Game.
 
 ## [Unreleased]
 

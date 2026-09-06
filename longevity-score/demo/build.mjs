@@ -66,13 +66,17 @@ await build({
 // 3. Inline into one file.
 const css = readFileSync(join(out, "app.css"), "utf8");
 const js = readFileSync(join(out, "app.js"), "utf8");
+// Fonts are embedded as base64, not linked. One file, no network, no silent
+// fallback to system sans when a request fails. See demo/fetch-fonts.mjs.
+const fonts = readFileSync(join(root, "demo", "fonts", "fonts.css"), "utf8");
 
-const html = `<title>Longevity Score</title>
+const html = `<title>The Long Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <style>
+${fonts}
 ${css}
-/* The preview is a phone app. Centre it and let the page behind stay dark. */
-html, body { background: #0a0c0f; color: #f2f4f7; }
+/* The preview is a phone app on a board-coloured page. */
+html, body { background: #141414; color: #f2f0eb; }
 #root { min-height: 100dvh; }
 </style>
 <div id="root"></div>
@@ -81,9 +85,9 @@ ${js}
 </script>
 `;
 
-const file = join(out, "longevity-preview.html");
+const file = join(out, "the-long-game-preview.html");
 writeFileSync(file, html);
 
 const kb = (n) => `${(n / 1024).toFixed(0)} kB`;
 console.log(`\n${file}`);
-console.log(`  css ${kb(css.length)}  js ${kb(js.length)}  total ${kb(html.length)}`);
+console.log(`  fonts ${kb(fonts.length)}  css ${kb(css.length)}  js ${kb(js.length)}  total ${kb(html.length)}`);

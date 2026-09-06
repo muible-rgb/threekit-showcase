@@ -1,5 +1,5 @@
 {
-  "name": "longevity-score",
+  "name": "the-long-game",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,7 +22,6 @@
     "next": "^15.5.25",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "recharts": "^3.10.1",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {

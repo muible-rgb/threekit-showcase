@@ -6,21 +6,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/** One place to decide what a band looks like, used by every surface. */
-export const BAND_STYLES: Record<
-  BandLabel,
-  { text: string; bg: string; ring: string; hex: string }
-> = {
-  Elite: { text: "text-elite", bg: "bg-elite/12", ring: "ring-elite/35", hex: "#d6ff3f" },
-  Strong: { text: "text-strong", bg: "bg-strong/12", ring: "ring-strong/35", hex: "#6ee7a8" },
-  Solid: { text: "text-solid", bg: "bg-solid/12", ring: "ring-solid/35", hex: "#7cc3ff" },
-  "Below average": {
-    text: "text-below",
-    bg: "bg-below/12",
-    ring: "ring-below/35",
-    hex: "#ffb86b",
-  },
-  "At risk": { text: "text-risk", bg: "bg-risk/12", ring: "ring-risk/35", hex: "#ff7a7a" },
+/**
+ * Bands are words, not colours.
+ *
+ * They used to be five colours - green, blue, orange, red. DESIGN.md rules out
+ * blue and teal outright and reserves the accent for your own result, so a
+ * five-colour scale cannot exist here. The percentile next to the label
+ * already carries the ranking; the word carries the meaning.
+ */
+export const BAND_LABELS: Record<BandLabel, string> = {
+  Elite: "Elite",
+  Strong: "Strong",
+  Solid: "Solid",
+  "Below average": "Below",
+  "At risk": "At risk",
 };
 
 export function formatSigned(n: number, decimals = 1): string {
@@ -28,20 +27,18 @@ export function formatSigned(n: number, decimals = 1): string {
   return n > 0 ? `+${v}` : v;
 }
 
-/** 92.5 -> "92.5", 92 -> "92.0". The composite always shows its decimal. */
+/** 92.5 -> "92.5", 92 -> "92.0". The score always shows its decimal. */
 export function oneDecimal(n: number): string {
   return n.toFixed(1);
 }
 
 /**
- * Raw results, imperial. Every unit gets the shape people actually say out
- * loud: a mile is 7:42, an agility shuttle is 5.62s, a jump is 78".
+ * Raw results, imperial. Every unit gets the shape people say out loud: a mile
+ * is 7:42, an agility shuttle is 5.62s, a jump is 7'0".
  */
 export function formatRaw(value: number, unit: string): string {
   switch (unit) {
     case "s":
-      // Anything over a minute is a running time; under it is a stopwatch
-      // reading, and the decimal matters.
       if (value >= 60) {
         const m = Math.floor(value / 60);
         const sec = Math.round(value - m * 60);
@@ -68,8 +65,7 @@ export function formatRaw(value: number, unit: string): string {
 
 /**
  * A change, in the unit it was measured in. A 148-second mile improvement is
- * "-2:28", not "-148.0" - the raw number is technically right and tells you
- * nothing at a glance.
+ * "-2:28", not "-148.0" - technically right and useless at a glance.
  */
 export function formatRawDelta(delta: number, unit: string): string {
   const sign = delta > 0 ? "+" : "-";
@@ -101,18 +97,13 @@ export function secondsToClock(total: number): { minutes: number; seconds: numbe
   return { minutes, seconds: Math.round(total - minutes * 60) };
 }
 
-export function formatClock(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
+/** Untested is "--". Never "N/A", never a placeholder. */
+export const EMPTY = "--";
 
 export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+  return new Date(iso)
+    .toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "2-digit" })
+    .toUpperCase();
 }
 
 export function ordinal(n: number): string {
@@ -121,7 +112,7 @@ export function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] ?? s[v] ?? s[0]);
 }
 
-/** The sentence that makes a percentile mean something to a human. */
+/** Sentence-free. "Better than 74% of men your age." */
 export function betterThanSentence(percentile: number, sex: "M" | "F"): string {
   const group = sex === "M" ? "men" : "women";
   return `Better than ${Math.round(percentile)}% of ${group} your age`;
@@ -133,13 +124,8 @@ export function ageBandLabel(age: number, sex: "M" | "F"): string {
 }
 
 /**
- * Did the raw number move the right way?
- *
- * Sign alone is not the answer: a faster 400m is a smaller number, so a
- * negative raw delta on the only lower-is-better test in the battery is an
- * improvement. Getting this backwards paints every PR on that test red, which
- * is exactly the kind of small wrongness that makes people stop trusting a
- * score card.
+ * Did the raw number move the right way? Sign alone is not the answer: a
+ * faster mile is a smaller number.
  */
 export function rawImproved(
   direction: "higher_better" | "lower_better",

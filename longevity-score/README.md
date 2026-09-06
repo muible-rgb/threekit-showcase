@@ -1,4 +1,4 @@
-# Longevity Score
+# The Long Game
 
 Eight physical tests, one score, graded against people your own age and sex.
 Imperial units. Test with a crew, compare on a shared board.
@@ -44,6 +44,25 @@ Supabase URL and anon key, and apply `supabase/migrations/*.sql` in order.
 To put it on the web, see `DEPLOY.md`. Short version: import the repo on
 Netlify or Vercel and set the base/root directory to `longevity-score`. No
 environment variables needed - it deploys and runs on the seeded demo data.
+
+## Design
+
+All UI follows `DESIGN.md` - gym whiteboard: near-black board, chalk type, one
+acid accent. Tokens live in `src/app/globals.css` and are exposed as Tailwind
+utilities (`bg-board`, `text-chalk`, `border-rule`, `font-num`), so components
+name the token and never the value.
+
+**One thing the design system cost, worth knowing:** score bands used to be
+five colours. DESIGN.md rules out blue and teal outright and reserves the
+accent for your own result, so a five-colour scale cannot exist. Bands are now
+words - ELITE, STRONG, SOLID, BELOW, AT RISK - sitting next to the percentile
+that already carries the ranking. It reads cleaner and you lose the
+at-a-glance colour cue.
+
+The radar chart went with it. A radar is a shape you decode; eight bars sorted
+best to worst is the same data read in one pass, and it obeys the rule that if
+an element is not a number, a label or a rule, it gets cut. Recharts is no
+longer a dependency, which took 320 kB off the bundle.
 
 ## How it fits together
 

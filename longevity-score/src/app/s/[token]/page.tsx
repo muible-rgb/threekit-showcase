@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const share = parseShareToken(token);
   if (!share) return { title: "Score not found" };
 
-  const title = `${share.name} - ${oneDecimal(share.composite)} Longevity Score`;
+  const title = `${share.name} - ${oneDecimal(share.composite)} on The Long Game`;
   const description = `${share.band}. Better than ${Math.round(share.composite)}% of ${
     share.sex === "M" ? "men" : "women"
   } in the ${share.ageBand.slice(2)} age band, across ten physical tests.`;

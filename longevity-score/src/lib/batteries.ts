@@ -117,7 +117,7 @@ export function attemptsFor(
 
 export interface ParticipantHistory {
   attempts: BatteryAttempt[];
-  /** Newest attempt with all ten tests. This is "your Longevity Score". */
+  /** Newest attempt with every test present. */
   latestComplete: BatteryAttempt | null;
   /** The one before it, for retest deltas. */
   previousComplete: BatteryAttempt | null;

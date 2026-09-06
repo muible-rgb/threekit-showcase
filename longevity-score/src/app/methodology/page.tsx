@@ -29,24 +29,24 @@ export default function MethodologyPage() {
   return (
     <article className="space-y-8 pb-6">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight">Methodology</h1>
-        <p className="mt-2 text-sm leading-relaxed text-paper-dim">
+        <h1 className="name text-[26px]">Methodology</h1>
+        <p className="mt-2 text-[13px] leading-relaxed text-chalk-dim">
           Every number this app shows you traces back to a source on this page.
           Where the source is weak, it says so. That is the point of the page.
         </p>
       </header>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-paper-faint">
+        <h2 className="label border-b border-rule-2 pb-2">
           How the score works
         </h2>
-        <div className="space-y-3 text-sm leading-relaxed text-paper-dim">
+        <div className="space-y-3 text-[13px] leading-relaxed text-chalk-dim">
           <p>
             You do eight tests. Each raw result is compared to published norms for
             people of your sex in your five-year age band. That comparison gives
             a percentile between 1 and 99.
           </p>
-          <p className="font-medium text-paper">
+          <p className="font-medium text-chalk">
             Your Longevity Score is the average of those eight percentiles. Nothing
             is weighted. A 78-year-old woman can outscore a 30-year-old man,
             because both are measured against their own cohort.
@@ -65,17 +65,17 @@ export default function MethodologyPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-paper-faint">
+        <h2 className="label border-b border-rule-2 pb-2">
           What the labels mean
         </h2>
-        <ul className="overflow-hidden rounded-2xl ring-1 ring-ink-line">
+        <ul className="">
           {BANDS.map((band) => (
             <li
               key={band.label}
-              className="flex items-baseline justify-between border-b border-ink-line-soft bg-ink-raised px-4 py-3 last:border-b-0"
+              className="flex items-baseline justify-between border-b border-rule py-2.5"
             >
-              <span className="text-sm font-semibold">{band.label}</span>
-              <span className="tnum text-xs text-paper-faint">
+              <span className="name text-name">{band.label}</span>
+              <span className="tnum meta">
                 {band.min}-{Math.round(band.max)} percentile
               </span>
             </li>
@@ -84,17 +84,17 @@ export default function MethodologyPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-paper-faint">
+        <h2 className="label border-b border-rule-2 pb-2">
           Two numbers, never blended
         </h2>
-        <div className="space-y-3 text-sm leading-relaxed text-paper-dim">
+        <div className="space-y-3 text-[13px] leading-relaxed text-chalk-dim">
           <p>
-            <span className="font-semibold text-paper">Longevity Score</span> is
+            <span className="font-semibold text-chalk">Longevity Score</span> is
             you against published general-population norms. It is the number that
             carries any health meaning.
           </p>
           <p>
-            <span className="font-semibold text-paper">Crew rank</span> is you
+            <span className="font-semibold text-chalk">Crew rank</span> is you
             against the other people in your session. It is the game. It never
             feeds into your Longevity Score, and your Longevity Score never
             changes because of who showed up on Saturday.
@@ -103,10 +103,10 @@ export default function MethodologyPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-paper-faint">
+        <h2 className="label border-b border-rule-2 pb-2">
           Fitness age
         </h2>
-        <div className="space-y-3 text-sm leading-relaxed text-paper-dim">
+        <div className="space-y-3 text-[13px] leading-relaxed text-chalk-dim">
           <p>
             For each test, we find the age at which your raw result would be
             exactly average for your sex, then take the median of those eight ages.
@@ -119,7 +119,7 @@ export default function MethodologyPage() {
             per cent above it in raw terms, which maps to an age below the
             youngest band the norms cover.
           </p>
-          <p className="font-medium text-paper">
+          <p className="font-medium text-chalk">
             When that happens on more than three of your eight tests, the number is
             shown as a floor - &quot;22 or under&quot; - and tagged approx. It is
             not a more precise answer being rounded. It is the edge of what these
@@ -129,12 +129,12 @@ export default function MethodologyPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-paper-faint">
+        <h2 className="label border-b border-rule-2 pb-2">
           Where the norms are weak
         </h2>
-        <div className="rounded-2xl bg-below/8 p-4 ring-1 ring-below/25">
-          <p className="text-sm leading-relaxed text-paper-dim">
-            <span className="font-semibold text-below">
+        <div className="border border-rule-2 p-4">
+          <p className="text-[13px] leading-relaxed text-chalk-dim">
+            <span className="font-semibold text-chalk-dim">
               {provisionalCount} of {files.length} tests
             </span>{" "}
             use provisional norms, and {unverifiedCount} of {files.length} have
@@ -142,7 +142,7 @@ export default function MethodologyPage() {
             human. Both states are marked on every test below and tagged wherever
             a percentile from them appears in the app.
           </p>
-          <p className="mt-3 text-sm leading-relaxed text-paper-dim">
+          <p className="mt-3 text-[13px] leading-relaxed text-chalk-dim">
             A file is only non-provisional when both the average and the spread
             come from the cited source. If we had to infer the spread, it is
             provisional, even where the average is well published.
@@ -151,7 +151,7 @@ export default function MethodologyPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-paper-faint">
+        <h2 className="label border-b border-rule-2 pb-2">
           The eight tests
         </h2>
 
@@ -159,37 +159,37 @@ export default function MethodologyPage() {
           <div
             key={test.slug}
             id={test.slug}
-            className="scroll-mt-20 rounded-2xl bg-ink-raised p-4 ring-1 ring-ink-line"
+            className="scroll-mt-20 border-b border-rule py-5"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-paper-faint">
+                <p className="label text-chalk-dim">
                   {i + 1} - {test.capacityName}
                 </p>
-                <h3 className="mt-0.5 text-base font-bold">{test.name}</h3>
+                <h3 className="mt-0.5 name text-name">{test.name}</h3>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 {norms.source.provisional ? (
-                  <span className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-below ring-1 ring-below/30">
+                  <span className="rounded px-2 py-0.5 label text-chalk-dim border border-rule-2">
                     provisional
                   </span>
                 ) : (
-                  <span className="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-strong ring-1 ring-strong/30">
+                  <span className="rounded px-2 py-0.5 label text-chalk border border-rule-2">
                     sourced
                   </span>
                 )}
-                <span className="text-[10px] text-paper-faint">
+                <span className="text-[10px] text-chalk-dim">
                   {test.direction === "lower_better" ? "lower is better" : "higher is better"}
                 </span>
               </div>
             </div>
 
-            <p className="mt-3 text-sm leading-relaxed text-paper-dim">{test.protocol}</p>
+            <p className="mt-3 text-[13px] leading-relaxed text-chalk-dim">{test.protocol}</p>
 
-            <dl className="mt-4 space-y-2 border-t border-ink-line-soft pt-3 text-xs leading-relaxed">
+            <dl className="mt-4 space-y-2 border-t border-ink-line-soft pt-3 text-[12px] leading-relaxed">
               <div>
-                <dt className="font-semibold text-paper-faint">Source</dt>
-                <dd className="mt-0.5 text-paper-dim">
+                <dt className="font-semibold text-chalk-dim">Source</dt>
+                <dd className="mt-0.5 text-chalk-dim">
                   {norms.source.citation}
                   {norms.source.url && (
                     <>
@@ -198,7 +198,7 @@ export default function MethodologyPage() {
                         href={norms.source.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-signal underline underline-offset-2"
+                        className="text-chalk underline underline-offset-2"
                       >
                         link
                       </a>
@@ -207,18 +207,18 @@ export default function MethodologyPage() {
                 </dd>
               </div>
               <div>
-                <dt className="font-semibold text-paper-faint">Population</dt>
-                <dd className="mt-0.5 text-paper-dim">{norms.source.population}</dd>
+                <dt className="font-semibold text-chalk-dim">Population</dt>
+                <dd className="mt-0.5 text-chalk-dim">{norms.source.population}</dd>
               </div>
               {norms.source.notes && (
                 <div>
-                  <dt className="font-semibold text-paper-faint">What to know</dt>
-                  <dd className="mt-0.5 text-paper-dim">{norms.source.notes}</dd>
+                  <dt className="font-semibold text-chalk-dim">What to know</dt>
+                  <dd className="mt-0.5 text-chalk-dim">{norms.source.notes}</dd>
                 </div>
               )}
               <div>
-                <dt className="font-semibold text-paper-faint">Form</dt>
-                <dd className="mt-0.5 text-paper-dim">
+                <dt className="font-semibold text-chalk-dim">Form</dt>
+                <dd className="mt-0.5 text-chalk-dim">
                   {norms.cohorts[0]?.mean !== undefined
                     ? "Mean and standard deviation per cohort; percentile from the normal curve."
                     : "Published percentile cut-points per cohort; linear interpolation between them."}{" "}
@@ -235,10 +235,10 @@ export default function MethodologyPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-paper-faint">
+        <h2 className="label border-b border-rule-2 pb-2">
           Not medical advice
         </h2>
-        <p className="text-sm leading-relaxed text-paper-dim">
+        <p className="text-[13px] leading-relaxed text-chalk-dim">
           Several of these tests are associated with mortality risk in published
           research. That is a statement about populations, not about you. This is
           a fitness score, not a diagnosis, and a low band is a reason to train,
@@ -246,7 +246,7 @@ export default function MethodologyPage() {
         </p>
       </section>
 
-      <p className="text-center text-xs text-paper-faint">
+      <p className="text-center meta">
         <Link href="/" className="underline underline-offset-2">
           Back to your score
         </Link>

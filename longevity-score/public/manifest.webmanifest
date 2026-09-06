@@ -1,13 +1,13 @@
 {
-  "name": "Longevity Score",
-  "short_name": "Longevity",
-  "description": "Ten tests, one score, graded against your own age and sex.",
+  "name": "The Long Game",
+  "short_name": "Long Game",
+  "description": "Eight tests. One score, graded against your own age and sex.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0a0c0f",
-  "theme_color": "#0a0c0f",
+  "background_color": "#141414",
+  "theme_color": "#141414",
   "categories": ["health", "fitness"],
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

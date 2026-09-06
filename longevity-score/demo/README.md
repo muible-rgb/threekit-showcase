@@ -5,7 +5,7 @@ without a server - dropped into a page, opened from disk, attached to a
 message.
 
 ```bash
-node demo/build.mjs   # -> demo/dist/longevity-preview.html  (~900 kB)
+node demo/build.mjs   # -> demo/dist/the-long-game-preview.html  (~900 kB)
 ```
 
 It is the real app, not a mock: the same scoring engine, the same norms JSON,
