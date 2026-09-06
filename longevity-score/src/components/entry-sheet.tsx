@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn, formatRaw, secondsToClock } from "@/lib/utils";
-import { CARRY_LOAD_TOLERANCE, carryLoadDrift } from "@/lib/battery";
+import { CARRY_LOAD_LB, CARRY_LOAD_TOLERANCE, carryLoadDrift } from "@/lib/battery";
 import type { BatteryTest } from "@/lib/battery";
 
 /**
@@ -18,23 +18,20 @@ export function EntrySheet({
   test,
   current,
   currentSecondary,
-  bodyweightLb,
   onSave,
   onClose,
 }: {
   test: BatteryTest;
   current: number | null;
   currentSecondary: number | null;
-  bodyweightLb: number | null;
   onSave: (value: number, secondary: number | null) => void | Promise<void>;
   onClose: () => void;
 }) {
   const [value, setValue] = React.useState<number | null>(current);
   const [secondary, setSecondary] = React.useState<number | null>(
-    // Default the carry load to the protocol's half bodyweight, so the common
-    // case is already filled in and the uncommon case is a deliberate edit.
-    currentSecondary ??
-      (test.secondary && bodyweightLb ? Math.round(bodyweightLb / 2) : null),
+    // Default to the prescribed load, so the common case is already filled in
+    // and the uncommon case is a deliberate edit.
+    currentSecondary ?? (test.secondary ? CARRY_LOAD_LB : null),
   );
   const [saving, setSaving] = React.useState(false);
 
@@ -59,7 +56,7 @@ export function EntrySheet({
   const valid =
     value !== null && value >= test.min && value <= test.max && secondaryValid;
 
-  const drift = test.secondary ? carryLoadDrift(secondary, bodyweightLb) : null;
+  const drift = test.secondary ? carryLoadDrift(secondary) : null;
   const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 
   return (
@@ -89,12 +86,7 @@ export function EntrySheet({
 
         <div className="px-pad pb-5 pt-4">
           {test.secondary && (
-            <SecondaryInput
-              test={test}
-              value={secondary}
-              bodyweightLb={bodyweightLb}
-              onChange={setSecondary}
-            />
+            <SecondaryInput test={test} value={secondary} onChange={setSecondary} />
           )}
 
           <ValueInput test={test} value={value} onChange={setValue} />
@@ -102,9 +94,10 @@ export function EntrySheet({
           {offProtocol && (
             <p className="mt-3 border border-rule-2 p-3 text-[12px] leading-relaxed text-chalk-dim">
               That is {Math.abs(Math.round(drift! * 100))}%{" "}
-              {drift! > 0 ? "heavier" : "lighter"} than half your bodyweight.
-              The norms assume half, so your percentile will be marked
-              off-protocol rather than compared as if it matched.
+              {drift! > 0 ? "heavier" : "lighter"} than the prescribed{" "}
+              {CARRY_LOAD_LB} lb. The norms assume {CARRY_LOAD_LB}, so your
+              percentile will be marked off-protocol rather than compared as if
+              it matched.
             </p>
           )}
 
@@ -148,12 +141,10 @@ export function EntrySheet({
 function SecondaryInput({
   test,
   value,
-  bodyweightLb,
   onChange,
 }: {
   test: BatteryTest;
   value: number | null;
-  bodyweightLb: number | null;
   onChange: (v: number | null) => void;
 }) {
   const spec = test.secondary!;
@@ -164,7 +155,7 @@ function SecondaryInput({
     onChange(text !== "" && Number.isFinite(n) ? n : null);
   }, [text, onChange]);
 
-  const suggested = bodyweightLb ? Math.round(bodyweightLb / 2) : null;
+  const suggested = CARRY_LOAD_LB;
 
   return (
     <div className="mb-5">
@@ -175,24 +166,21 @@ function SecondaryInput({
             inputMode="decimal"
             value={text}
             onChange={(e) => setText(e.target.value.replace(/[^\d.]/g, ""))}
-            placeholder={suggested === null ? "0" : String(suggested)}
+            placeholder={String(suggested)}
             aria-label={spec.label}
             className="num h-14 w-full min-w-0 flex-1 border border-rule-2 bg-board px-3 text-[24px] text-chalk focus:border-chalk focus:outline-none"
           />
           <span className="label w-7 shrink-0">{spec.unitLabel}</span>
         </div>
       </label>
-      {suggested !== null && Number(text) !== suggested && (
+      {Number(text) !== suggested && (
         <button
           type="button"
           onClick={() => setText(String(suggested))}
           className="label mt-2 text-chalk"
         >
-          Use half bodyweight ({suggested} lb)
+          Use {suggested} lb
         </button>
-      )}
-      {suggested === null && (
-        <p className="meta mt-2">Set bodyweight on the scorecard to prefill this.</p>
       )}
     </div>
   );

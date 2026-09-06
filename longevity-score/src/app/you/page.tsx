@@ -9,7 +9,6 @@ import { currentCard, historyFor, previousCard } from "@/lib/batteries";
 import {
   BATTERY_TEST_COUNT,
   CARRY_LOAD_TOLERANCE,
-  SOLO_SESSION_ID,
   carryLoadDrift,
   testBySlug,
 } from "@/lib/battery";
@@ -39,7 +38,7 @@ import {
  * rule that if an element is not a number, a label or a rule, it is cut.
  */
 export default function DeepDivePage() {
-  const { me, ready, db } = useStore();
+  const { me, ready } = useStore();
   const results = useResultsFor(me?.id);
 
   const card = React.useMemo(() => (me ? currentCard(me, results) : null), [me, results]);
@@ -57,14 +56,6 @@ export default function DeepDivePage() {
 
   const score = card!.score;
   const age = ageAt(me.birthDate, card!.updatedAt ?? new Date().toISOString());
-  const bodyweight =
-    db?.sessionParticipants.find(
-      (sp) => sp.participantId === me.id && sp.sessionId === SOLO_SESSION_ID,
-    )?.bodyweightKg ??
-    db?.sessionParticipants.find(
-      (sp) => sp.participantId === me.id && sp.bodyweightKg != null,
-    )?.bodyweightKg ??
-    null;
 
   if (score.testsCompleted === 0) {
     return (
@@ -113,7 +104,7 @@ export default function DeepDivePage() {
           const entry = card!.entries.get(t.testVariant);
           const d = delta?.tests.find((x) => x.testVariant === t.testVariant);
           const drift = meta?.secondary
-            ? carryLoadDrift(entry?.secondaryValue, bodyweight)
+            ? carryLoadDrift(entry?.secondaryValue)
             : null;
           const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 

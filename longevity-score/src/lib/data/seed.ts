@@ -181,16 +181,9 @@ export function buildSeedDatabase(): Database {
 
       const participantId = id("p", person.key);
       const age = ageAt(person.birthDate, session.startsAt!);
-      // Pounds. The carry load comes out of this.
-      const bodyweight =
-        person.sex === "M"
-          ? Math.round(172 + gauss(rand) * 16)
-          : Math.round(141 + gauss(rand) * 13);
-
       sessionParticipants.push({
         sessionId: session.id,
         participantId,
-        bodyweightKg: bodyweight,
         joinedAt: new Date(startedAt - 900000).toISOString(),
       });
 

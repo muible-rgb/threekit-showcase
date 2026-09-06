@@ -126,16 +126,10 @@ export class SupabaseStore implements DataStore {
   async joinSession(
     sessionId: string,
     participantId: string,
-    bodyweightKg?: number | null,
   ): Promise<SessionParticipant> {
-    const sp = await this.local.joinSession(sessionId, participantId, bodyweightKg);
+    const sp = await this.local.joinSession(sessionId, participantId);
     void this.flush();
     return sp;
-  }
-
-  async setBodyweight(sessionId: string, participantId: string, kg: number) {
-    await this.local.setBodyweight(sessionId, participantId, kg);
-    void this.flush();
   }
 
   /**
@@ -301,7 +295,6 @@ export class SupabaseStore implements DataStore {
           const { error } = await this.client.from("session_participants").upsert({
             session_id: w.payload.sessionId,
             participant_id: w.payload.participantId,
-            bodyweight_kg: w.payload.bodyweightKg,
             joined_at: w.payload.joinedAt,
           });
           if (error) throw error;

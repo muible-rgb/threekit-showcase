@@ -5,20 +5,20 @@
   "direction": "higher_better",
   "norms_version": "v2",
   "source": {
-    "citation": "No published normative table for a relative-load (half bodyweight per hand) carry to grip failure.",
+    "citation": "No published normative table for a fixed-load (50 lb per hand) carry to grip failure.",
     "url": "",
     "population": "None. This is a construction, not a normative sample.",
     "provisional": true,
     "transcription_verified": false,
-    "notes": "PROVISIONAL. Because the load scales with bodyweight the test is already partly self-normalising, which is why the sex gap in the anchors is narrower than on absolute-load tests. The anchors come from strength-coaching benchmarks, where a passing relative-load carry is usually put somewhere between 150 and 350 feet. The 0.5 coefficient of variation is wide on purpose: distance to grip failure has a heavy right tail. Surface and route matter more here than on any other test in the battery, so protocol discipline beats norm precision.",
+    "notes": "PROVISIONAL. The load is fixed at 50 lb per hand for everyone, so the sex gap in the anchors is wider than it would be on a bodyweight-relative carry: a fixed load is a smaller fraction of a heavier person's strength. The anchors put a median 42-year-old somewhere around two and a half minutes of walking before grip failure. The 0.5 coefficient of variation is wide on purpose: distance to grip failure has a heavy right tail. Surface and route matter more here than on any other test in the battery, so protocol discipline beats norm precision. Older cohorts will bunch near zero at a fixed load - that is real, and it is the same shape the pull-up file has. The decline per decade is steeper than the bodyweight-relative version used to be (0.22 against 0.15), because a fixed load does not shrink with the athlete: 100 lb total is a moderate carry at 35 and close to a maximal one at 80.",
     "generated_by": "scripts/generate-provisional-norms.ts",
     "model": {
       "form": "mean(age) = anchor42 * (1 -/+ declinePerDecade) ^ ((max(bandMid, peakAge) - 42) / 10)",
       "peak_age": 28,
-      "decline_per_decade": 0.15,
+      "decline_per_decade": 0.22,
       "anchor_age_42": {
-        "M": 280,
-        "F": 230
+        "M": 550,
+        "F": 340
       },
       "coefficient_of_variation": 0.5
     }
@@ -28,183 +28,183 @@
       "sex": "M",
       "age_min": 20,
       "age_max": 24,
-      "mean": 352.0,
-      "sd": 175.8
+      "mean": 779.0,
+      "sd": 389.4
     },
     {
       "sex": "M",
       "age_min": 25,
       "age_max": 29,
-      "mean": 352.0,
-      "sd": 175.8
+      "mean": 779.0,
+      "sd": 389.4
     },
     {
       "sex": "M",
       "age_min": 30,
       "age_max": 34,
-      "mean": 329.0,
-      "sd": 164.7
+      "mean": 705.0,
+      "sd": 352.6
     },
     {
       "sex": "M",
       "age_min": 35,
       "age_max": 39,
-      "mean": 304.0,
-      "sd": 151.9
+      "mean": 623.0,
+      "sd": 311.4
     },
     {
       "sex": "M",
       "age_min": 40,
       "age_max": 44,
-      "mean": 280.0,
-      "sd": 140.0
+      "mean": 550.0,
+      "sd": 275.0
     },
     {
       "sex": "M",
       "age_min": 45,
       "age_max": 49,
-      "mean": 258.0,
-      "sd": 129.1
+      "mean": 486.0,
+      "sd": 242.9
     },
     {
       "sex": "M",
       "age_min": 50,
       "age_max": 54,
-      "mean": 238.0,
-      "sd": 119.0
+      "mean": 429.0,
+      "sd": 214.5
     },
     {
       "sex": "M",
       "age_min": 55,
       "age_max": 59,
-      "mean": 219.0,
-      "sd": 109.7
+      "mean": 379.0,
+      "sd": 189.4
     },
     {
       "sex": "M",
       "age_min": 60,
       "age_max": 64,
-      "mean": 202.0,
-      "sd": 101.1
+      "mean": 335.0,
+      "sd": 167.3
     },
     {
       "sex": "M",
       "age_min": 65,
       "age_max": 69,
-      "mean": 187.0,
-      "sd": 93.3
+      "mean": 296.0,
+      "sd": 147.8
     },
     {
       "sex": "M",
       "age_min": 70,
       "age_max": 74,
-      "mean": 172.0,
-      "sd": 86.0
+      "mean": 261.0,
+      "sd": 130.5
     },
     {
       "sex": "M",
       "age_min": 75,
       "age_max": 79,
-      "mean": 159.0,
-      "sd": 79.3
+      "mean": 231.0,
+      "sd": 115.3
     },
     {
       "sex": "M",
       "age_min": 80,
       "age_max": 84,
-      "mean": 146.0,
-      "sd": 73.1
+      "mean": 204.0,
+      "sd": 101.8
     },
     {
       "sex": "F",
       "age_min": 20,
       "age_max": 24,
-      "mean": 289.0,
-      "sd": 144.4
+      "mean": 481.0,
+      "sd": 240.7
     },
     {
       "sex": "F",
       "age_min": 25,
       "age_max": 29,
-      "mean": 289.0,
-      "sd": 144.4
+      "mean": 481.0,
+      "sd": 240.7
     },
     {
       "sex": "F",
       "age_min": 30,
       "age_max": 34,
-      "mean": 271.0,
-      "sd": 135.3
+      "mean": 436.0,
+      "sd": 217.9
     },
     {
       "sex": "F",
       "age_min": 35,
       "age_max": 39,
-      "mean": 249.0,
-      "sd": 124.7
+      "mean": 385.0,
+      "sd": 192.5
     },
     {
       "sex": "F",
       "age_min": 40,
       "age_max": 44,
-      "mean": 230.0,
-      "sd": 115.0
+      "mean": 340.0,
+      "sd": 170.0
     },
     {
       "sex": "F",
       "age_min": 45,
       "age_max": 49,
-      "mean": 212.0,
-      "sd": 106.0
+      "mean": 300.0,
+      "sd": 150.1
     },
     {
       "sex": "F",
       "age_min": 50,
       "age_max": 54,
-      "mean": 196.0,
-      "sd": 97.8
+      "mean": 265.0,
+      "sd": 132.6
     },
     {
       "sex": "F",
       "age_min": 55,
       "age_max": 59,
-      "mean": 180.0,
-      "sd": 90.1
+      "mean": 234.0,
+      "sd": 117.1
     },
     {
       "sex": "F",
       "age_min": 60,
       "age_max": 64,
-      "mean": 166.0,
-      "sd": 83.1
+      "mean": 207.0,
+      "sd": 103.4
     },
     {
       "sex": "F",
       "age_min": 65,
       "age_max": 69,
-      "mean": 153.0,
-      "sd": 76.6
+      "mean": 183.0,
+      "sd": 91.3
     },
     {
       "sex": "F",
       "age_min": 70,
       "age_max": 74,
-      "mean": 141.0,
-      "sd": 70.6
+      "mean": 161.0,
+      "sd": 80.7
     },
     {
       "sex": "F",
       "age_min": 75,
       "age_max": 79,
-      "mean": 130.0,
-      "sd": 65.1
+      "mean": 142.0,
+      "sd": 71.2
     },
     {
       "sex": "F",
       "age_min": 80,
       "age_max": 84,
-      "mean": 120.0,
-      "sd": 60.0
+      "mean": 126.0,
+      "sd": 62.9
     }
   ]
 }

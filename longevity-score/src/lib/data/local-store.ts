@@ -292,20 +292,14 @@ export class LocalStore implements DataStore {
   async joinSession(
     sessionId: string,
     participantId: string,
-    bodyweightKg: number | null = null,
   ): Promise<SessionParticipant> {
     const existing = this.db.sessionParticipants.find(
       (sp) => sp.sessionId === sessionId && sp.participantId === participantId,
     );
-    if (existing) {
-      if (bodyweightKg !== null) existing.bodyweightKg = bodyweightKg;
-      this.persist();
-      return existing;
-    }
+    if (existing) return existing;
     const created: SessionParticipant = {
       sessionId,
       participantId,
-      bodyweightKg,
       joinedAt: new Date().toISOString(),
     };
     this.db.sessionParticipants.push(created);
@@ -316,20 +310,6 @@ export class LocalStore implements DataStore {
 
   async listSessionParticipants(sessionId: string): Promise<SessionParticipant[]> {
     return this.db.sessionParticipants.filter((sp) => sp.sessionId === sessionId);
-  }
-
-  async setBodyweight(
-    sessionId: string,
-    participantId: string,
-    kg: number,
-  ): Promise<void> {
-    const sp = this.db.sessionParticipants.find(
-      (x) => x.sessionId === sessionId && x.participantId === participantId,
-    );
-    if (sp) {
-      sp.bodyweightKg = kg;
-      this.persist();
-    }
   }
 
   // -- sync ----------------------------------------------------------------

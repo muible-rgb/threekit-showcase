@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   BATTERY_TESTS,
   BATTERY_TEST_COUNT,
+  CARRY_LOAD_LB,
   CARRY_LOAD_TOLERANCE,
   carryLoadDrift,
   testBySlug,
@@ -126,15 +127,16 @@ describe("the carry records what you held as well as how far", () => {
     expect(carry.secondary!.unit).toBe("lb");
   });
 
-  it("calls a half-bodyweight load on protocol", () => {
-    // 180 lb bodyweight means 90 lb per hand.
-    expect(carryLoadDrift(90, 180)).toBe(0);
-    expect(Math.abs(carryLoadDrift(95, 180)!)).toBeLessThan(CARRY_LOAD_TOLERANCE);
+  it("prescribes one load for everyone, whatever they weigh", () => {
+    expect(CARRY_LOAD_LB).toBe(50);
+    expect(carryLoadDrift(CARRY_LOAD_LB)).toBe(0);
+    // A 53 lb kettlebell is the nearest thing most racks have. Still on protocol.
+    expect(Math.abs(carryLoadDrift(53)!)).toBeLessThan(CARRY_LOAD_TOLERANCE);
   });
 
-  it("flags a load that is not half bodyweight", () => {
-    const light = carryLoadDrift(45, 180)!;
-    const heavy = carryLoadDrift(135, 180)!;
+  it("flags a load that is not the prescribed one", () => {
+    const light = carryLoadDrift(25)!;
+    const heavy = carryLoadDrift(75)!;
     expect(light).toBe(-0.5);
     expect(heavy).toBe(0.5);
     expect(Math.abs(light)).toBeGreaterThan(CARRY_LOAD_TOLERANCE);
@@ -142,10 +144,10 @@ describe("the carry records what you held as well as how far", () => {
   });
 
   it("says it does not know rather than guessing", () => {
-    // No bodyweight on file is a different answer from "on protocol".
-    expect(carryLoadDrift(90, null)).toBeNull();
-    expect(carryLoadDrift(null, 180)).toBeNull();
-    expect(carryLoadDrift(90, 0)).toBeNull();
+    // No load recorded is a different answer from "on protocol".
+    expect(carryLoadDrift(null)).toBeNull();
+    expect(carryLoadDrift(undefined)).toBeNull();
+    expect(carryLoadDrift(0)).toBeNull();
   });
 });
 

@@ -28,8 +28,6 @@ export interface CrewSession {
 export interface SessionParticipant {
   sessionId: string;
   participantId: string;
-  /** Pounds. Drives the carry load; never scored. */
-  bodyweightKg: number | null;
   joinedAt: string;
 }
 
@@ -139,13 +137,8 @@ export interface DataStore {
     s: Omit<CrewSession, "id" | "code" | "createdAt" | "status" | "lockedAt">,
   ): Promise<CrewSession>;
   lockSession(id: string): Promise<CrewSession | null>;
-  joinSession(
-    sessionId: string,
-    participantId: string,
-    bodyweightKg?: number | null,
-  ): Promise<SessionParticipant>;
+  joinSession(sessionId: string, participantId: string): Promise<SessionParticipant>;
   listSessionParticipants(sessionId: string): Promise<SessionParticipant[]>;
-  setBodyweight(sessionId: string, participantId: string, kg: number): Promise<void>;
 
   syncStatus(): Promise<SyncStatus>;
   flush(): Promise<SyncStatus>;

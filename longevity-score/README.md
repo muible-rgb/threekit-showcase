@@ -175,6 +175,13 @@ Cooper 12-minute distance → mile time. Each step is a documented equation and
 each adds error. Percentile ordering survives because every step is monotone,
 so the ranking is sounder than the absolute time.
 
+**A fixed carry load bunches older cohorts near zero.** 100 lb total is a
+moderate carry at 35 and close to a maximal one at 80, so a good share of the
+oldest bands will record very short distances or none at all. That is real
+rather than a modelling artefact, and it is the same shape the pull-up file
+has: the cohort norms still rank within the band. The decline per decade in the
+carry file is set at 0.22 rather than 0.15 to reflect it.
+
 **Balance and sit-to-rise are compressed at the ceiling.** Both are capped
 scales (60 seconds, 10 points) with right-skewed distributions, and a normal
 model misbehaves at the top. Anyone capping out lands at the 99th percentile.
@@ -218,10 +225,17 @@ your results follow you to another phone, and you appear on the board. Without
 it everything still works, on that device only. There is no password - a magic
 link signs you in, which needs the Supabase wiring in `DEPLOY.md`.
 
-## The carry records two numbers
+## The carry records two numbers, and neither is your bodyweight
 
 Distance alone is not a result. 300 feet at 40 lb a hand and 300 feet at 90 lb
-are different tests, and the norms assume half bodyweight. So the entry sheet
-captures load and distance, prefills the load from your bodyweight, and marks
-the result off-protocol on the card when what you actually held is more than
-15% away from half. It does not quietly score it as if it matched.
+are different tests. So the entry sheet captures load and distance, prefills
+the load at the prescribed **50 lb per hand**, and marks the result
+off-protocol on the card when what you actually held is more than 15% away. It
+does not quietly score it as if it matched.
+
+The load used to be half your bodyweight. It is fixed now, and **the app never
+asks what you weigh.** Every other test in the battery is absolute - a pull-up
+is a pull-up at any size - and the cohort norms are what make results
+comparable. Scaling one test to bodyweight made it the odd one out, put the
+load at 90 lb a hand for a big man (not a dumbbell most gyms own), and made the
+app ask for a number people would rather not give.

@@ -76,8 +76,11 @@ name. It never becomes the Longevity Score.
    bodyweight-relative variant.
 2. **Push-ups, female** - the 0.62 knee-to-full conversion is the single
    largest known distortion in the set, and it hits half the user base.
-3. **Wall sit and farmer carry** - no norm at all, but both are
-   bodyweight-relative already, so a raw re-fit works.
+3. **Wall sit and farmer carry** - no norm at all. The carry now runs at a
+   fixed 50 lb per hand, so a raw re-fit works and needs no bodyweight
+   covariate. Watch the oldest bands: at a fixed load they are zero-inflated
+   the way pull-ups are, and a mean/SD model will misbehave there. Cut-points
+   are the likely answer when there is enough app data to fit them.
 4. **Single-leg balance** - does not need a new mean, needs a distribution that
    respects the 60-second cap. Consider fitting a truncated or beta model
    instead of forcing a normal.

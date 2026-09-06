@@ -38,7 +38,7 @@ export interface BatteryTest {
   /**
    * A second captured number, where the scored one needs context. The carry
    * records the load you actually held: 300 feet at 40 lb a hand and 300 feet
-   * at 90 lb are not the same result, and the norm assumes half bodyweight.
+   * at 90 lb are not the same result, and the norm assumes 50 lb.
    */
   secondary?: {
     label: string;
@@ -137,9 +137,9 @@ export const BATTERY_TESTS: BatteryTest[] = [
     min: 0,
     max: 3000,
     step: 5,
-    standard: "Half your bodyweight per hand. Walk till your grip goes.",
+    standard: "50 lb in each hand. Walk till your grip goes.",
     protocol:
-      "Half your bodyweight in each hand. Walk a flat, marked course until your grip fails and you have to put them down. Record what you held and how far you got. The norms assume half bodyweight per hand - carry lighter or heavier and the distance is not comparable, so the app says so rather than quietly scoring it anyway.",
+      "50 lb in each hand - a pair of dumbbells or kettlebells, same weight both sides. Walk a flat, marked course until your grip fails and you have to put them down. Record what you held and how far you got. The load is fixed for everyone, the way a pull-up is a pull-up at any size: your age and sex cohort is what makes the distance comparable, not the weight on the handle. If 50 is not what you own, enter what you carried - the app marks it off-protocol rather than quietly scoring it as if it matched.",
     demoVideoId: "",
     secondary: {
       label: "Load per hand",
@@ -213,30 +213,28 @@ export function testBySlug(slug: string): BatteryTest | undefined {
 }
 
 /**
- * Bodyweight, in pounds. Not scored - it is here because the carry load is
- * derived from it, and because a carry distance means nothing without it.
- */
-export const BODYWEIGHT_UNIT = "lb";
-
-/**
- * Bodyweight rides on a solo session row rather than a second storage concept.
- */
-export const SOLO_SESSION_ID = "solo";
-
-/**
- * How far the load strayed from the protocol's half-bodyweight, as a fraction.
- * 0 means exactly on protocol; 0.25 means a quarter light or heavy.
+ * The carry runs at a fixed load, not a fraction of your bodyweight.
  *
- * Returns null when we cannot tell - no bodyweight on file, or no load
- * recorded - because "we do not know" and "on protocol" are different answers.
+ * Every other test in the battery is absolute - a pull-up is a pull-up at any
+ * size - and the cohort norms are what make results comparable. Scaling one
+ * test to bodyweight made it the odd one out, made the app ask for a number
+ * people would rather not give, and put the load at 90 lb a hand for a big
+ * man, which is not a dumbbell most gyms own. 50 is a rack standard.
+ */
+export const CARRY_LOAD_LB = 50;
+
+/**
+ * How far the load strayed from the prescribed 50 lb, as a fraction. 0 means
+ * on protocol; 0.25 means a quarter light or heavy.
+ *
+ * Returns null when no load was recorded, because "we do not know" and "on
+ * protocol" are different answers.
  */
 export function carryLoadDrift(
   loadPerHandLb: number | null | undefined,
-  bodyweightLb: number | null | undefined,
 ): number | null {
-  if (!loadPerHandLb || !bodyweightLb || bodyweightLb <= 0) return null;
-  const expected = bodyweightLb / 2;
-  return (loadPerHandLb - expected) / expected;
+  if (!loadPerHandLb || loadPerHandLb <= 0) return null;
+  return (loadPerHandLb - CARRY_LOAD_LB) / CARRY_LOAD_LB;
 }
 
 /** Outside this, the distance is not comparable to the norm. */

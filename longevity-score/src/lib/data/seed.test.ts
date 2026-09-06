@@ -140,10 +140,11 @@ describe("seed produces the states each screen needs", () => {
     }
   });
 
-  it("records a bodyweight in pounds for everyone, which the carry needs", () => {
-    expect(
-      db.sessionParticipants.every((sp) => (sp.bodyweightKg ?? 0) > 90),
-    ).toBe(true);
+  it("asks for no bodyweight anywhere", () => {
+    // The carry runs at a fixed load, so nothing in the app needs a weigh-in.
+    for (const sp of db.sessionParticipants) {
+      expect(Object.keys(sp)).not.toContain("bodyweightKg");
+    }
   });
 });
 

@@ -11,7 +11,6 @@ import {
   BATTERY_TESTS,
   BATTERY_TEST_COUNT,
   CARRY_LOAD_TOLERANCE,
-  SOLO_SESSION_ID,
   carryLoadDrift,
   type BatteryTest,
 } from "@/lib/battery";
@@ -41,7 +40,7 @@ import type { BatteryScore, TestPercentile } from "@/lib/scoring/types";
  * number you got outside. The accent appears exactly once - on the score.
  */
 export default function ScorecardPage() {
-  const { me, ready, store, refresh, db } = useStore();
+  const { me, ready, store, refresh } = useStore();
   const results = useResultsFor(me?.id);
   const [editing, setEditing] = React.useState<BatteryTest | null>(null);
 
@@ -62,7 +61,6 @@ export default function ScorecardPage() {
 
   const age = ageAt(me.birthDate, card!.updatedAt ?? new Date().toISOString());
   const delta = complete && previous ? retestDelta(score, previous) : null;
-  const bodyweight = bodyweightFor(db, me.id);
 
   async function save(test: BatteryTest, value: number, secondary: number | null) {
     await store.addResult({
@@ -127,7 +125,6 @@ export default function ScorecardPage() {
             test={test}
             scored={byTest.get(test.slug)}
             entry={card!.entries.get(test.slug)}
-            bodyweightLb={bodyweight}
             delta={delta?.tests.find((d) => d.testVariant === test.slug)}
             onTap={() => setEditing(test)}
           />
@@ -149,8 +146,6 @@ export default function ScorecardPage() {
         </Link>
       </div>
 
-      <BodyweightRow current={bodyweight} />
-
       <p className="meta mt-6">
         {card!.updatedAt ? `Updated ${formatDate(card!.updatedAt)}` : "Nothing entered"}
       </p>
@@ -162,7 +157,6 @@ export default function ScorecardPage() {
           test={editing}
           current={card!.entries.get(editing.slug)?.value ?? null}
           currentSecondary={card!.entries.get(editing.slug)?.secondaryValue ?? null}
-          bodyweightLb={bodyweight}
           onSave={(v, secondary) => save(editing, v, secondary)}
           onClose={() => setEditing(null)}
         />
@@ -193,21 +187,17 @@ function TestRow({
   test,
   scored,
   entry,
-  bodyweightLb,
   delta,
   onTap,
 }: {
   test: BatteryTest;
   scored?: TestPercentile;
   entry?: { value: number; secondaryValue: number | null };
-  bodyweightLb: number | null;
   delta?: { delta: number; rawDelta: number };
   onTap: () => void;
 }) {
   // The entry sheet promises an off-protocol load gets marked. This is the mark.
-  const drift = test.secondary
-    ? carryLoadDrift(entry?.secondaryValue, bodyweightLb)
-    : null;
+  const drift = test.secondary ? carryLoadDrift(entry?.secondaryValue) : null;
   const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 
   return (
@@ -244,77 +234,6 @@ function TestRow({
         {scored ? scored.percentile.toFixed(0) : <span className="text-chalk-off">{EMPTY}</span>}
       </p>
     </button>
-  );
-}
-
-/**
- * Read bodyweight back from the row it is written to. Matching "any row for
- * this participant" picked up whichever session happened to be first, which
- * for a returning user is an old weigh-in rather than what they are today.
- */
-function bodyweightFor(
-  db: ReturnType<typeof useStore>["db"],
-  participantId: string,
-): number | null {
-  if (!db) return null;
-  const rows = db.sessionParticipants.filter(
-    (sp) => sp.participantId === participantId && sp.bodyweightKg != null,
-  );
-  const solo = rows.find((sp) => sp.sessionId === SOLO_SESSION_ID);
-  if (solo) return solo.bodyweightKg;
-  return (
-    [...rows].sort((a, b) => Date.parse(b.joinedAt) - Date.parse(a.joinedAt))[0]
-      ?.bodyweightKg ?? null
-  );
-}
-
-function BodyweightRow({ current }: { current: number | null }) {
-  const { me, store, refresh } = useStore();
-  const [editing, setEditing] = React.useState(false);
-  const [text, setText] = React.useState(current === null ? "" : String(current));
-
-  async function save(e?: React.FormEvent) {
-    e?.preventDefault();
-    const n = Number(text);
-    if (!Number.isFinite(n) || n < 60 || n > 500 || !me) return;
-    await store.joinSession(SOLO_SESSION_ID, me.id, n);
-    refresh();
-    setEditing(false);
-  }
-
-  return (
-    <div className="mt-6 border-t border-rule-2 pt-4">
-      {editing ? (
-        <form className="flex items-center gap-2" onSubmit={save}>
-          <input
-            autoFocus
-            inputMode="decimal"
-            value={text}
-            onChange={(e) => setText(e.target.value.replace(/[^\d.]/g, ""))}
-            aria-label="Bodyweight in pounds"
-            className="num h-10 w-full min-w-0 flex-1 border border-rule-2 bg-board px-3 text-name text-chalk focus:border-chalk focus:outline-none"
-          />
-          <Button size="md" type="submit" className="shrink-0">
-            Set
-          </Button>
-        </form>
-      ) : (
-        <button
-          onClick={() => setEditing(true)}
-          className="flex w-full items-center justify-between text-left"
-        >
-          <span className="label">Bodyweight</span>
-          <span className="num text-name">
-            {current === null ? (
-              <span className="text-chalk-off">{EMPTY}</span>
-            ) : (
-              `${Math.round(current)} lb`
-            )}
-          </span>
-        </button>
-      )}
-      <p className="meta mt-1">Sets your carry load. Not scored.</p>
-    </div>
   );
 }
 
