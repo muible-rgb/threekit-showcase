@@ -13,7 +13,7 @@ import type { Direction } from "@/lib/scoring/types";
  * the mean of one percentile per capacity.
  */
 
-export type InputKind = "number" | "reps" | "time" | "half_step";
+export type InputKind = "number" | "reps" | "time" | "half_step" | "load_distance";
 
 export interface BatteryTest {
   slug: string;
@@ -35,6 +35,18 @@ export interface BatteryTest {
   /** The full protocol, for /methodology and the entry sheet. */
   protocol: string;
   demoVideoId: string;
+  /**
+   * A second captured number, where the scored one needs context. The carry
+   * records the load you actually held: 300 feet at 40 lb a hand and 300 feet
+   * at 90 lb are not the same result, and the norm assumes half bodyweight.
+   */
+  secondary?: {
+    label: string;
+    unit: string;
+    unitLabel: string;
+    min: number;
+    max: number;
+  };
 }
 
 export const BATTERY_SLUG = "open-v2";
@@ -121,14 +133,21 @@ export const BATTERY_TESTS: BatteryTest[] = [
     unit: "ft",
     unitLabel: "feet",
     direction: "higher_better",
-    input: "number",
+    input: "load_distance",
     min: 0,
     max: 3000,
     step: 5,
     standard: "Half your bodyweight per hand. Walk till your grip goes.",
     protocol:
-      "Half your bodyweight in each hand. Walk a flat, marked course until your grip fails and you have to put them down. Record the distance covered.",
+      "Half your bodyweight in each hand. Walk a flat, marked course until your grip fails and you have to put them down. Record what you held and how far you got. The norms assume half bodyweight per hand - carry lighter or heavier and the distance is not comparable, so the app says so rather than quietly scoring it anyway.",
     demoVideoId: "",
+    secondary: {
+      label: "Load per hand",
+      unit: "lb",
+      unitLabel: "lb",
+      min: 5,
+      max: 300,
+    },
   },
   {
     slug: "agility_5_10_5",
@@ -198,3 +217,27 @@ export function testBySlug(slug: string): BatteryTest | undefined {
  * derived from it, and because a carry distance means nothing without it.
  */
 export const BODYWEIGHT_UNIT = "lb";
+
+/**
+ * Bodyweight rides on a solo session row rather than a second storage concept.
+ */
+export const SOLO_SESSION_ID = "solo";
+
+/**
+ * How far the load strayed from the protocol's half-bodyweight, as a fraction.
+ * 0 means exactly on protocol; 0.25 means a quarter light or heavy.
+ *
+ * Returns null when we cannot tell - no bodyweight on file, or no load
+ * recorded - because "we do not know" and "on protocol" are different answers.
+ */
+export function carryLoadDrift(
+  loadPerHandLb: number | null | undefined,
+  bodyweightLb: number | null | undefined,
+): number | null {
+  if (!loadPerHandLb || !bodyweightLb || bodyweightLb <= 0) return null;
+  const expected = bodyweightLb / 2;
+  return (loadPerHandLb - expected) / expected;
+}
+
+/** Outside this, the distance is not comparable to the norm. */
+export const CARRY_LOAD_TOLERANCE = 0.15;

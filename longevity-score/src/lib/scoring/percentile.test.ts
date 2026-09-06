@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { percentileFor, percentileInCohort, scoreTest } from "./percentile";
+import type { NormsFile } from "./types";
 import {
   cappedHigher,
   cutPointsHigher,
@@ -246,5 +247,57 @@ describe("non-finite input", () => {
     );
     expect(() => percentileFor(meanSdHigher, undefined as unknown as number, "M", 42))
       .toThrow(/must be a finite number/);
+  });
+});
+
+describe("cut-point tables with repeated values", () => {
+  /**
+   * A zero-inflated test publishes the same value at more than one percentile:
+   * if 60% of a cohort cannot do a pull-up, 0 reps IS the 50th percentile and
+   * also the 30th. Taking the adjacent point blindly divides by zero.
+   */
+  const zeroInflated: NormsFile = {
+    ...cutPointsHigher,
+    test_variant: "fixture_zero_inflated",
+    cohorts: [
+      {
+        sex: "F",
+        age_min: 40,
+        age_max: 44,
+        percentiles: { "30": 0, "50": 0, "75": 3, "90": 6 },
+      },
+    ],
+  };
+
+  it("returns a real percentile at the repeated value", () => {
+    const p = percentileFor(zeroInflated, 0, "F", 42).percentile;
+    expect(Number.isNaN(p)).toBe(false);
+    expect(p).toBeGreaterThanOrEqual(1);
+    expect(p).toBeLessThanOrEqual(99);
+  });
+
+  it("still interpolates above the repeated value", () => {
+    const at0 = percentileFor(zeroInflated, 0, "F", 42).percentile;
+    const at1 = percentileFor(zeroInflated, 1, "F", 42).percentile;
+    const at3 = percentileFor(zeroInflated, 3, "F", 42).percentile;
+    expect(at1).toBeGreaterThan(at0);
+    expect(at3).toBeGreaterThan(at1);
+    expect(at3).toBe(75);
+  });
+
+  it("survives a table where every cut-point is the same value", () => {
+    const flat: NormsFile = {
+      ...zeroInflated,
+      cohorts: [
+        {
+          sex: "F",
+          age_min: 40,
+          age_max: 44,
+          percentiles: { "25": 0, "50": 0, "75": 0 },
+        },
+      ],
+    };
+    const p = percentileFor(flat, 0, "F", 42).percentile;
+    expect(Number.isNaN(p)).toBe(false);
   });
 });

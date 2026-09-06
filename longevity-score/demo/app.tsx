@@ -8,9 +8,8 @@ import { AppFrame } from "@/components/app-frame";
 import { setActiveParams, usePathname, navigate } from "./shims/navigation";
 
 import HomePage from "@/app/page";
-import CrewPage from "@/app/crew/page";
-import SessionPage from "@/app/crew/[sessionId]/page";
-import JoinPage from "@/app/join/[code]/page";
+import BoardPage from "@/app/board/page";
+import DeepDivePage from "@/app/you/page";
 import MethodologyPage from "@/app/methodology/page";
 import AdminNormsPage from "@/app/admin/norms/page";
 import PublicScorePreview from "./public-score";
@@ -60,9 +59,8 @@ function route(
 
 const ROUTES: Route[] = [
   route("/", HomePage),
-  route("/crew", CrewPage),
-  route("/crew/:sessionId", SessionPage),
-  route("/join/:code", JoinPage, true),
+  route("/board", BoardPage),
+  route("/you", DeepDivePage),
   route("/methodology", MethodologyPage),
   route("/admin/norms", AdminNormsPage),
   route("/s/:token", PublicScorePreview, true),

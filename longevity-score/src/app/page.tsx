@@ -4,15 +4,21 @@ import * as React from "react";
 import Link from "next/link";
 import { Check, ChevronRight, Plus, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardBody } from "@/components/ui/card";
 import { BandBadge } from "@/components/ui/badge";
-import { CapacityRadar } from "@/components/capacity-radar";
 import { EntrySheet } from "@/components/entry-sheet";
-import { ProfileGate } from "@/components/profile-gate";
+import { Register } from "@/components/register";
 import { DemoBanner } from "@/components/demo-banner";
-import { BATTERY_TESTS, BATTERY_TEST_COUNT, type BatteryTest } from "@/lib/battery";
+import {
+  BATTERY_TESTS,
+  BATTERY_TEST_COUNT,
+  CARRY_LOAD_TOLERANCE,
+  SOLO_SESSION_ID,
+  carryLoadDrift,
+  type BatteryTest,
+} from "@/lib/battery";
 import { useResultsFor, useStore } from "@/lib/data/store-context";
-import { currentCard, historyFor, previousCard } from "@/lib/batteries";
+import { currentCard, previousCard } from "@/lib/batteries";
 import { retestDelta } from "@/lib/scoring/board";
 import { ageAt } from "@/lib/scoring/cohort";
 import { buildSharePayload, encodeShareToken } from "@/lib/share-token";
@@ -26,7 +32,7 @@ import {
   oneDecimal,
   rawImproved,
 } from "@/lib/utils";
-import type { TestPercentile } from "@/lib/scoring/types";
+import type { BatteryScore, TestPercentile } from "@/lib/scoring/types";
 
 /**
  * The scorecard. Eight rows, one per test.
@@ -49,13 +55,8 @@ export default function ScorecardPage() {
     () => (me ? previousCard(me, results) : null),
     [me, results],
   );
-  const history = React.useMemo(
-    () => (me ? historyFor(me, results) : null),
-    [me, results],
-  );
-
   if (!ready) return <Skeleton />;
-  if (!me) return <ProfileGate />;
+  if (!me) return <Register />;
 
   const score = card!.score;
   const complete = score.composite != null;
@@ -66,16 +67,15 @@ export default function ScorecardPage() {
 
   const age = ageAt(me.birthDate, card!.updatedAt ?? new Date().toISOString());
   const delta = complete && previous ? retestDelta(score, previous) : null;
-  const bodyweight =
-    db?.sessionParticipants.find((sp) => sp.participantId === me.id)?.bodyweightKg ??
-    null;
+  const bodyweight = bodyweightFor(db, me.id);
 
-  async function save(test: BatteryTest, value: number) {
+  async function save(test: BatteryTest, value: number, secondary: number | null) {
     await store.addResult({
       participantId: me!.id,
       sessionId: null,
       testVariant: test.slug,
       rawValue: value,
+      secondaryValue: secondary,
       recordedAt: new Date().toISOString(),
       recordedByParticipantId: me!.id,
       witnessed: false,
@@ -143,21 +143,27 @@ export default function ScorecardPage() {
             test={test}
             scored={byTest.get(test.slug)}
             entry={card!.entries.get(test.slug)}
+            bodyweightLb={bodyweight}
             delta={delta?.tests.find((d) => d.testVariant === test.slug)}
             onTap={() => setEditing(test)}
           />
         ))}
       </div>
 
-      <ProvisionalNote tests={score.tests} />
-
       {complete && (
         <>
-          <Card>
-            <CardBody className="pt-5">
-              <CapacityRadar tests={score.tests} previous={previous?.tests} />
-            </CardBody>
-          </Card>
+          <Link
+            href="/you"
+            className="flex items-center justify-between rounded-2xl bg-ink-raised px-4 py-3.5 ring-1 ring-ink-line"
+          >
+            <span className="text-sm font-semibold">
+              Break it down
+              <span className="ml-2 font-normal text-paper-faint">
+                strengths, gaps, what moved
+              </span>
+            </span>
+            <ChevronRight size={16} className="text-paper-faint" />
+          </Link>
 
           <ShareButton
             name={me.name}
@@ -171,16 +177,15 @@ export default function ScorecardPage() {
 
       <BodyweightRow current={bodyweight} />
 
-      {history && history.attempts.length > 1 && <History history={history} />}
-
       <DemoBanner />
 
       {editing && (
         <EntrySheet
           test={editing}
           current={card!.entries.get(editing.slug)?.value ?? null}
+          currentSecondary={card!.entries.get(editing.slug)?.secondaryValue ?? null}
           bodyweightLb={bodyweight}
-          onSave={(v) => save(editing, v)}
+          onSave={(v, secondary) => save(editing, v, secondary)}
           onClose={() => setEditing(null)}
         />
       )}
@@ -188,38 +193,28 @@ export default function ScorecardPage() {
   );
 }
 
-/**
- * A tag on every single row is not a warning, it is wallpaper. One line under
- * the list says the same thing and keeps the rows readable.
- */
-function ProvisionalNote({ tests }: { tests: TestPercentile[] }) {
-  const n = tests.filter((t) => t.provisional).length;
-  if (n === 0) return null;
-  const all = n === BATTERY_TEST_COUNT;
-  return (
-    <p className="px-1 text-xs text-paper-faint">
-      {all ? "All" : n} of these use provisional norms.{" "}
-      <Link href="/methodology" className="text-below underline underline-offset-2">
-        What that means
-      </Link>
-    </p>
-  );
-}
-
 function TestRow({
   test,
   scored,
   entry,
+  bodyweightLb,
   delta,
   onTap,
 }: {
   test: BatteryTest;
   scored?: TestPercentile;
-  entry?: { value: number };
+  entry?: { value: number; secondaryValue: number | null };
+  bodyweightLb: number | null;
   delta?: { delta: number; rawDelta: number };
   onTap: () => void;
 }) {
   const done = entry !== undefined;
+
+  // The entry sheet promises an off-protocol load gets marked. This is the mark.
+  const drift = test.secondary
+    ? carryLoadDrift(entry?.secondaryValue, bodyweightLb)
+    : null;
+  const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 
   return (
     <button
@@ -232,6 +227,12 @@ function TestRow({
           {done ? (
             <>
               <span className="text-paper-dim">{formatRaw(entry!.value, test.unit)}</span>
+              {entry!.secondaryValue != null && (
+                <span className="text-paper-faint">
+                  {" "}
+                  at {Math.round(entry!.secondaryValue)} lb
+                </span>
+              )}
               {delta && delta.rawDelta !== 0 && (
                 <span
                   className={
@@ -247,6 +248,11 @@ function TestRow({
             test.standard
           )}
         </p>
+        {offProtocol && (
+          <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-below">
+            Off-protocol load
+          </p>
+        )}
       </div>
 
       {scored ? (
@@ -283,7 +289,7 @@ function FitnessAgeRow({
   score,
   actualAge,
 }: {
-  score: NonNullable<ReturnType<typeof historyFor>["latestComplete"]>["score"];
+  score: BatteryScore;
   actualAge: number;
 }) {
   const fa = score.fitnessAge;
@@ -318,17 +324,38 @@ function FitnessAgeRow({
 }
 
 /** Not scored. It is here because the carry load comes out of it. */
+/**
+ * Read bodyweight back from the row it is written to. Matching "any row for
+ * this participant" picked up whichever session happened to be first, which
+ * for a returning user is an old weigh-in rather than what they are today.
+ */
+function bodyweightFor(
+  db: ReturnType<typeof useStore>["db"],
+  participantId: string,
+): number | null {
+  if (!db) return null;
+  const rows = db.sessionParticipants.filter(
+    (sp) => sp.participantId === participantId && sp.bodyweightKg != null,
+  );
+  const solo = rows.find((sp) => sp.sessionId === SOLO_SESSION_ID);
+  if (solo) return solo.bodyweightKg;
+  // Otherwise the most recent one on file.
+  return (
+    [...rows].sort((a, b) => Date.parse(b.joinedAt) - Date.parse(a.joinedAt))[0]
+      ?.bodyweightKg ?? null
+  );
+}
+
 function BodyweightRow({ current }: { current: number | null }) {
   const { me, store, refresh } = useStore();
   const [editing, setEditing] = React.useState(false);
   const [text, setText] = React.useState(current === null ? "" : String(current));
 
-  async function save() {
+  async function save(e?: React.FormEvent) {
+    e?.preventDefault();
     const n = Number(text);
     if (!Number.isFinite(n) || n < 60 || n > 500 || !me) return;
-    // Bodyweight rides on a lightweight solo session row so the carry load
-    // survives a reload without inventing a second storage concept.
-    await store.joinSession("solo", me.id, n);
+    await store.joinSession(SOLO_SESSION_ID, me.id, n);
     refresh();
     setEditing(false);
   }
@@ -336,19 +363,20 @@ function BodyweightRow({ current }: { current: number | null }) {
   return (
     <div className="rounded-2xl bg-ink-raised px-4 py-3 ring-1 ring-ink-line">
       {editing ? (
-        <div className="flex items-center gap-2">
+        <form className="flex items-center gap-2" onSubmit={save}>
           <input
             autoFocus
-            inputMode="numeric"
+            inputMode="decimal"
             value={text}
             onChange={(e) => setText(e.target.value.replace(/[^\d.]/g, ""))}
             placeholder="lb"
-            className="tnum h-11 flex-1 rounded-xl bg-ink px-3 text-lg ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
+            aria-label="Bodyweight in pounds"
+            className="tnum h-11 w-full min-w-0 flex-1 rounded-xl bg-ink px-3 text-lg ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
           />
-          <Button size="sm" className="h-11" onClick={save}>
+          <Button size="sm" type="submit" className="h-11 shrink-0" aria-label="Save bodyweight">
             <Check size={15} />
           </Button>
-        </div>
+        </form>
       ) : (
         <button
           onClick={() => setEditing(true)}
@@ -381,7 +409,7 @@ function ShareButton({
   name: string;
   sex: "M" | "F";
   age: number;
-  score: NonNullable<ReturnType<typeof historyFor>["latestComplete"]>["score"];
+  score: BatteryScore;
   completedAt: string;
 }) {
   const [copied, setCopied] = React.useState(false);
@@ -447,35 +475,6 @@ function ShareButton({
         </div>
       )}
     </div>
-  );
-}
-
-function History({ history }: { history: ReturnType<typeof historyFor> }) {
-  const rows = history.attempts.slice(1, 5).filter((a) => a.score.composite !== null);
-  if (rows.length === 0) return null;
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Before</CardTitle>
-      </CardHeader>
-      <CardBody className="space-y-0">
-        {rows.map((a) => (
-          <div
-            key={a.key}
-            className="flex items-center justify-between border-t border-ink-line-soft py-3 first:border-t-0 first:pt-0"
-          >
-            <p className="text-sm">{formatDate(a.completedAt)}</p>
-            <div className="flex shrink-0 items-center gap-2.5">
-              <span className="tnum text-lg font-bold">
-                {oneDecimal(a.score.composite!)}
-              </span>
-              <BandBadge band={a.score.band!} size="sm" />
-            </div>
-          </div>
-        ))}
-      </CardBody>
-    </Card>
   );
 }
 

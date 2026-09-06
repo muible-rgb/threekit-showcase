@@ -179,6 +179,8 @@ export interface CardEntry {
   testVariant: string;
   /** The value that counts. */
   value: number;
+  /** The carry's load, where a test records one. */
+  secondaryValue: number | null;
   recordedAt: string;
   /** What this test read before, if it has been entered more than once. */
   previousValue: number | null;
@@ -214,6 +216,7 @@ export function currentCard(
     entries.set(slug, {
       testVariant: slug,
       value: forTest[0].rawValue,
+      secondaryValue: forTest[0].secondaryValue ?? null,
       recordedAt: forTest[0].recordedAt,
       previousValue: forTest[1]?.rawValue ?? null,
     });

@@ -8,7 +8,7 @@ import * as React from "react";
  * next/navigation, and esbuild aliases it here.
  *
  * An Artifact is one HTML file served at one URL with no server routing, so
- * the whole app has to live behind the fragment: #/score, #/crew/s_q2.
+ * the whole app has to live behind the fragment: #/board, #/you.
  */
 
 const listeners = new Set<() => void>();

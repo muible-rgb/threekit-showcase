@@ -2,24 +2,39 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, ClipboardList, Users } from "lucide-react";
+import { ClipboardList, Trophy, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SyncIndicator } from "@/components/sync-indicator";
+import { useStore } from "@/lib/data/store-context";
 
 const TABS = [
   { href: "/", label: "Score", icon: ClipboardList },
-  { href: "/crew", label: "Crew", icon: Users },
-  { href: "/methodology", label: "Method", icon: BookOpen },
+  { href: "/board", label: "Board", icon: Trophy },
+  { href: "/you", label: "You", icon: User },
 ];
 
 /** Public pages run full-bleed - they are not the app, they are a link. */
-const FULL_BLEED = [/^\/s\//, /^\/join/];
+const FULL_BLEED = [/^\/s\//];
 
 export function AppFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
-  const bare = FULL_BLEED.some((re) => re.test(pathname));
+  const { me, ready } = useStore();
 
-  if (bare) return <div className="min-h-dvh">{children}</div>;
+  // Before there is an account there is no app to frame: a tab bar over a
+  // registration form is chrome for a place you cannot go yet.
+  const bare =
+    FULL_BLEED.some((re) => re.test(pathname)) || (ready && me === null);
+
+  if (bare) {
+    const fullBleed = FULL_BLEED.some((re) => re.test(pathname));
+    return fullBleed ? (
+      <div className="min-h-dvh">{children}</div>
+    ) : (
+      <div className="pt-safe mx-auto min-h-dvh w-full max-w-lg px-5 py-10">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">

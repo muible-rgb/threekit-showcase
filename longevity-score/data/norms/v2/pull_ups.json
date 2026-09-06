@@ -10,7 +10,7 @@
     "population": "None. This is a construction, not a normative sample.",
     "provisional": true,
     "transcription_verified": false,
-    "notes": "PROVISIONAL, and the hardest test in the battery to norm honestly. Pull-ups are zero-inflated: a large share of adults, and a majority of women past 40, cannot do one. A mean and SD are meaningless against that shape, so this file uses cut-points, and places the 0-rep point at HALF the estimated zero share rather than at its top. That is deliberate. If 60 per cent of women aged 40-44 cannot do a pull-up, a zero cannot be resolved any finer than \"somewhere in that 60 per cent\", and the midpoint is the least wrong single answer - putting it at the top would hand every zero-scorer the 60th percentile. Consequence: a zero is scored generously relative to a true ranking, and the first rep moves the percentile a long way. Re-fit from app data first."
+    "notes": "PROVISIONAL, and the hardest test in the battery to norm honestly. Pull-ups are zero-inflated: a large share of adults, and a majority of women past 40, cannot do one. A mean and SD are meaningless against that shape, so this file uses cut-points, and places the 0-rep point at HALF the estimated zero share rather than at its top. That is deliberate. If 60 per cent of women aged 40-44 cannot do a pull-up, a zero cannot be resolved any finer than \"somewhere in that 60 per cent\", and the midpoint is the least wrong single answer - putting it at the top would hand every zero-scorer the 60th percentile. Consequence: a zero is scored generously relative to a true ranking, and the first rep moves the percentile a long way. Each value appears at exactly one percentile: publishing 0 reps at both the 30th and the 50th says nothing extra and leaves the edge slope undefined. Re-fit from app data first."
   },
   "cohorts": [
     {
@@ -129,7 +129,6 @@
       "age_max": 74,
       "percentiles": {
         "31": 0,
-        "50": 0,
         "75": 3,
         "90": 6
       }
@@ -140,7 +139,6 @@
       "age_max": 79,
       "percentiles": {
         "35": 0,
-        "50": 0,
         "75": 2,
         "90": 4
       }
@@ -151,7 +149,6 @@
       "age_max": 84,
       "percentiles": {
         "39": 0,
-        "50": 0,
         "75": 1,
         "90": 3
       }
@@ -195,7 +192,6 @@
       "age_max": 39,
       "percentiles": {
         "28": 0,
-        "50": 0,
         "75": 4,
         "90": 7
       }
@@ -206,7 +202,6 @@
       "age_max": 44,
       "percentiles": {
         "30": 0,
-        "50": 0,
         "75": 3,
         "90": 6
       }
@@ -217,7 +212,6 @@
       "age_max": 49,
       "percentiles": {
         "32": 0,
-        "50": 0,
         "75": 2,
         "90": 6
       }
@@ -228,7 +222,6 @@
       "age_max": 54,
       "percentiles": {
         "35": 0,
-        "50": 0,
         "75": 2,
         "90": 5
       }
@@ -239,7 +232,6 @@
       "age_max": 59,
       "percentiles": {
         "38": 0,
-        "50": 0,
         "75": 2,
         "90": 4
       }
@@ -250,7 +242,6 @@
       "age_max": 64,
       "percentiles": {
         "41": 0,
-        "50": 0,
         "75": 1,
         "90": 3
       }
@@ -261,8 +252,6 @@
       "age_max": 69,
       "percentiles": {
         "43": 0,
-        "50": 0,
-        "75": 0,
         "90": 2
       }
     },
@@ -272,8 +261,6 @@
       "age_max": 74,
       "percentiles": {
         "45": 0,
-        "50": 0,
-        "75": 0,
         "90": 2
       }
     },
@@ -283,8 +270,6 @@
       "age_max": 79,
       "percentiles": {
         "46": 0,
-        "50": 0,
-        "75": 0,
         "90": 2
       }
     },
@@ -294,8 +279,6 @@
       "age_max": 84,
       "percentiles": {
         "48": 0,
-        "50": 0,
-        "75": 0,
         "90": 1
       }
     }

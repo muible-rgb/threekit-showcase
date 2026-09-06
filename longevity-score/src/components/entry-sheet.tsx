@@ -4,6 +4,7 @@ import * as React from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, formatRaw, secondsToClock } from "@/lib/utils";
+import { CARRY_LOAD_TOLERANCE, carryLoadDrift } from "@/lib/battery";
 import type { BatteryTest } from "@/lib/battery";
 
 /**
@@ -17,17 +18,25 @@ import type { BatteryTest } from "@/lib/battery";
 export function EntrySheet({
   test,
   current,
+  currentSecondary,
   bodyweightLb,
   onSave,
   onClose,
 }: {
   test: BatteryTest;
   current: number | null;
+  currentSecondary: number | null;
   bodyweightLb: number | null;
-  onSave: (value: number) => void | Promise<void>;
+  onSave: (value: number, secondary: number | null) => void | Promise<void>;
   onClose: () => void;
 }) {
   const [value, setValue] = React.useState<number | null>(current);
+  const [secondary, setSecondary] = React.useState<number | null>(
+    // Default the carry load to the protocol's half bodyweight, so the common
+    // case is already filled in and the uncommon case is a deliberate edit.
+    currentSecondary ??
+      (test.secondary && bodyweightLb ? Math.round(bodyweightLb / 2) : null),
+  );
   const [saving, setSaving] = React.useState(false);
 
   // Escape closes, and the sheet takes focus so a hardware keyboard works.
@@ -43,7 +52,16 @@ export function EntrySheet({
     };
   }, [onClose]);
 
-  const valid = value !== null && value >= test.min && value <= test.max;
+  const secondaryValid =
+    !test.secondary ||
+    (secondary !== null &&
+      secondary >= test.secondary.min &&
+      secondary <= test.secondary.max);
+  const valid =
+    value !== null && value >= test.min && value <= test.max && secondaryValid;
+
+  const drift = test.secondary ? carryLoadDrift(secondary, bodyweightLb) : null;
+  const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end bg-ink/70 backdrop-blur-sm">
@@ -71,13 +89,25 @@ export function EntrySheet({
         </div>
 
         <div className="px-5 pb-5">
-          {test.slug === "farmer_carry" && bodyweightLb !== null && (
-            <p className="mb-4 rounded-xl bg-signal/10 px-4 py-3 text-sm font-semibold text-signal ring-1 ring-signal/25">
-              {Math.round(bodyweightLb / 2)} lb in each hand
-            </p>
+          {test.secondary && (
+            <SecondaryInput
+              test={test}
+              value={secondary}
+              bodyweightLb={bodyweightLb}
+              onChange={setSecondary}
+            />
           )}
 
           <ValueInput test={test} value={value} onChange={setValue} />
+
+          {offProtocol && (
+            <p className="mt-3 rounded-xl bg-below/10 px-4 py-3 text-xs leading-relaxed text-below ring-1 ring-below/25">
+              That is {Math.abs(Math.round(drift! * 100))}%{" "}
+              {drift! > 0 ? "heavier" : "lighter"} than half your bodyweight.
+              The norms assume half, so your percentile will be marked
+              off-protocol rather than compared as if it matched.
+            </p>
+          )}
 
           <details className="mt-5">
             <summary className="cursor-pointer text-xs font-semibold text-paper-faint">
@@ -97,7 +127,7 @@ export function EntrySheet({
             onClick={async () => {
               if (!valid) return;
               setSaving(true);
-              await onSave(value!);
+              await onSave(value!, secondary);
             }}
           >
             {saving ? "Saving..." : current === null ? "Save" : "Update"}
@@ -110,6 +140,67 @@ export function EntrySheet({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * The second number, where the scored one needs context. Today that is the
+ * carry: distance without load is not a result.
+ */
+function SecondaryInput({
+  test,
+  value,
+  bodyweightLb,
+  onChange,
+}: {
+  test: BatteryTest;
+  value: number | null;
+  bodyweightLb: number | null;
+  onChange: (v: number | null) => void;
+}) {
+  const spec = test.secondary!;
+  const [text, setText] = React.useState(value === null ? "" : String(value));
+
+  React.useEffect(() => {
+    const n = Number(text);
+    onChange(text !== "" && Number.isFinite(n) ? n : null);
+  }, [text, onChange]);
+
+  const suggested = bodyweightLb ? Math.round(bodyweightLb / 2) : null;
+
+  return (
+    <div className="mb-5">
+      <label className="block">
+        <span className="text-xs font-semibold uppercase tracking-wider text-paper-faint">
+          {spec.label}
+        </span>
+        <div className="mt-1.5 flex items-center gap-2">
+          <input
+            inputMode="decimal"
+            value={text}
+            onChange={(e) => setText(e.target.value.replace(/[^\d.]/g, ""))}
+            placeholder={suggested === null ? "0" : String(suggested)}
+            aria-label={spec.label}
+            className="tnum h-14 w-full min-w-0 flex-1 rounded-xl bg-ink px-4 text-2xl font-semibold ring-1 ring-ink-line focus:outline-none focus:ring-2 focus:ring-signal"
+          />
+          <span className="w-7 shrink-0 text-sm text-paper-faint">{spec.unitLabel}</span>
+        </div>
+      </label>
+      {suggested !== null && Number(text) !== suggested && (
+        <button
+          type="button"
+          onClick={() => setText(String(suggested))}
+          className="mt-2 text-xs font-semibold text-signal"
+        >
+          Use half bodyweight ({suggested} lb)
+        </button>
+      )}
+      {suggested === null && (
+        <p className="mt-2 text-xs text-paper-faint">
+          Set your bodyweight on the scorecard and this fills itself in.
+        </p>
+      )}
     </div>
   );
 }

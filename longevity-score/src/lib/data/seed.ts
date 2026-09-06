@@ -61,7 +61,7 @@ const PEOPLE: SeedPerson[] = [
   // below average to strong, so the demo shows a real board rather than eight
   // variations on "elite" - and so the fitness-age floor (see below) is
   // visible on some rows and not others.
-  { key: "you", name: "You", sex: "M", birthDate: "1983-04-12", isUser: true, ability: 0.2, drift: 0.3 },
+  { key: "you", name: "Alex T.", sex: "M", birthDate: "1983-04-12", isUser: true, ability: 0.2, drift: 0.3 },
   { key: "dan", name: "Dan R.", sex: "M", birthDate: "1980-09-02", isUser: true, ability: 0.75, drift: -0.12 },
   { key: "marisa", name: "Marisa K.", sex: "F", birthDate: "1982-01-25", isUser: true, ability: 0.5, drift: 0.4 },
   { key: "tomas", name: "Tomas B.", sex: "M", birthDate: "1978-11-30", isUser: true, ability: -0.25, drift: 0.2, q2StopsAfter: 6 },

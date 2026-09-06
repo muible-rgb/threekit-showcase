@@ -10,6 +10,10 @@ It is a scorecard, not a coach. There is no guided mode, no fixed order, no
 stopwatch and no rest timer: you do the tests outside and tap a row to type in
 what you got.
 
+Three tabs. **Score** is the eight rows. **Board** ranks everyone on how far
+they sit above their own cohort. **You** breaks your score apart - shape,
+strengths, gaps, what moved, and what the number is actually claiming.
+
 The thing to protect: **scoring is cohort-relative**. A 78-year-old woman can
 outscore a 30-year-old man, because both are measured against their own sex and
 five-year age band. Every number a user sees is a percentile first; raw values
@@ -48,6 +52,8 @@ data/norms/v2/*.json          the numbers. no norm lives in TypeScript.
 src/lib/scoring/              pure engine. no I/O. takes norms as an argument.
 src/lib/norms/                loads and validates the JSON
 src/lib/battery.ts            the eight tests, mirrors migration 0002
+src/app/board/                the leaderboard
+src/app/you/                  the deep dive
 src/lib/data/                 DataStore: LocalStore + SupabaseStore
 src/app/                      five screens, public score page, share card
 supabase/migrations/          schema, RLS, reference data
@@ -181,3 +187,22 @@ install starts empty on purpose.
 
 Global leaderboard, training plans, wearables, social feed, payments, native
 wrapper, weighted composite. `/admin/norms` is the only admin surface.
+
+## Registration
+
+Name, sex and date of birth. The last two are the denominator, not a
+preference: without a cohort there is no percentile, so they cannot be skipped
+and the screen says why.
+
+Email is genuinely optional and buys exactly two things, both stated on screen:
+your results follow you to another phone, and you appear on the board. Without
+it everything still works, on that device only. There is no password - a magic
+link signs you in, which needs the Supabase wiring in `DEPLOY.md`.
+
+## The carry records two numbers
+
+Distance alone is not a result. 300 feet at 40 lb a hand and 300 feet at 90 lb
+are different tests, and the norms assume half bodyweight. So the entry sheet
+captures load and distance, prefills the load from your bodyweight, and marks
+the result off-protocol on the card when what you actually held is more than
+15% away from half. It does not quietly score it as if it matched.

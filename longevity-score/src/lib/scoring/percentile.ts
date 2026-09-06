@@ -94,20 +94,24 @@ function fromCutPoints(
   const last = pts[pts.length - 1];
 
   if (x <= first.x) {
-    const next = pts[1];
+    // Walk outward to the first point with a DIFFERENT value. Adjacent points
+    // can share one - a zero-inflated table like pull-ups publishes 0 reps at
+    // more than one percentile - and taking the neighbour blindly divides by
+    // zero and returns NaN.
+    const next = pts.find((p) => p.x !== first.x);
+    if (!next) return { percentile: first.pct, extrapolated: false };
     const slope = (next.pct - first.pct) / (next.x - first.x);
-    const extrapolated = x < first.x;
     return {
       percentile: first.pct + slope * (x - first.x),
-      extrapolated,
+      extrapolated: x < first.x,
     };
   }
 
   if (x >= last.x) {
-    const prev = pts[pts.length - 2];
+    const prev = [...pts].reverse().find((p) => p.x !== last.x);
+    if (!prev) return { percentile: last.pct, extrapolated: false };
     const slope = (last.pct - prev.pct) / (last.x - prev.x);
-    const extrapolated = x > last.x;
-    return { percentile: last.pct + slope * (x - last.x), extrapolated };
+    return { percentile: last.pct + slope * (x - last.x), extrapolated: x > last.x };
   }
 
   for (let i = 0; i < pts.length - 1; i++) {

@@ -42,6 +42,15 @@ export interface Result {
   recordedAt: string;
   recordedByParticipantId: string | null;
   witnessed: boolean;
+  /**
+   * A second number, where one number is not the result.
+   *
+   * Only the carry uses it today: distance alone is meaningless without the
+   * load, because 300 feet with 40 lb per hand and 300 feet with 90 lb are not
+   * the same test. rawValue stays the scored number; this is the context that
+   * makes it mean something.
+   */
+  secondaryValue?: number | null;
   notes?: string | null;
   supersedesResultId?: string | null;
 }
