@@ -82,7 +82,7 @@ Today two phones cannot see the same session - each device holds its own data.
 To fix that:
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Run the two files in `supabase/migrations/` in order, in the SQL editor.
+2. Run the files in `supabase/migrations/` in order (0001 through 0005), in the SQL editor.
 3. Add these to the host's environment variables and redeploy:
 
    ```
