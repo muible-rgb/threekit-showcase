@@ -21,12 +21,12 @@ import { ageAt } from "@/lib/scoring/cohort";
 import { buildSharePayload, encodeShareToken } from "@/lib/share-token";
 import {
   BAND_LABELS,
+  COMPOSITE_CAPTION,
   EMPTY,
   ageBandLabel,
-  betterThanSentence,
   formatDate,
-  formatRaw,
   formatRawDelta,
+  formatResult,
   formatSigned,
   oneDecimal,
   rawImproved,
@@ -96,7 +96,7 @@ export default function ScorecardPage() {
                 </p>
               )}
             </div>
-            <p className="meta mt-2">{betterThanSentence(score.composite!, me.sex)}</p>
+            <p className="meta mt-2">{COMPOSITE_CAPTION}</p>
           </>
         ) : (
           <>
@@ -216,8 +216,9 @@ function TestRow({
         <p className="meta mt-0.5 truncate">
           {entry ? (
             <>
-              {formatRaw(entry.value, test.unit)}
+              {formatResult(test, entry.value)}
               {entry.secondaryValue != null && ` @ ${Math.round(entry.secondaryValue)}lb`}
+              {scored?.atCeiling && <span className="text-chalk-off"> max</span>}
               {delta && delta.rawDelta !== 0 && (
                 <span className={rawImproved(test.direction, delta.rawDelta) ? "text-chalk" : "text-chalk-off"}>
                   {" "}
@@ -225,6 +226,7 @@ function TestRow({
                 </span>
               )}
               {offProtocol && <span className="text-chalk-off"> off-protocol</span>}
+              {scored?.provisional && <span className="text-chalk-off"> provisional</span>}
             </>
           ) : (
             <span className="text-chalk-off">{EMPTY}</span>

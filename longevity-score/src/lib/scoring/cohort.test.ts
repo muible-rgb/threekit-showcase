@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ageAt, ageBand, cohortFor, findCohort } from "./cohort";
-import { meanSdHigher } from "./__fixtures__/norms";
+import { ageAt, ageBand, cohortFor } from "./cohort";
 
 describe("ageAt", () => {
   it("counts whole years", () => {
@@ -36,31 +35,5 @@ describe("cohortFor", () => {
       ageBandMin: 75,
       ageBandMax: 79,
     });
-  });
-});
-
-describe("findCohort", () => {
-  it("finds the exact band", () => {
-    const found = findCohort(meanSdHigher, "M", 42);
-    expect(found?.cohort.age_min).toBe(40);
-    expect(found?.clamped).toBe(false);
-  });
-
-  it("clamps below the youngest band and says so", () => {
-    const found = findCohort(meanSdHigher, "M", 12);
-    expect(found?.cohort.age_min).toBe(20);
-    expect(found?.clamped).toBe(true);
-  });
-
-  it("clamps above the oldest band and says so", () => {
-    const found = findCohort(meanSdHigher, "M", 90);
-    expect(found?.cohort.age_min).toBe(45);
-    expect(found?.clamped).toBe(true);
-  });
-
-  it("returns null when the file has no cohorts for that sex", () => {
-    expect(
-      findCohort({ ...meanSdHigher, cohorts: [] }, "M", 42),
-    ).toBeNull();
   });
 });

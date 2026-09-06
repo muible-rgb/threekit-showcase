@@ -11,7 +11,7 @@ import HomePage from "@/app/page";
 import BoardPage from "@/app/board/page";
 import DeepDivePage from "@/app/you/page";
 import MethodologyPage from "@/app/methodology/page";
-import AdminNormsPage from "@/app/admin/norms/page";
+import AdminBenchmarksPage from "@/app/admin/benchmarks/page";
 import PublicScorePreview from "./public-score";
 
 import "@/app/globals.css";
@@ -62,7 +62,7 @@ const ROUTES: Route[] = [
   route("/board", BoardPage),
   route("/you", DeepDivePage),
   route("/methodology", MethodologyPage),
-  route("/admin/norms", AdminNormsPage),
+  route("/admin/benchmarks", AdminBenchmarksPage),
   route("/s/:token", PublicScorePreview, true),
 ];
 

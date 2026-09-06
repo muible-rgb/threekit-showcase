@@ -31,11 +31,10 @@ entirely on local storage, seeded with a demo crew of eight across two
 quarterly sessions, so every screen renders on a fresh checkout.
 
 ```bash
-npm test             # unit tests: scoring engine, norms, seed, formatting
+npm test             # unit tests: scorer against the shipped table, engine, seed, formatting
 npm run typecheck
 npm run lint
-npm run norms:validate      # structural check on every norms file
-npm run norms:generate      # regenerate the provisional norms curves
+npm run benchmarks:build    # regenerate the benchmark tables (python: numpy, scipy, pandas)
 ```
 
 To point it at Postgres, copy `.env.example` to `.env.local`, fill in the
@@ -67,37 +66,56 @@ longer a dependency, which took 320 kB off the bundle.
 ## How it fits together
 
 ```
-data/norms/v2/*.json          the numbers. no norm lives in TypeScript.
-src/lib/scoring/              pure engine. no I/O. takes norms as an argument.
-src/lib/norms/                loads and validates the JSON
-src/lib/battery.ts            the eight tests, mirrors migration 0002
+data/benchmarks/*.json        the table: 99 quantiles per sex per year of age, per event
+src/lib/scoring/benchmark.ts  the scorer. lookup, interpolation, ties. no statistics.
+src/lib/scoring/              pure engine. no I/O. takes the table as an argument.
+src/lib/benchmarks/           registry of table versions, notes for /methodology
+src/lib/battery.ts            the eight tests, bound to table events with unit factors
+tools/benchmarks/             the Python model that generates the table
+docs/                         the methodology report, every source and assumption
 src/app/board/                the leaderboard
 src/app/you/                  the deep dive
 src/lib/data/                 DataStore: LocalStore + SupabaseStore
-src/app/                      five screens, public score page, share card
 supabase/migrations/          schema, RLS, reference data
 ```
 
-### The engine takes norms as an argument
+### The engine takes the table as an argument
 
-`src/lib/scoring` never imports a norms file. It takes a `NormsRegistry`, which
-is what lets the whole engine be tested against literal fixtures - a change to a
-published norm cannot turn an engine test red, and a bug in the engine cannot
-hide behind real data.
+`src/lib/scoring` never imports the benchmark file. It takes a `BenchmarkLookup`,
+which is what lets the whole engine be tested against literal fixtures - a
+change to a shipped table cannot turn an engine test red, and a bug in the
+engine cannot hide behind real data. A second test file runs the scorer against
+the real table and checks the fourteen reference values from the handoff to the
+decimal.
 
-Three layers: raw result → cohort percentile → composite.
+Three layers: raw result → percentile among people of your sex and exact age →
+composite.
 
-- Mean/SD cohorts go through the normal CDF, which gives smooth curves. A one
-  kilo improvement always moves the number.
-- Cut-point cohorts interpolate linearly between published points, and
-  **extrapolate** past the top and bottom rather than flattening. Flattening
-  would put every elite result on exactly 90.0, destroying ordering at the top
-  of the board - the one place a crew cares about ordering. Extrapolated results
-  are flagged.
-- Floor 1, cap 99. Nobody scores 0 and nobody scores 100.
+- **The table does the statistics.** Every event was modelled once in Python
+  (`tools/benchmarks/long_game_benchmarks.py`): smooth age curves through
+  source knots, a distribution family chosen for the measure's shape, explicit
+  shares who cannot do the test at all. The output is a table with a column for
+  every year of age from 18 to 89. The app ships the table and only looks up.
+- **Continuous events interpolate** between the two percentile anchors that
+  bracket the result. Past the 1st or 99th anchor the score is 0.5 or 99.5,
+  which says "off the end" without inventing precision.
+- **Discrete events score mid-rank**: `100 × (P(X < x) + ½ P(X = x))`. This is
+  what makes zero reps a real score and one rep always better than zero: a man
+  of 55 who does no pull-ups scores 28.9, because 58% of his peers also score
+  zero, and one rep takes him to 59.3.
+- **Floors and ceilings tie.** A DNF on the mile, a 0 on the jump, 60 s on the
+  balance, 10/10 on sit-to-rise: each is scored in the middle of the group that
+  got the same. The UI says DNF or max rather than showing a number that looks
+  like a bad one.
 - The composite is the unweighted mean of eight percentiles, to one decimal,
-  and it is **null until all eight are there**. Enforced in the engine, not the UI, so
-  no surface can leak a partial one.
+  and it is **null until all eight are there**. It is not itself a percentile
+  and is never described as "better than X%": a mean of correlated percentiles
+  is tighter than a percentile, so roughly 70 is strong, 80 the top tenth, 90
+  the top few percent.
+
+Units: the app stores what people say out loud (feet, inches, seconds, reps)
+and converts to the table's unit at the scoring boundary (`benchmark.factor`
+on each test). The stored raw never changes meaning.
 
 ### Local-first storage
 
@@ -126,54 +144,59 @@ is an INSERT, not a migration. A trigger enforces one test per capacity per
 battery version, which is what keeps composites comparable: every battery is
 always the mean of the same ten capacities.
 
-## Norms honesty
+## Benchmark honesty
 
-Two separate claims are tracked per file, and they are not the same thing:
+Every event carries an **evidence grade** in the table itself, read by the UI
+rather than written into it:
 
-- **`provisional`** - the approach is uncertain. Either no adequate published
-  norm exists, or a documented adjustment was applied. A file is only
-  non-provisional when **both** the central tendency and the dispersion come
-  from the cited source.
-- **`transcription_verified`** - whether a human has proofread the digits
-  against the source document. Currently `false` on all ten. See
-  `VERIFY_NORMS.md`.
+- **A** strong direct norms for this test and population. None yet.
+- **B** good evidence with a protocol or population mismatch: balance,
+  sit-to-rise, men's push-ups.
+- **C** a proxy or conversion chain: the mile (from VO2max), the broad jump
+  (Korean survey, extrapolated past 59), women's push-ups (converted from the
+  modified push-up).
+- **D** provisional, no general-population norm exists: pull-ups, the carry,
+  agility. These are models built from adjacent evidence. They render a
+  `provisional` tag wherever their percentile appears.
 
-All eight files are currently provisional, for reasons stated per file. The provisional
-curves come from `scripts/generate-provisional-norms.ts`, so the anchor, the
-decline rate and the coefficient of variation are all readable and arguable
-rather than hand-waved. `TODO_RENORM.md` has the re-fit plan and the priority
-order.
+Every cell also carries a **derivation** label - observed, interpolated,
+extrapolated, or modeled - and the deep dive marks extrapolated cells. The
+full account of sources, assumptions and the seven least trustworthy estimates
+is `docs/long_game_methodology_v1.0.0.md`. `/methodology` in the app is a
+condensed version, with grades and coverage read live from the table.
 
-Every provisional percentile carries a tag in the UI that links to
-`/methodology`, which is generated from the norms files themselves so a citation
-cannot drift from the numbers actually in use.
+**Versions.** Tables are semver'd and immutable. Every result is stamped with
+the version it was entered under (`benchmark_version`) and scored against that
+version on read, so shipping a recalibrated table moves nobody's history.
+`tools/benchmarks/README.md` has the publishing steps. The shipped v1.0.0 table
+regenerates byte-for-byte from the committed model.
 
 ## Known limits in v1
 
-**Fitness age saturates for this app's own audience.** Published norms describe
-the general population. A trained adult one standard deviation above that median
-is often 20-40% above it in raw terms, which maps to an age below the youngest
-band the norms cover. The engine flags those tests as out of range and the UI
-shows a floor ("28 or under") plus an `approx` tag rather than a false
-precision, but the number carries less signal for fit users than the concept
-implies. Fixing it properly needs a fitter reference population, not a code
-change.
+**Fitness age saturates for this app's own audience.** The table describes the
+general population. A trained adult often beats the median 18-year-old on
+several tests, and there is no younger column to read. The engine flags those
+tests as out of range and the UI shows a floor ("18 or under") plus an `approx`
+tag rather than a false precision, but the number carries less signal for fit
+users than the concept implies. Fixing it properly needs a fitter reference
+population, not a code change.
 
-**Pull-ups are the hardest test to norm honestly.** They are zero-inflated: a
-majority of women past 40 cannot do one, so a mean and SD are meaningless. The
-file uses cut-points and places the 0-rep point at half the estimated zero
-share, because a zero cannot be resolved any finer than "somewhere in that
-share". A zero therefore scores generously against a true ranking, and the
-first rep moves the percentile a long way.
+**Pull-ups are the hardest test to benchmark honestly.** No adult population
+norms exist and most women past 40 cannot do one. The table uses a hurdle model
+- a share who score zero, a count among the rest - and scores zero mid-rank in
+the zero group. The male zero share at 20-45 is the least trustworthy parameter
+in the whole framework; it moves the score for one pull-up at 30 by about 8
+points either way.
 
-**Female push-up norms are the second weakest.** The published source uses the
-modified knee push-up, which is not this battery's protocol. Values are
-converted at 0.62 and the file is marked provisional.
+**Women's push-ups are converted from a different exercise.** The published
+source uses the modified knee push-up; strict counts are taken at 0.45 of that
+with an added zero share. Grade C, and the weakest link after the Grade D
+events.
 
-**The mile passes through two conversions.** Published VO2max percentiles →
-Cooper 12-minute distance → mile time. Each step is a documented equation and
-each adds error. Percentile ordering survives because every step is monotone,
-so the ranking is sounder than the absolute time.
+**The mile passes through a conversion chain.** VO2max percentiles → sustainable
+speed → mile time, walk or run. Each step is a documented equation and each
+adds error. Percentile ordering survives because every step is monotone, so the
+ranking is sounder than the absolute time. The top end under 30 is optimistic.
 
 **A prescribed carry load bunches older cohorts near zero.** 100 lb total is a
 moderate carry at 35 and close to a maximal one at 80, so a good share of the
@@ -182,9 +205,15 @@ rather than a modelling artefact, and it is the same shape the pull-up file
 has: the cohort norms still rank within the band. The decline per decade in the
 carry file is set at 0.22 rather than 0.15 to reflect it.
 
-**Balance and sit-to-rise are compressed at the ceiling.** Both are capped
-scales (60 seconds, 10 points) with right-skewed distributions, and a normal
-model misbehaves at the top. Anyone capping out lands at the 99th percentile.
+**Balance and sit-to-rise are compressed at the ceiling.** 14% of 25-year-olds
+reach 60 s and tie at about 93; under 40, a perfect 10 on sit-to-rise ties with
+the top 40-50% and scores in the mid-70s. That is the correct population
+percentile and it will feel low to a fit young user. The UI marks the cap.
+
+**The table adds about 180 kB (gzipped) to the first load.** It is imported
+statically so the browser, the server and the share card all score identically
+and offline works from the first visit. Splitting it per event or loading it
+lazily is the fix if that ever matters.
 
 **The Supabase adapter is unexercised.** It is written against the schema in
 `supabase/migrations`, but there was no project to run it against, so it has not
@@ -212,7 +241,7 @@ install starts empty on purpose.
 ## Not in v1
 
 Global leaderboard, training plans, wearables, social feed, payments, native
-wrapper, weighted composite. `/admin/norms` is the only admin surface.
+wrapper, weighted composite. `/admin/benchmarks` is the only admin surface.
 
 ## Registration
 

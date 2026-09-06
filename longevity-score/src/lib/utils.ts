@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { BandLabel } from "@/lib/scoring/types";
+import type { BatteryTest } from "@/lib/battery";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -112,10 +113,31 @@ export function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] ?? s[v] ?? s[0]);
 }
 
-/** Sentence-free. "Better than 74% of men your age." */
-export function betterThanSentence(percentile: number, sex: "M" | "F"): string {
+/**
+ * One test's percentile, said properly. "84th percentile among women age 74."
+ * This phrasing is only right for a single test: the composite is a mean of
+ * percentiles and is never described this way.
+ */
+export function percentileSentence(percentile: number, sex: "M" | "F", age: number): string {
   const group = sex === "M" ? "men" : "women";
-  return `Better than ${Math.round(percentile)}% of ${group} your age`;
+  return `${ordinal(Math.round(percentile))} percentile among ${group} age ${age}`;
+}
+
+/**
+ * What the composite is. It is not a percentile - averaging eight correlated
+ * percentiles gives a tighter number - so it never gets "better than X%".
+ */
+export const COMPOSITE_CAPTION = "Mean of eight percentiles";
+
+/**
+ * A raw result for display, including the two that are not numbers to a
+ * reader: a did-not-finish and a protocol cap.
+ */
+export function formatResult(test: Pick<BatteryTest, "unit" | "dnfValue" | "direction">, value: number): string {
+  if (test.dnfValue !== undefined && test.direction === "lower_better" && value >= test.dnfValue) {
+    return "DNF";
+  }
+  return formatRaw(value, test.unit);
 }
 
 export function ageBandLabel(age: number, sex: "M" | "F"): string {

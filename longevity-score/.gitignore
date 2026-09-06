@@ -8,3 +8,6 @@ next-env.d.ts
 .env.local
 coverage/
 demo/dist/
+
+# Regenerated benchmark tables; the shipped one lives in data/benchmarks
+tools/benchmarks/out/

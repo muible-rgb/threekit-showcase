@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { DecodedShare } from "@/lib/share-token";
-import { BAND_LABELS, formatDate, oneDecimal } from "@/lib/utils";
+import { BAND_LABELS, COMPOSITE_CAPTION, formatDate, oneDecimal } from "@/lib/utils";
 
 /**
  * The body of a shared score. Shared between the server-rendered public page
@@ -24,10 +24,7 @@ export function PublicScoreView({ share }: { share: DecodedShare }) {
           <p className="name text-name text-chalk-dim">{BAND_LABELS[share.band]}</p>
         </div>
 
-        <p className="meta mt-2">
-          Better than {Math.round(share.composite)}% of{" "}
-          {share.sex === "M" ? "men" : "women"} the same age
-        </p>
+        <p className="meta mt-2">{COMPOSITE_CAPTION}</p>
         {share.fitnessAge !== null && (
           <p className="meta mt-0.5">
             Fitness age {share.fitnessAge}

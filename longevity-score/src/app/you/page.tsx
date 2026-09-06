@@ -20,7 +20,7 @@ import {
   ageBandLabel,
   cn,
   formatDate,
-  formatRaw,
+  formatResult,
   formatRawDelta,
   formatSigned,
   oneDecimal,
@@ -124,7 +124,8 @@ export default function DeepDivePage() {
               </div>
 
               <p className="meta mt-1.5">
-                {meta?.name} · {entry ? formatRaw(entry.value, t.unit) : EMPTY}
+                {meta?.name} · {entry && meta ? formatResult(meta, entry.value) : EMPTY}
+                {t.atCeiling && <span className="text-chalk-off"> · at the cap</span>}
                 {d && d.rawDelta !== 0 && (
                   <span
                     className={
@@ -140,8 +141,11 @@ export default function DeepDivePage() {
                 {offProtocol && (
                   <span className="text-chalk-off"> · off-protocol load</span>
                 )}
-                {t.extrapolated && (
-                  <span className="text-chalk-off"> · outside norms</span>
+                {t.provisional && (
+                  <span className="text-chalk-off"> · provisional benchmark</span>
+                )}
+                {t.derivation === "extrapolated" && (
+                  <span className="text-chalk-off"> · extrapolated</span>
                 )}
               </p>
             </div>
@@ -215,10 +219,22 @@ export default function DeepDivePage() {
 
       <SectionLabel>What this claims</SectionLabel>
       <p className="mt-3 max-w-prose text-[13px] leading-relaxed text-chalk-dim">
-        Each test is a percentile against published norms for your sex and
-        five-year age band. Your score is the mean of all {BATTERY_TEST_COUNT},
-        unweighted. All {BATTERY_TEST_COUNT} currently use provisional norms and
-        none have been proofread against their sources.
+        Each test is a percentile among people of your sex and exact age,
+        from population benchmarks v{score.benchmarkVersion}. Your score is the
+        mean of all {BATTERY_TEST_COUNT}, unweighted, and is not itself a
+        percentile. Zero reps and a DNF are real results, scored with everyone
+        else who got the same.
+        {score.tests.some((t) => t.provisional) && (
+          <>
+            {" "}
+            Provisional:{" "}
+            {score.tests
+              .filter((t) => t.provisional)
+              .map((t) => testBySlug(t.testVariant)?.name ?? t.testVariant)
+              .join(", ")}
+            {" "}- no general-population norm exists for these yet.
+          </>
+        )}
       </p>
       <Link href="/methodology" className="label mt-3 inline-block text-chalk">
         Read the methodology

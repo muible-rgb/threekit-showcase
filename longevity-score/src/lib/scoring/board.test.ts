@@ -11,9 +11,11 @@ function test(slug: string, percentile: number, raw = percentile): TestPercentil
     raw,
     percentile,
     band: bandFor(percentile),
-    method: "mean_sd",
+    evidenceGrade: "B",
+    derivation: "observed",
     provisional: false,
-    extrapolated: false,
+    atFloor: false,
+    atCeiling: false,
   };
 }
 
@@ -31,7 +33,7 @@ function score(percentiles: number[], required = 10): BatteryScore {
     tests,
     missing: Array.from({ length: required - tests.length }, (_, i) => `m${i}`),
     fitnessAge: null,
-    normsVersion: "test",
+    benchmarkVersion: "test",
     anyProvisional: false,
   };
 }

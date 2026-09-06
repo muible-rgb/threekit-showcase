@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   ageBandLabel,
-  betterThanSentence,
+  COMPOSITE_CAPTION,
+  percentileSentence,
   formatRaw,
   formatRawDelta,
   formatSigned,
@@ -68,10 +69,17 @@ describe("oneDecimal", () => {
   });
 });
 
-describe("betterThanSentence", () => {
-  it("uses the right group for each sex", () => {
-    expect(betterThanSentence(74.3, "M")).toBe("Better than 74% of men your age");
-    expect(betterThanSentence(74.3, "F")).toBe("Better than 74% of women your age");
+describe("percentileSentence", () => {
+  it("says a single test's percentile properly, for the right group and age", () => {
+    expect(percentileSentence(84.2, "F", 74)).toBe("84th percentile among women age 74");
+    expect(percentileSentence(51, "M", 39)).toBe("51st percentile among men age 39");
+  });
+});
+
+describe("COMPOSITE_CAPTION", () => {
+  it("never calls the composite a percentile", () => {
+    expect(COMPOSITE_CAPTION).not.toMatch(/better than|th percentile/i);
+    expect(COMPOSITE_CAPTION).toMatch(/mean/i);
   });
 });
 

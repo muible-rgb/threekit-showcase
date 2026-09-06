@@ -15,7 +15,7 @@ Two denominators, never blended:
 ## Architecture decisions made up front
 
 **1. Norms are data.** Every mean, SD and percentile cut-point lives in
-`/data/norms/v1/<test_variant>.json`. Zero normative constants in TypeScript.
+`/data/benchmarks/long_game_lookup_v<version>.json`, one table per version. Zero normative constants in TypeScript.
 The engine takes a `NormsRegistry` as an argument - it never imports a file
 itself. That is what makes it a pure, fully testable unit.
 
@@ -75,7 +75,7 @@ saying exactly what was inferred.
 Layer 1 raw → Layer 2 cohort percentile → Layer 3 composite.
 Ships with tests before any UI imports it.
 
-- `normal.ts` - normal CDF + inverse, no dependency
+- `benchmark.ts` - table lookup, interpolation, mid-rank ties; no statistics
 - `cohort.ts` - age at test, 5-year band resolution
 - `percentile.ts` - mean/SD path, cut-point interpolation path, direction, 1-99 clamp
 - `composite.ts` - mean of 10, bands, all-or-nothing rule
@@ -94,18 +94,18 @@ Home → Test mode → Score → Crew session → Methodology. Mobile-first.
 `next/og` at 1080x1080 and 1200x630.
 
 ### Phase 7 - PWA + polish
-Manifest, service worker, install prompt, `/admin/norms`.
+Manifest, service worker, install prompt, `/admin/benchmarks`.
 
 ## Out of scope for v1
 
 Global leaderboard, training plans, wearables, social feed, payments, native
-wrapper, weighted composite, admin beyond `/admin/norms`.
+wrapper, weighted composite, admin beyond `/admin/benchmarks`.
 
 ## Acceptance criteria → where each is proven
 
 | Criterion | Proven by |
 |---|---|
-| Both norms formats, both directions, floor/cap | `percentile.test.ts` |
+| Scorer matches the handoff's reference values; table-wide invariants | `benchmark.test.ts` |
 | Missing tests → null composite | `composite.test.ts` |
 | Band boundaries | `composite.test.ts` |
 | Fitness age | `fitness-age.test.ts` |
@@ -113,7 +113,7 @@ wrapper, weighted composite, admin beyond `/admin/norms`.
 | Full battery on a phone, score in <90s | Test mode: no blocking network call on save |
 | Guests claim results by email | `participants.user_id` nullable + claim flow |
 | Airplane mode loses zero results | Outbox queue, local write is the source of truth |
-| Every percentile traces to a citation | `/methodology`, generated from the norms files |
+| Every percentile traces to a citation | `/methodology`, grades and coverage read from the table; sources in `docs/` |
 | Seed data renders every screen | `LocalStore` ships pre-seeded |
 
 ## Status

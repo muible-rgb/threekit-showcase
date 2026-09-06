@@ -10,8 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "norms:generate": "tsx scripts/generate-provisional-norms.ts",
-    "norms:validate": "tsx scripts/validate-norms.ts"
+    "benchmarks:build": "python3 tools/benchmarks/build.py"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",

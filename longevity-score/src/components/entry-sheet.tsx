@@ -62,6 +62,11 @@ export function EntrySheet({
   const drift = test.secondary ? carryLoadDrift(secondary, sex) : null;
   const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 
+  // Could not finish. Recorded as the floor value and scored with everyone
+  // else who could not - a result in the low tail, not missing data.
+  const canDnf = test.dnfValue !== undefined;
+  const isDnf = canDnf && value === test.dnfValue;
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end bg-board/85">
       {/* Tap-outside-to-dismiss. Not a button: the header already has a real
@@ -97,7 +102,23 @@ export function EntrySheet({
             />
           )}
 
-          <ValueInput test={test} value={value} onChange={setValue} />
+          {isDnf ? (
+            <div className="flex h-24 items-center justify-center border border-rule-2">
+              <span className="figure text-[48px]">DNF</span>
+            </div>
+          ) : (
+            <ValueInput test={test} value={value} onChange={setValue} />
+          )}
+
+          {canDnf && (
+            <button
+              type="button"
+              onClick={() => setValue(isDnf ? null : test.dnfValue!)}
+              className="label mt-3 text-chalk"
+            >
+              {isDnf ? "Enter a time instead" : "Did not finish"}
+            </button>
+          )}
 
           {offProtocol && (
             <p className="mt-3 border border-rule-2 p-3 text-[12px] leading-relaxed text-chalk-dim">

@@ -7,9 +7,21 @@ import {
   carryLoadDrift,
   testBySlug,
 } from "./battery";
-import { normsRegistry } from "./norms/registry";
-import { percentileFor } from "./scoring/percentile";
-import { formatRaw, formatRawDelta } from "./utils";
+import { scorer } from "./benchmarks/registry";
+import { formatRaw, formatRawDelta, formatResult } from "./utils";
+
+/** A stored raw value, in the table's unit, scored for a 42-year-old. */
+const score = (t: (typeof BATTERY_TESTS)[number], v: number, sex: "M" | "F" = "F") =>
+  scorer.scoreEvent(t.benchmark.event, sex, 42, v * t.benchmark.factor).score;
+
+/** The unit the app stores against the unit the table speaks. */
+const UNIT_FAMILY: Record<string, string> = {
+  s: "seconds",
+  reps: "reps",
+  in: "cm",
+  ft: "meters",
+  points: "score_0_10",
+};
 
 /**
  * Input plumbing.
@@ -29,13 +41,16 @@ describe("battery definition", () => {
     expect(capacities.size).toBe(8);
   });
 
-  it("has a norms file for every test, matching unit and direction", () => {
+  it("binds every test to a benchmark event with a matching direction and unit", () => {
     for (const t of BATTERY_TESTS) {
-      const f = normsRegistry.get(t.slug);
-      expect(f, `no norms for ${t.slug}`).toBeDefined();
-      expect(f!.unit, t.slug).toBe(t.unit);
-      expect(f!.direction, t.slug).toBe(t.direction);
-      expect(f!.capacity, t.slug).toBe(t.capacity);
+      const ev = scorer.event(t.benchmark.event);
+      expect(ev, `no benchmark event for ${t.slug}`).toBeDefined();
+      expect(ev!.lower_better, t.slug).toBe(t.direction === "lower_better");
+      expect(ev!.unit, t.slug).toBe(UNIT_FAMILY[t.unit]);
+      // Same-unit tests convert by 1; the two imperial lengths convert to metric.
+      if (t.unit === "in") expect(t.benchmark.factor).toBe(2.54);
+      else if (t.unit === "ft") expect(t.benchmark.factor).toBe(0.3048);
+      else expect(t.benchmark.factor, t.slug).toBe(1);
     }
   });
 
@@ -78,25 +93,46 @@ describe("battery definition", () => {
   it("accepts a plausible result at both ends of every range", () => {
     // The engine must not throw anywhere inside a range the UI allows.
     for (const t of BATTERY_TESTS) {
-      const f = normsRegistry.get(t.slug)!;
       for (const v of [t.min, t.min + t.step, t.max - t.step, t.max]) {
-        const p = percentileFor(f, v, "F", 42).percentile;
-        expect(p, `${t.slug} at ${v}`).toBeGreaterThanOrEqual(1);
-        expect(p, `${t.slug} at ${v}`).toBeLessThanOrEqual(99);
+        const p = score(t, v);
+        expect(p, `${t.slug} at ${v}`).toBeGreaterThanOrEqual(0);
+        expect(p, `${t.slug} at ${v}`).toBeLessThanOrEqual(100);
       }
     }
   });
 
   it("makes the better end of each range score higher", () => {
     for (const t of BATTERY_TESTS) {
-      const f = normsRegistry.get(t.slug)!;
-      const atMin = percentileFor(f, t.min, "M", 42).percentile;
-      const atMax = percentileFor(f, t.max, "M", 42).percentile;
+      const atMin = score(t, t.min, "M");
+      const atMax = score(t, t.max, "M");
       if (t.direction === "higher_better") {
         expect(atMax, t.slug).toBeGreaterThan(atMin);
       } else {
         expect(atMin, t.slug).toBeGreaterThan(atMax);
       }
+    }
+  });
+
+  it("lets the mile and the shuttle record a did-not-finish, at the top of their range", () => {
+    // DNF is a real result that shares the floor with everyone who could not
+    // finish. It has to be enterable, so it sits inside the allowed range.
+    const mile = testBySlug("mile_run")!;
+    const agility = testBySlug("agility_5_10_5")!;
+    expect(mile.dnfValue).toBe(1800);
+    expect(mile.max).toBe(mile.dnfValue);
+    expect(agility.dnfValue).toBe(30);
+    expect(agility.max).toBe(agility.dnfValue);
+    expect(formatResult(mile, 1800)).toBe("DNF");
+    expect(formatResult(agility, 30)).toBe("DNF");
+    expect(formatResult(agility, 5.62)).toBe("5.62s");
+    // A DNF scores in the low tail: never above the slowest finishing time,
+    // and never as missing. At 42 nobody between P1 and P99 fails to finish,
+    // so the tied group is empty and a DNF reads 0.0; at 85 it reads 5.1.
+    expect(score(mile, 1800, "M")).toBeLessThanOrEqual(score(mile, 1799, "M"));
+    expect(score(mile, 1800, "M")).toBeLessThan(10);
+    expect(scorer.scoreEvent("mile_run", "M", 85, 1800).score).toBe(5.1);
+    for (const t of BATTERY_TESTS) {
+      if (t.dnfValue === undefined) expect(formatResult(t, t.max)).not.toBe("DNF");
     }
   });
 });
@@ -166,17 +202,18 @@ describe("pull-ups accept zero", () => {
   it("treats zero as a real result, not a missing one", () => {
     const pullUps = testBySlug("pull_ups")!;
     expect(pullUps.min).toBe(0);
-    const p = percentileFor(normsRegistry.get("pull_ups")!, 0, "F", 42).percentile;
-    expect(p).toBeGreaterThanOrEqual(1);
-    expect(p).toBeLessThan(50);
+    // Most women at 42 score zero, so zero is scored mid-rank in that group:
+    // well above 0, and below the first rep.
+    const zero = score(pullUps, 0);
+    expect(zero).toBeGreaterThan(20);
+    expect(zero).toBeLessThan(50);
+    expect(score(pullUps, 1)).toBeGreaterThan(zero);
   });
 });
 
 describe("balance is capped at the protocol ceiling", () => {
   it("scores everyone who reaches 60 seconds identically", () => {
-    const f = normsRegistry.get("balance_eyes_closed")!;
-    expect(percentileFor(f, 60, "M", 42).percentile).toBe(
-      percentileFor(f, 120, "M", 42).percentile,
-    );
+    const balance = testBySlug("balance_eyes_closed")!;
+    expect(score(balance, 60, "M")).toBe(score(balance, 120, "M"));
   });
 });

@@ -1,4 +1,5 @@
 import { buildSeedDatabase } from "./seed";
+import { CURRENT_BENCHMARK_VERSION } from "@/lib/benchmarks/registry";
 import type {
   CrewSession,
   Database,
@@ -210,7 +211,11 @@ export class LocalStore implements DataStore {
    * which is what makes a botched entry recoverable and an audit possible.
    */
   async addResult(input: Omit<Result, "id">): Promise<Result> {
-    const created: Result = { ...input, id: this.newId("r") };
+    const created: Result = {
+      ...input,
+      benchmarkVersion: input.benchmarkVersion ?? CURRENT_BENCHMARK_VERSION,
+      id: this.newId("r"),
+    };
     this.endDemo();
     this.db.results.push(created);
     this.enqueue({ kind: "result", payload: created });

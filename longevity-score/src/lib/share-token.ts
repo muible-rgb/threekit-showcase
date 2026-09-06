@@ -24,7 +24,7 @@ export interface SharePayload {
   s: Sex;
   /** Age band minimum, e.g. 40. */
   a: number;
-  /** Composite, one decimal. */
+  /** Composite, one decimal. A mean of percentiles, not a percentile. */
   c: number;
   /** Fitness age, or null. */
   f: number | null;
@@ -112,7 +112,7 @@ export function parseShareToken(token: string): DecodedShare | null {
   // Validate rather than trust: this arrives from a URL a stranger may have
   // edited, and it drives a rendered image.
   if (payload?.v !== 1) return null;
-  if (typeof payload.c !== "number" || payload.c < 1 || payload.c > 99) return null;
+  if (typeof payload.c !== "number" || payload.c < 0 || payload.c > 100) return null;
   if (payload.s !== "M" && payload.s !== "F") return null;
   if (!Array.isArray(payload.p) || payload.p.length === 0 || payload.p.length > 20) {
     return null;
@@ -124,8 +124,8 @@ export function parseShareToken(token: string): DecodedShare | null {
         Array.isArray(pair) &&
         typeof pair[0] === "string" &&
         typeof pair[1] === "number" &&
-        pair[1] >= 1 &&
-        pair[1] <= 99,
+        pair[1] >= 0 &&
+        pair[1] <= 100,
     )
     .map((pair) => ({
       slug: pair[0],

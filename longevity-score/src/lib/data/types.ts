@@ -49,6 +49,13 @@ export interface Result {
    * makes it mean something.
    */
   secondaryValue?: number | null;
+  /**
+   * The benchmark table this result is scored against, stamped at entry.
+   * Percentiles are computed on read from raw + version, so a new table does
+   * not move anyone's history. Null on rows from before versions existed;
+   * those score against the current table.
+   */
+  benchmarkVersion?: string | null;
   notes?: string | null;
   supersedesResultId?: string | null;
 }

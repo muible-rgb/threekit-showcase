@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { buildSeedDatabase } from "./seed";
 import { LocalStore } from "./local-store";
-import { BATTERY_TEST_SLUGS } from "@/lib/battery";
-import { normsRegistry } from "@/lib/norms/registry";
+import { BATTERY_BINDINGS, BATTERY_TEST_SLUGS, testBySlug } from "@/lib/battery";
+import { currentBenchmark } from "@/lib/benchmarks/registry";
 import { mostImproved, rankBoard } from "@/lib/scoring/board";
 import { scoreBattery } from "@/lib/scoring/composite";
 
@@ -20,7 +20,7 @@ function scoreFor(participantId: string, sessionId: string) {
   return scoreBattery({
     sex: p.sex,
     birthDate: p.birthDate,
-    batteryTests: BATTERY_TEST_SLUGS,
+    tests: BATTERY_BINDINGS,
     results: db.results
       .filter((r) => r.participantId === participantId && r.sessionId === sessionId)
       .map((r) => ({
@@ -28,7 +28,7 @@ function scoreFor(participantId: string, sessionId: string) {
         value: r.rawValue,
         recordedAt: r.recordedAt,
       })),
-    norms: normsRegistry,
+    lookup: currentBenchmark,
   });
 }
 
@@ -132,12 +132,16 @@ describe("seed produces the states each screen needs", () => {
 
   it("keeps every raw result inside its test's input bounds", () => {
     for (const r of db.results) {
-      const file = normsRegistry.get(r.testVariant)!;
-      expect(file, r.testVariant).toBeDefined();
+      const test = testBySlug(r.testVariant);
+      expect(test, r.testVariant).toBeDefined();
       expect(Number.isFinite(r.rawValue)).toBe(true);
-      // Zero is a real result on pull-ups and on balance.
-      expect(r.rawValue).toBeGreaterThanOrEqual(0);
+      expect(r.rawValue, r.testVariant).toBeGreaterThanOrEqual(test!.min);
+      expect(r.rawValue, r.testVariant).toBeLessThanOrEqual(test!.max);
     }
+  });
+
+  it("stamps every seeded result with the benchmark version it was scored under", () => {
+    expect(db.results.every((r) => r.benchmarkVersion === currentBenchmark.version)).toBe(true);
   });
 
   it("asks for no bodyweight anywhere", () => {

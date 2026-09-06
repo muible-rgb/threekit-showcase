@@ -1,5 +1,5 @@
-import { BATTERY_TEST_SLUGS } from "@/lib/battery";
-import { normsRegistry } from "@/lib/norms/registry";
+import { BATTERY_BINDINGS, BATTERY_TEST_SLUGS } from "@/lib/battery";
+import { currentBenchmark } from "@/lib/benchmarks/registry";
 import type { Participant, Result } from "@/lib/data/types";
 import { scoreBattery } from "@/lib/scoring/composite";
 import type { BatteryScore } from "@/lib/scoring/types";
@@ -85,13 +85,13 @@ export function scoreAttempt(
   return scoreBattery({
     sex: participant.sex,
     birthDate: participant.birthDate,
-    batteryTests: BATTERY_TEST_SLUGS,
+    tests: BATTERY_BINDINGS,
     results: results.map((r) => ({
       testVariant: r.testVariant,
       value: r.rawValue,
       recordedAt: r.recordedAt,
     })),
-    norms: normsRegistry,
+    lookup: currentBenchmark,
   });
 }
 
@@ -225,13 +225,13 @@ export function currentCard(
   const score = scoreBattery({
     sex: participant.sex,
     birthDate: participant.birthDate,
-    batteryTests: BATTERY_TEST_SLUGS,
+    tests: BATTERY_BINDINGS,
     results: [...entries.values()].map((e) => ({
       testVariant: e.testVariant,
       value: e.value,
       recordedAt: e.recordedAt,
     })),
-    norms: normsRegistry,
+    lookup: currentBenchmark,
   });
 
   const updatedAt =
@@ -257,12 +257,12 @@ export function previousCard(
   return scoreBattery({
     sex: participant.sex,
     birthDate: participant.birthDate,
-    batteryTests: BATTERY_TEST_SLUGS,
+    tests: BATTERY_BINDINGS,
     results: [...card.entries.values()].map((e) => ({
       testVariant: e.testVariant,
       value: e.previousValue ?? e.value,
       recordedAt: e.recordedAt,
     })),
-    norms: normsRegistry,
+    lookup: currentBenchmark,
   });
 }

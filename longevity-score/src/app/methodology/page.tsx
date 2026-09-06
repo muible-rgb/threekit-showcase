@@ -1,55 +1,68 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BATTERY_TESTS } from "@/lib/battery";
-import { normsRegistry } from "@/lib/norms/registry";
+import { currentBenchmark } from "@/lib/benchmarks/registry";
+import { BENCHMARK_NOTES, GRADE_MEANING } from "@/lib/benchmarks/notes";
+import { coverageLine, eventGrades } from "@/lib/benchmarks/summary";
 import { BANDS } from "@/lib/scoring/composite";
+import type { EvidenceGrade } from "@/lib/scoring/types";
 
 export const metadata: Metadata = {
   title: "Methodology",
   description:
-    "Every test, its protocol, its source, and whether its norms are provisional. Plus how the score is worked out, in plain language.",
+    "Every test, its protocol, its sources, and how strong the evidence behind its benchmark is. Plus how the score is worked out, in plain language.",
 };
 
+const GRADES: EvidenceGrade[] = ["A", "B", "C", "D"];
+
 /**
- * Rendered from the norms files themselves rather than written by hand, so it
- * cannot drift from what the app actually uses. If a citation changes in
- * /data/norms, this page changes with it.
+ * Grades, floors, ceilings and age coverage are read from the benchmark table
+ * itself rather than written by hand, so this page cannot say one thing while
+ * the scorer does another. The prose about sources is condensed from the
+ * methodology report in docs/, which remains the full account.
  */
 export default function MethodologyPage() {
-  const files = BATTERY_TESTS.map((test) => ({
+  const table = currentBenchmark;
+  const rows = BATTERY_TESTS.map((test) => ({
     test,
-    norms: normsRegistry.get(test.slug)!,
+    ev: table.events[test.benchmark.event],
+    note: BENCHMARK_NOTES[test.benchmark.event],
   }));
-
-  const provisionalCount = files.filter((f) => f.norms.source.provisional).length;
-  const unverifiedCount = files.filter(
-    (f) => f.norms.source.transcription_verified !== true,
-  ).length;
+  const provisional = rows.filter((r) => r.ev.grade.M === "D" || r.ev.grade.F === "D");
 
   return (
     <article className="space-y-8 pb-6">
       <header>
         <h1 className="name text-[26px]">Methodology</h1>
-        <p className="mt-2 text-[13px] leading-relaxed text-chalk-dim">
+        <p className="meta mt-2">
+          Benchmarks v{table.version} · {table.generated} · ages {table.age_min}-{table.age_max}
+        </p>
+        <p className="mt-3 text-[13px] leading-relaxed text-chalk-dim">
           Every number this app shows you traces back to a source on this page.
           Where the source is weak, it says so. That is the point of the page.
         </p>
       </header>
 
       <section className="space-y-3">
-        <h2 className="label border-b border-rule-2 pb-2">
-          How the score works
-        </h2>
+        <h2 className="label border-b border-rule-2 pb-2">How the score works</h2>
         <div className="space-y-3 text-[13px] leading-relaxed text-chalk-dim">
           <p>
-            You do eight tests. Each raw result is compared to published norms for
-            people of your sex in your five-year age band. That comparison gives
-            a percentile between 1 and 99.
+            You do eight tests. Each raw result is placed against a population
+            benchmark for people of your sex and your exact age at the time of the
+            test - not a five-year band, a column for every year from{" "}
+            {table.age_min} to {table.age_max}. That gives a percentile from 0 to
+            100: the share of people like you that the result beats.
           </p>
           <p className="font-medium text-chalk">
             Your Longevity Score is the average of those eight percentiles. Nothing
             is weighted. A 78-year-old woman can outscore a 30-year-old man,
-            because both are measured against their own cohort.
+            because both are measured against their own age and sex.
+          </p>
+          <p>
+            The score itself is not a percentile. Averaging eight related
+            percentiles gives a tighter number than any one of them: roughly, 70
+            is strong, 80 is the top tenth, 90 the top few percent. It is never
+            described as &quot;better than X% of people&quot;.
           </p>
           <p>
             All eight are required. Seven tests gives you seven percentiles and no
@@ -57,26 +70,27 @@ export default function MethodologyPage() {
             worst at and call the result an improvement.
           </p>
           <p>
-            Nobody scores 0 and nobody scores 100. The floor is the 1st
-            percentile and the ceiling is the 99th - a test can tell you that you
-            are near the edge of a distribution, not that you are outside it.
+            Ties are scored in the middle of the tied group. Zero reps is a real
+            result: a man of 55 who does no pull-ups scores about 29, because 58%
+            of his peers also score zero, and one rep moves him past all of them.
+            A did-not-finish on the mile or the shuttle is scored with everyone
+            who could not finish. Reaching the balance cap or a perfect
+            sit-to-rise ties you with everyone else at the cap.
           </p>
         </div>
       </section>
 
       <section className="space-y-3">
-        <h2 className="label border-b border-rule-2 pb-2">
-          What the labels mean
-        </h2>
-        <ul className="">
+        <h2 className="label border-b border-rule-2 pb-2">What the labels mean</h2>
+        <ul>
           {BANDS.map((band) => (
             <li
               key={band.label}
               className="flex items-baseline justify-between border-b border-rule py-2.5"
             >
               <span className="name text-name">{band.label}</span>
-              <span className="tnum meta">
-                {band.min}-{Math.round(band.max)} percentile
+              <span className="num meta">
+                {band.min}-{Math.round(band.max)}
               </span>
             </li>
           ))}
@@ -84,101 +98,41 @@ export default function MethodologyPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="label border-b border-rule-2 pb-2">
-          Two numbers, never blended
-        </h2>
-        <div className="space-y-3 text-[13px] leading-relaxed text-chalk-dim">
-          <p>
-            <span className="font-semibold text-chalk">Longevity Score</span> is
-            you against published general-population norms. It is the number that
-            carries any health meaning.
-          </p>
-          <p>
-            <span className="font-semibold text-chalk">Crew rank</span> is you
-            against the other people in your session. It is the game. It never
-            feeds into your Longevity Score, and your Longevity Score never
-            changes because of who showed up on Saturday.
-          </p>
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="label border-b border-rule-2 pb-2">
-          Fitness age
-        </h2>
-        <div className="space-y-3 text-[13px] leading-relaxed text-chalk-dim">
-          <p>
-            For each test, we find the age at which your raw result would be
-            exactly average for your sex, then take the median of those eight ages.
-          </p>
-          <p>
-            It has a known limit in v1, and it is worth understanding before you
-            read anything into it. Published norms describe the general
-            population, which includes a lot of untrained people. A trained adult
-            sitting one standard deviation above that median is often 20 to 40
-            per cent above it in raw terms, which maps to an age below the
-            youngest band the norms cover.
-          </p>
-          <p className="font-medium text-chalk">
-            When that happens on more than three of your eight tests, the number is
-            shown as a floor - &quot;22 or under&quot; - and tagged approx. It is
-            not a more precise answer being rounded. It is the edge of what these
-            norms can resolve.
-          </p>
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="label border-b border-rule-2 pb-2">
-          Where the norms are weak
-        </h2>
-        <div className="border border-rule-2 p-4">
-          <p className="text-[13px] leading-relaxed text-chalk-dim">
-            <span className="font-semibold text-chalk-dim">
-              {provisionalCount} of {files.length} tests
-            </span>{" "}
-            use provisional norms, and {unverifiedCount} of {files.length} have
-            not yet had their numbers proofread against the source document by a
-            human. Both states are marked on every test below and tagged wherever
-            a percentile from them appears in the app.
-          </p>
-          <p className="mt-3 text-[13px] leading-relaxed text-chalk-dim">
-            A file is only non-provisional when both the average and the spread
-            come from the cited source. If we had to infer the spread, it is
-            provisional, even where the average is well published.
-          </p>
-        </div>
+        <h2 className="label border-b border-rule-2 pb-2">Evidence grades</h2>
+        <ul>
+          {GRADES.map((g) => (
+            <li key={g} className="grid grid-cols-[24px_1fr] gap-gap border-b border-rule py-2.5">
+              <span className="num text-name">{g}</span>
+              <span className="text-[13px] leading-relaxed text-chalk-dim">{GRADE_MEANING[g]}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-[13px] leading-relaxed text-chalk-dim">
+          {provisional.length} of {rows.length} tests are Grade D -{" "}
+          {provisional.map((r) => r.test.name).join(", ")}. No general-population
+          norm exists for them. They are honest models built from adjacent
+          evidence, marked provisional wherever their percentile appears, and the
+          first thing to recalibrate once real results exist.
+        </p>
       </section>
 
       <section className="space-y-4">
-        <h2 className="label border-b border-rule-2 pb-2">
-          The eight tests
-        </h2>
+        <h2 className="label border-b border-rule-2 pb-2">The eight tests</h2>
 
-        {files.map(({ test, norms }, i) => (
-          <div
-            key={test.slug}
-            id={test.slug}
-            className="scroll-mt-20 border-b border-rule py-5"
-          >
+        {rows.map(({ test, ev, note }, i) => (
+          <div key={test.slug} id={test.slug} className="scroll-mt-20 border-b border-rule py-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="label text-chalk-dim">
+                <p className="label">
                   {i + 1} - {test.capacityName}
                 </p>
-                <h3 className="mt-0.5 name text-name">{test.name}</h3>
+                <h3 className="name mt-0.5 text-name">{test.name}</h3>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
-                {norms.source.provisional ? (
-                  <span className="rounded px-2 py-0.5 label text-chalk-dim border border-rule-2">
-                    provisional
-                  </span>
-                ) : (
-                  <span className="rounded px-2 py-0.5 label text-chalk border border-rule-2">
-                    sourced
-                  </span>
-                )}
-                <span className="text-[10px] text-chalk-dim">
+                <span className="label border border-rule-2 px-2 py-0.5 text-chalk">
+                  grade {eventGrades(ev)}
+                </span>
+                <span className="meta">
                   {test.direction === "lower_better" ? "lower is better" : "higher is better"}
                 </span>
               </div>
@@ -186,48 +140,32 @@ export default function MethodologyPage() {
 
             <p className="mt-3 text-[13px] leading-relaxed text-chalk-dim">{test.protocol}</p>
 
-            <dl className="mt-4 space-y-2 border-t border-ink-line-soft pt-3 text-[12px] leading-relaxed">
+            <dl className="mt-4 space-y-2 border-t border-rule pt-3 text-[12px] leading-relaxed">
               <div>
-                <dt className="font-semibold text-chalk-dim">Source</dt>
+                <dt className="font-semibold text-chalk-dim">Basis</dt>
+                <dd className="mt-0.5 text-chalk-dim">{note.basis}</dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-chalk-dim">Sources</dt>
                 <dd className="mt-0.5 text-chalk-dim">
-                  {norms.source.citation}
-                  {norms.source.url && (
-                    <>
-                      {" "}
-                      <a
-                        href={norms.source.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-chalk underline underline-offset-2"
-                      >
-                        link
-                      </a>
-                    </>
-                  )}
+                  <ul className="list-disc space-y-0.5 pl-4">
+                    {note.sources.map((s) => (
+                      <li key={s}>{s}</li>
+                    ))}
+                  </ul>
                 </dd>
               </div>
               <div>
-                <dt className="font-semibold text-chalk-dim">Population</dt>
-                <dd className="mt-0.5 text-chalk-dim">{norms.source.population}</dd>
-              </div>
-              {norms.source.notes && (
-                <div>
-                  <dt className="font-semibold text-chalk-dim">What to know</dt>
-                  <dd className="mt-0.5 text-chalk-dim">{norms.source.notes}</dd>
-                </div>
-              )}
-              <div>
-                <dt className="font-semibold text-chalk-dim">Form</dt>
+                <dt className="font-semibold text-chalk-dim">Coverage</dt>
                 <dd className="mt-0.5 text-chalk-dim">
-                  {norms.cohorts[0]?.mean !== undefined
-                    ? "Mean and standard deviation per cohort; percentile from the normal curve."
-                    : "Published percentile cut-points per cohort; linear interpolation between them."}{" "}
-                  {norms.cohorts.length} cohorts, ages{" "}
-                  {Math.min(...norms.cohorts.map((c) => c.age_min))} to{" "}
-                  {Math.max(...norms.cohorts.map((c) => c.age_max))}, both sexes.
-                  {norms.source.transcription_verified !== true &&
-                    " Numbers not yet proofread against the source document."}
+                  Ages {coverageLine(ev)}.
+                  {ev.floor !== null && ` Floor at ${ev.floor} ${ev.unit} (could not do it).`}
+                  {ev.ceiling !== null && ` Ceiling at ${ev.ceiling} ${ev.unit}.`}
                 </dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-chalk-dim">What to know</dt>
+                <dd className="mt-0.5 text-chalk-dim">{note.limitation}</dd>
               </div>
             </dl>
           </div>
@@ -235,9 +173,37 @@ export default function MethodologyPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="label border-b border-rule-2 pb-2">
-          Not medical advice
-        </h2>
+        <h2 className="label border-b border-rule-2 pb-2">Fitness age</h2>
+        <div className="space-y-3 text-[13px] leading-relaxed text-chalk-dim">
+          <p>
+            For each test, we find the age at which your raw result would be
+            exactly average for your sex, then take the median of those eight ages.
+          </p>
+          <p>
+            Population benchmarks include a lot of untrained people. A trained
+            adult often beats the average {table.age_min}-year-old on several
+            tests, and there is no younger age to read. When that happens on more
+            than three of your eight, the number is shown as a floor - &quot;
+            {table.age_min} or under&quot; - and tagged approx. It is not a more
+            precise answer being rounded. It is the edge of what the table can
+            resolve.
+          </p>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="label border-b border-rule-2 pb-2">Versions</h2>
+        <p className="text-[13px] leading-relaxed text-chalk-dim">
+          Every result is stamped with the benchmark version it was entered under
+          and scored against that version on read. When a recalibrated table
+          ships, your history does not move. Boards pin one version per season.
+          The full report, every parameter, and the model that generates the table
+          live in the repository under docs/ and tools/benchmarks/.
+        </p>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="label border-b border-rule-2 pb-2">Not medical advice</h2>
         <p className="text-[13px] leading-relaxed text-chalk-dim">
           Several of these tests are associated with mortality risk in published
           research. That is a statement about populations, not about you. This is
@@ -246,7 +212,7 @@ export default function MethodologyPage() {
         </p>
       </section>
 
-      <p className="text-center meta">
+      <p className="meta text-center">
         <Link href="/" className="underline underline-offset-2">
           Back to your score
         </Link>

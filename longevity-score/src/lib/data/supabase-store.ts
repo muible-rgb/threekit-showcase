@@ -263,6 +263,7 @@ export class SupabaseStore implements DataStore {
             witnessed: w.payload.witnessed,
             notes: w.payload.notes ?? null,
             supersedes_result_id: w.payload.supersedesResultId ?? null,
+            benchmark_version: w.payload.benchmarkVersion ?? null,
           });
           if (error && error.code !== "23505") throw error;
           break;

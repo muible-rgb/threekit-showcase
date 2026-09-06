@@ -1,7 +1,6 @@
 import { BATTERY_SLUG, BATTERY_TESTS } from "@/lib/battery";
-import { normsRegistry } from "@/lib/norms/registry";
+import { scorer } from "@/lib/benchmarks/registry";
 import { ageAt } from "@/lib/scoring/cohort";
-import type { NormCohort } from "@/lib/scoring/types";
 import type { Database, Participant, Result, CrewSession } from "./types";
 
 /**
@@ -74,18 +73,11 @@ const PEOPLE: SeedPerson[] = [
 const SESSION_1_AT = "2026-03-14T09:30:00.000Z";
 const SESSION_2_AT = "2026-06-13T09:30:00.000Z";
 
-function cohortFor(slug: string, sex: "M" | "F", age: number): NormCohort {
-  const file = normsRegistry.get(slug)!;
-  const forSex = file.cohorts.filter((c) => c.sex === sex);
-  return (
-    forSex.find((c) => age >= c.age_min && age <= c.age_max) ??
-    forSex[forSex.length - 1]
-  );
-}
-
 /**
- * Turn "this person is 1.05 SDs above their cohort" into a plausible raw
- * result, respecting each test's direction, units and step size.
+ * Turn "this person is 1.05 SDs above their peers" into a plausible raw
+ * result, respecting each test's direction, units and step size. The table
+ * gives the raw value at a percentile in its own unit; the seed stores the
+ * app's unit, so it converts back.
  */
 function rawFor(
   slug: string,
@@ -93,26 +85,11 @@ function rawFor(
   age: number,
   z: number,
 ): number {
-  const file = normsRegistry.get(slug)!;
   const test = BATTERY_TESTS.find((t) => t.slug === slug)!;
-  const cohort = cohortFor(slug, sex, age);
-
-  let value: number;
-  if (cohort.mean !== undefined && cohort.sd !== undefined) {
-    const signed = file.direction === "higher_better" ? z : -z;
-    value = cohort.mean + signed * cohort.sd;
-  } else {
-    // Cut-point file: walk the published points and interpolate on z.
-    const pts = Object.entries(cohort.percentiles!)
-      .map(([p, v]) => ({ p: Number(p), v }))
-      .sort((a, b) => a.p - b.p);
-    // Approximate percentile for this z, then interpolate the value.
-    const pct = Math.min(97, Math.max(3, 50 + z * 34));
-    const lo = [...pts].reverse().find((x) => x.p <= pct) ?? pts[0];
-    const hi = pts.find((x) => x.p >= pct) ?? pts[pts.length - 1];
-    value =
-      lo.p === hi.p ? lo.v : lo.v + ((pct - lo.p) / (hi.p - lo.p)) * (hi.v - lo.v);
-  }
+  // Roughly Phi(z) * 100, clamped to the anchors the table has.
+  const pct = Math.min(99, Math.max(1, Math.round(50 + z * 34)));
+  const inTableUnits = scorer.benchmarkAt(test.benchmark.event, sex, age, pct) ?? 0;
+  const value = inTableUnits / test.benchmark.factor;
 
   const clamped = Math.min(test.max, Math.max(test.min, value));
   const stepped = Math.round(clamped / test.step) * test.step;
@@ -206,6 +183,7 @@ export function buildSeedDatabase(): Database {
           recordedAt,
           recordedByParticipantId: hostId,
           witnessed: true,
+          benchmarkVersion: scorer.version,
         });
       });
 
