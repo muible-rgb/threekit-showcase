@@ -127,16 +127,27 @@ describe("the carry records what you held as well as how far", () => {
     expect(carry.secondary!.unit).toBe("lb");
   });
 
-  it("prescribes one load for everyone, whatever they weigh", () => {
-    expect(CARRY_LOAD_LB).toBe(50);
-    expect(carryLoadDrift(CARRY_LOAD_LB)).toBe(0);
+  it("prescribes the load by sex, not by what you weigh", () => {
+    expect(CARRY_LOAD_LB.M).toBe(50);
+    expect(CARRY_LOAD_LB.F).toBe(35);
+    expect(carryLoadDrift(50, "M")).toBe(0);
+    expect(carryLoadDrift(35, "F")).toBe(0);
     // A 53 lb kettlebell is the nearest thing most racks have. Still on protocol.
-    expect(Math.abs(carryLoadDrift(53)!)).toBeLessThan(CARRY_LOAD_TOLERANCE);
+    expect(Math.abs(carryLoadDrift(53, "M")!)).toBeLessThan(CARRY_LOAD_TOLERANCE);
+    // As is a pair of 35s read off a 40 lb rack step for a woman.
+    expect(Math.abs(carryLoadDrift(40, "F")!)).toBeLessThan(CARRY_LOAD_TOLERANCE);
+  });
+
+  it("measures drift against your own prescription", () => {
+    // 50 lb is on protocol for a man and half again too heavy for a woman.
+    expect(carryLoadDrift(50, "M")).toBe(0);
+    expect(carryLoadDrift(50, "F")).toBeCloseTo(0.4286, 4);
+    expect(Math.abs(carryLoadDrift(50, "F")!)).toBeGreaterThan(CARRY_LOAD_TOLERANCE);
   });
 
   it("flags a load that is not the prescribed one", () => {
-    const light = carryLoadDrift(25)!;
-    const heavy = carryLoadDrift(75)!;
+    const light = carryLoadDrift(25, "M")!;
+    const heavy = carryLoadDrift(75, "M")!;
     expect(light).toBe(-0.5);
     expect(heavy).toBe(0.5);
     expect(Math.abs(light)).toBeGreaterThan(CARRY_LOAD_TOLERANCE);
@@ -145,9 +156,9 @@ describe("the carry records what you held as well as how far", () => {
 
   it("says it does not know rather than guessing", () => {
     // No load recorded is a different answer from "on protocol".
-    expect(carryLoadDrift(null)).toBeNull();
-    expect(carryLoadDrift(undefined)).toBeNull();
-    expect(carryLoadDrift(0)).toBeNull();
+    expect(carryLoadDrift(null, "M")).toBeNull();
+    expect(carryLoadDrift(undefined, "F")).toBeNull();
+    expect(carryLoadDrift(0, "M")).toBeNull();
   });
 });
 

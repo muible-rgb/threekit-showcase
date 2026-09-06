@@ -5,12 +5,12 @@
   "direction": "higher_better",
   "norms_version": "v2",
   "source": {
-    "citation": "No published normative table for a fixed-load (50 lb per hand) carry to grip failure.",
+    "citation": "No published normative table for a prescribed-load (50 lb per hand for men, 35 for women) carry to grip failure.",
     "url": "",
     "population": "None. This is a construction, not a normative sample.",
     "provisional": true,
     "transcription_verified": false,
-    "notes": "PROVISIONAL. The load is fixed at 50 lb per hand for everyone, so the sex gap in the anchors is wider than it would be on a bodyweight-relative carry: a fixed load is a smaller fraction of a heavier person's strength. The anchors put a median 42-year-old somewhere around two and a half minutes of walking before grip failure. The 0.5 coefficient of variation is wide on purpose: distance to grip failure has a heavy right tail. Surface and route matter more here than on any other test in the battery, so protocol discipline beats norm precision. Older cohorts will bunch near zero at a fixed load - that is real, and it is the same shape the pull-up file has. The decline per decade is steeper than the bodyweight-relative version used to be (0.22 against 0.15), because a fixed load does not shrink with the athlete: 100 lb total is a moderate carry at 35 and close to a maximal one at 80.",
+    "notes": "PROVISIONAL. The load is prescribed by sex - 50 lb per hand for men, 35 for women - rather than derived from bodyweight. 35 against 50 is close to the published female/male ratio for grip and carrying strength, so the sex gap in the anchors is narrower than it would be at a single load for everyone, though not closed: 35 lb is still relatively the heavier carry, which is why the female anchor sits below the male one rather than level with it. The anchors put a median 42-year-old somewhere around two and a half minutes of walking before grip failure. The 0.5 coefficient of variation is wide on purpose: distance to grip failure has a heavy right tail. Surface and route matter more here than on any other test in the battery, so protocol discipline beats norm precision. The decline per decade is steeper than the bodyweight-relative version used to be (0.22 against 0.15), because a prescribed load does not shrink with the athlete: 100 lb total is a moderate carry at 35 and close to a maximal one at 80. Older cohorts will bunch near zero at either load - that is real, and it is the same shape the pull-up file has.",
     "generated_by": "scripts/generate-provisional-norms.ts",
     "model": {
       "form": "mean(age) = anchor42 * (1 -/+ declinePerDecade) ^ ((max(bandMid, peakAge) - 42) / 10)",
@@ -18,7 +18,7 @@
       "decline_per_decade": 0.22,
       "anchor_age_42": {
         "M": 550,
-        "F": 340
+        "F": 460
       },
       "coefficient_of_variation": 0.5
     }
@@ -119,92 +119,92 @@
       "sex": "F",
       "age_min": 20,
       "age_max": 24,
-      "mean": 481.0,
-      "sd": 240.7
+      "mean": 651.0,
+      "sd": 325.7
     },
     {
       "sex": "F",
       "age_min": 25,
       "age_max": 29,
-      "mean": 481.0,
-      "sd": 240.7
+      "mean": 651.0,
+      "sd": 325.7
     },
     {
       "sex": "F",
       "age_min": 30,
       "age_max": 34,
-      "mean": 436.0,
-      "sd": 217.9
+      "mean": 590.0,
+      "sd": 294.9
     },
     {
       "sex": "F",
       "age_min": 35,
       "age_max": 39,
-      "mean": 385.0,
-      "sd": 192.5
+      "mean": 521.0,
+      "sd": 260.4
     },
     {
       "sex": "F",
       "age_min": 40,
       "age_max": 44,
-      "mean": 340.0,
-      "sd": 170.0
+      "mean": 460.0,
+      "sd": 230.0
     },
     {
       "sex": "F",
       "age_min": 45,
       "age_max": 49,
-      "mean": 300.0,
-      "sd": 150.1
+      "mean": 406.0,
+      "sd": 203.1
     },
     {
       "sex": "F",
       "age_min": 50,
       "age_max": 54,
-      "mean": 265.0,
-      "sd": 132.6
+      "mean": 359.0,
+      "sd": 179.4
     },
     {
       "sex": "F",
       "age_min": 55,
       "age_max": 59,
-      "mean": 234.0,
-      "sd": 117.1
+      "mean": 317.0,
+      "sd": 158.4
     },
     {
       "sex": "F",
       "age_min": 60,
       "age_max": 64,
-      "mean": 207.0,
-      "sd": 103.4
+      "mean": 280.0,
+      "sd": 139.9
     },
     {
       "sex": "F",
       "age_min": 65,
       "age_max": 69,
-      "mean": 183.0,
-      "sd": 91.3
+      "mean": 247.0,
+      "sd": 123.6
     },
     {
       "sex": "F",
       "age_min": 70,
       "age_max": 74,
-      "mean": 161.0,
-      "sd": 80.7
+      "mean": 218.0,
+      "sd": 109.1
     },
     {
       "sex": "F",
       "age_min": 75,
       "age_max": 79,
-      "mean": 142.0,
-      "sd": 71.2
+      "mean": 193.0,
+      "sd": 96.4
     },
     {
       "sex": "F",
       "age_min": 80,
       "age_max": 84,
-      "mean": 126.0,
-      "sd": 62.9
+      "mean": 170.0,
+      "sd": 85.1
     }
   ]
 }

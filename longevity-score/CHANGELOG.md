@@ -4,10 +4,13 @@ All notable changes to The Long Game.
 
 ## [Unreleased]
 
-### Changed - the carry runs at a fixed load, and nothing asks your weight
+### Changed - the carry runs at a prescribed load, and nothing asks your weight
 
-- **Carry load is 50 lb per hand for everyone**, not half your bodyweight
-  (`CARRY_LOAD_LB`). Every other test in the battery is absolute and the cohort
+- **Carry load is 50 lb per hand for men and 35 for women**, not half your
+  bodyweight (`CARRY_LOAD_LB`, keyed by sex; `carryLoadDrift` takes the sex).
+  35 against 50 is close to the published female/male ratio for carrying
+  strength, so the test measures grip endurance rather than who can lift the
+  things off the floor (`0004_carry_load_by_sex.sql`). Every other test in the battery is absolute and the cohort
   norms are what make results comparable; scaling one test to bodyweight made
   it the odd one out, put the load at 90 lb a hand for a big man, and forced
   the app to ask for a number people would rather not give. `carryLoadDrift`
@@ -16,9 +19,9 @@ All notable changes to The Long Game.
   sheet prefill, the deep dive, the seed, `SessionParticipant.bodyweightKg`,
   `setBodyweight`, and the `session_participants.bodyweight_kg` column
   (`0003_fixed_carry_load.sql`). `joinSession` takes two arguments.
-- **Carry norms re-fit** for the fixed load: anchors at 42 move to 550 ft (M) /
-  340 ft (F), and decline per decade goes 0.15 → 0.22, because a fixed load
-  does not shrink with the athlete. Still provisional.
+- **Carry norms re-fit** for the prescribed loads: anchors at 42 move to 550 ft
+  (M) / 460 ft (F), and decline per decade goes 0.15 → 0.22, because a
+  prescribed load does not shrink with the athlete. Still provisional.
 
 ### Added - Phase 1-3: data model, norms, scoring engine
 

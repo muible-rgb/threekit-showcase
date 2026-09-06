@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatRaw, secondsToClock } from "@/lib/utils";
 import { CARRY_LOAD_LB, CARRY_LOAD_TOLERANCE, carryLoadDrift } from "@/lib/battery";
 import type { BatteryTest } from "@/lib/battery";
+import type { Sex } from "@/lib/scoring/types";
 
 /**
  * Tap a test, type the number, save. That is the whole interaction.
@@ -18,12 +19,14 @@ export function EntrySheet({
   test,
   current,
   currentSecondary,
+  sex,
   onSave,
   onClose,
 }: {
   test: BatteryTest;
   current: number | null;
   currentSecondary: number | null;
+  sex: Sex;
   onSave: (value: number, secondary: number | null) => void | Promise<void>;
   onClose: () => void;
 }) {
@@ -31,7 +34,7 @@ export function EntrySheet({
   const [secondary, setSecondary] = React.useState<number | null>(
     // Default to the prescribed load, so the common case is already filled in
     // and the uncommon case is a deliberate edit.
-    currentSecondary ?? (test.secondary ? CARRY_LOAD_LB : null),
+    currentSecondary ?? (test.secondary ? CARRY_LOAD_LB[sex] : null),
   );
   const [saving, setSaving] = React.useState(false);
 
@@ -56,7 +59,7 @@ export function EntrySheet({
   const valid =
     value !== null && value >= test.min && value <= test.max && secondaryValid;
 
-  const drift = test.secondary ? carryLoadDrift(secondary) : null;
+  const drift = test.secondary ? carryLoadDrift(secondary, sex) : null;
   const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 
   return (
@@ -86,7 +89,12 @@ export function EntrySheet({
 
         <div className="px-pad pb-5 pt-4">
           {test.secondary && (
-            <SecondaryInput test={test} value={secondary} onChange={setSecondary} />
+            <SecondaryInput
+              test={test}
+              value={secondary}
+              sex={sex}
+              onChange={setSecondary}
+            />
           )}
 
           <ValueInput test={test} value={value} onChange={setValue} />
@@ -95,9 +103,9 @@ export function EntrySheet({
             <p className="mt-3 border border-rule-2 p-3 text-[12px] leading-relaxed text-chalk-dim">
               That is {Math.abs(Math.round(drift! * 100))}%{" "}
               {drift! > 0 ? "heavier" : "lighter"} than the prescribed{" "}
-              {CARRY_LOAD_LB} lb. The norms assume {CARRY_LOAD_LB}, so your
-              percentile will be marked off-protocol rather than compared as if
-              it matched.
+              {CARRY_LOAD_LB[sex]} lb. The norms assume {CARRY_LOAD_LB[sex]}, so
+              your percentile will be marked off-protocol rather than compared
+              as if it matched.
             </p>
           )}
 
@@ -141,10 +149,12 @@ export function EntrySheet({
 function SecondaryInput({
   test,
   value,
+  sex,
   onChange,
 }: {
   test: BatteryTest;
   value: number | null;
+  sex: Sex;
   onChange: (v: number | null) => void;
 }) {
   const spec = test.secondary!;
@@ -155,7 +165,7 @@ function SecondaryInput({
     onChange(text !== "" && Number.isFinite(n) ? n : null);
   }, [text, onChange]);
 
-  const suggested = CARRY_LOAD_LB;
+  const suggested = CARRY_LOAD_LB[sex];
 
   return (
     <div className="mb-5">

@@ -1,4 +1,4 @@
-import type { Direction } from "@/lib/scoring/types";
+import type { Direction, Sex } from "@/lib/scoring/types";
 
 /**
  * The eight-test battery. Imperial units.
@@ -38,7 +38,8 @@ export interface BatteryTest {
   /**
    * A second captured number, where the scored one needs context. The carry
    * records the load you actually held: 300 feet at 40 lb a hand and 300 feet
-   * at 90 lb are not the same result, and the norm assumes 50 lb.
+   * at 90 lb are not the same result, and the norm assumes the prescribed
+   * load for your sex.
    */
   secondary?: {
     label: string;
@@ -137,9 +138,9 @@ export const BATTERY_TESTS: BatteryTest[] = [
     min: 0,
     max: 3000,
     step: 5,
-    standard: "50 lb in each hand. Walk till your grip goes.",
+    standard: "50 lb in each hand, 35 for women. Walk till your grip goes.",
     protocol:
-      "50 lb in each hand - a pair of dumbbells or kettlebells, same weight both sides. Walk a flat, marked course until your grip fails and you have to put them down. Record what you held and how far you got. The load is fixed for everyone, the way a pull-up is a pull-up at any size: your age and sex cohort is what makes the distance comparable, not the weight on the handle. If 50 is not what you own, enter what you carried - the app marks it off-protocol rather than quietly scoring it as if it matched.",
+      "50 lb in each hand for men, 35 for women - a pair of dumbbells or kettlebells, same weight both sides. Walk a flat, marked course until your grip fails and you have to put them down. Record what you held and how far you got. The load is prescribed rather than worked out from your bodyweight, so what makes distances comparable is your age and sex cohort, not the weight on the handle. If the prescribed load is not what you own, enter what you carried - the app marks it off-protocol rather than quietly scoring it as if it matched.",
     demoVideoId: "",
     secondary: {
       label: "Load per hand",
@@ -213,28 +214,31 @@ export function testBySlug(slug: string): BatteryTest | undefined {
 }
 
 /**
- * The carry runs at a fixed load, not a fraction of your bodyweight.
+ * The carry runs at a prescribed load, not a fraction of your bodyweight.
  *
- * Every other test in the battery is absolute - a pull-up is a pull-up at any
- * size - and the cohort norms are what make results comparable. Scaling one
- * test to bodyweight made it the odd one out, made the app ask for a number
- * people would rather not give, and put the load at 90 lb a hand for a big
- * man, which is not a dumbbell most gyms own. 50 is a rack standard.
+ * Scaling the load to bodyweight made this the only test in the battery that
+ * asked what you weigh, and put it at 90 lb a hand for a big man, which is not
+ * a dumbbell most gyms own. The prescription is by sex rather than one number
+ * for everyone: 50 and 35 are rack standards, and 35 for a woman is close to
+ * the same relative load as 50 for a man, which keeps the test measuring grip
+ * endurance rather than who can pick the things up at all.
  */
-export const CARRY_LOAD_LB = 50;
+export const CARRY_LOAD_LB: Record<Sex, number> = { M: 50, F: 35 };
 
 /**
- * How far the load strayed from the prescribed 50 lb, as a fraction. 0 means
- * on protocol; 0.25 means a quarter light or heavy.
+ * How far the load strayed from the prescribed one, as a fraction. 0 means on
+ * protocol; 0.25 means a quarter light or heavy.
  *
  * Returns null when no load was recorded, because "we do not know" and "on
  * protocol" are different answers.
  */
 export function carryLoadDrift(
   loadPerHandLb: number | null | undefined,
+  sex: Sex,
 ): number | null {
   if (!loadPerHandLb || loadPerHandLb <= 0) return null;
-  return (loadPerHandLb - CARRY_LOAD_LB) / CARRY_LOAD_LB;
+  const prescribed = CARRY_LOAD_LB[sex];
+  return (loadPerHandLb - prescribed) / prescribed;
 }
 
 /** Outside this, the distance is not comparable to the norm. */

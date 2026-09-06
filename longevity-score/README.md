@@ -175,7 +175,7 @@ Cooper 12-minute distance → mile time. Each step is a documented equation and
 each adds error. Percentile ordering survives because every step is monotone,
 so the ranking is sounder than the absolute time.
 
-**A fixed carry load bunches older cohorts near zero.** 100 lb total is a
+**A prescribed carry load bunches older cohorts near zero.** 100 lb total is a
 moderate carry at 35 and close to a maximal one at 80, so a good share of the
 oldest bands will record very short distances or none at all. That is real
 rather than a modelling artefact, and it is the same shape the pull-up file
@@ -229,13 +229,16 @@ link signs you in, which needs the Supabase wiring in `DEPLOY.md`.
 
 Distance alone is not a result. 300 feet at 40 lb a hand and 300 feet at 90 lb
 are different tests. So the entry sheet captures load and distance, prefills
-the load at the prescribed **50 lb per hand**, and marks the result
-off-protocol on the card when what you actually held is more than 15% away. It
-does not quietly score it as if it matched.
+the load at the prescribed **50 lb per hand for men, 35 for women**, and marks
+the result off-protocol on the card when what you actually held is more than
+15% away. It does not quietly score it as if it matched.
 
-The load used to be half your bodyweight. It is fixed now, and **the app never
-asks what you weigh.** Every other test in the battery is absolute - a pull-up
-is a pull-up at any size - and the cohort norms are what make results
-comparable. Scaling one test to bodyweight made it the odd one out, put the
-load at 90 lb a hand for a big man (not a dumbbell most gyms own), and made the
-app ask for a number people would rather not give.
+The load used to be half your bodyweight. It is prescribed now, and **the app
+never asks what you weigh.** Scaling it to bodyweight made this the only test
+that needed a weigh-in and put the load at 90 lb a hand for a big man, which is
+not a dumbbell most gyms own.
+
+The prescription is by sex rather than one number for everyone. 35 against 50
+is close to the published female/male ratio for grip and carrying strength, so
+the test keeps measuring grip endurance instead of who can lift the things off
+the floor at all - and it does that without bringing bodyweight back.

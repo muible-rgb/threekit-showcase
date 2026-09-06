@@ -31,7 +31,7 @@ import {
   oneDecimal,
   rawImproved,
 } from "@/lib/utils";
-import type { BatteryScore, TestPercentile } from "@/lib/scoring/types";
+import type { BatteryScore, Sex, TestPercentile } from "@/lib/scoring/types";
 
 /**
  * The scorecard. Eight rows, one per test.
@@ -125,6 +125,7 @@ export default function ScorecardPage() {
             test={test}
             scored={byTest.get(test.slug)}
             entry={card!.entries.get(test.slug)}
+            sex={me.sex}
             delta={delta?.tests.find((d) => d.testVariant === test.slug)}
             onTap={() => setEditing(test)}
           />
@@ -157,6 +158,7 @@ export default function ScorecardPage() {
           test={editing}
           current={card!.entries.get(editing.slug)?.value ?? null}
           currentSecondary={card!.entries.get(editing.slug)?.secondaryValue ?? null}
+          sex={me.sex}
           onSave={(v, secondary) => save(editing, v, secondary)}
           onClose={() => setEditing(null)}
         />
@@ -187,17 +189,21 @@ function TestRow({
   test,
   scored,
   entry,
+  sex,
   delta,
   onTap,
 }: {
   test: BatteryTest;
   scored?: TestPercentile;
   entry?: { value: number; secondaryValue: number | null };
+  sex: Sex;
   delta?: { delta: number; rawDelta: number };
   onTap: () => void;
 }) {
   // The entry sheet promises an off-protocol load gets marked. This is the mark.
-  const drift = test.secondary ? carryLoadDrift(entry?.secondaryValue) : null;
+  const drift = test.secondary
+    ? carryLoadDrift(entry?.secondaryValue, sex)
+    : null;
   const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 
   return (

@@ -104,7 +104,7 @@ export default function DeepDivePage() {
           const entry = card!.entries.get(t.testVariant);
           const d = delta?.tests.find((x) => x.testVariant === t.testVariant);
           const drift = meta?.secondary
-            ? carryLoadDrift(entry?.secondaryValue)
+            ? carryLoadDrift(entry?.secondaryValue, me.sex)
             : null;
           const offProtocol = drift !== null && Math.abs(drift) > CARRY_LOAD_TOLERANCE;
 
