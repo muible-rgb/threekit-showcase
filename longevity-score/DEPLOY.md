@@ -1,5 +1,8 @@
 # Getting this on the web
 
+Live at the Vercel project **health-app** (Threekit Marketing team), connected
+to this repo/branch with root directory `longevity-score`.
+
 The app needs **no environment variables**. With Supabase unset it runs on
 local storage with the demo crew seeded, so a deploy works immediately and
 anyone who opens the link gets a working app on their own phone.
