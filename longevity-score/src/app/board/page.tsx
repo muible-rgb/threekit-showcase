@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Register } from "@/components/register";
 import { SectionLabel } from "@/components/ui/row";
+import { DemoBanner } from "@/components/demo-banner";
 import { useDb, useStore } from "@/lib/data/store-context";
 import { currentCard } from "@/lib/batteries";
 import { rankBoard, type BoardEntry } from "@/lib/scoring/board";
@@ -156,6 +157,8 @@ export default function BoardPage() {
         Incomplete cards rank below every scored one. Eight of eight or you are
         not ranked.
       </p>
+
+      <DemoBanner />
     </div>
   );
 }

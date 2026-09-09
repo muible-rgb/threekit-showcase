@@ -229,6 +229,8 @@ function ValueInput({
   onChange: (v: number | null) => void;
 }) {
   if (test.input === "time") return <TimeInput value={value} onChange={onChange} />;
+  if (test.input === "feet_inches")
+    return <FeetInchesInput test={test} value={value} onChange={onChange} />;
   if (test.input === "half_step") return <HalfStepInput value={value} onChange={onChange} />;
   if (test.input === "reps") return <RepsInput test={test} value={value} onChange={onChange} />;
   return <NumberInput test={test} value={value} onChange={onChange} />;
@@ -285,6 +287,78 @@ function TimeInput({
         />
       </div>
       <p className="label mt-2">Minutes : seconds</p>
+    </div>
+  );
+}
+
+/**
+ * Broad jump. Two fields, because a jump is said in feet and inches - "3 foot
+ * 9" - and a plain decimal keypad quietly turns that into 3.9 inches instead
+ * of 45. Mirrors TimeInput's split-field shape for the same reason the mile
+ * gets one: the natural unit is compound, so the keypad should be too.
+ */
+function FeetInchesInput({
+  test,
+  value,
+  onChange,
+}: {
+  test: BatteryTest;
+  value: number | null;
+  onChange: (v: number | null) => void;
+}) {
+  const initialFeet = value === null ? 0 : Math.floor(value / 12);
+  const initialInches = value === null ? 0 : Math.round(value - initialFeet * 12);
+  const [feet, setFeet] = React.useState(value === null ? "" : String(initialFeet));
+  const [inches, setInches] = React.useState(value === null ? "" : String(initialInches));
+
+  React.useEffect(() => {
+    const f = Number(feet);
+    const i = Number(inches === "" ? "0" : inches);
+    if (feet === "" || !Number.isFinite(f) || !Number.isFinite(i)) {
+      onChange(null);
+      return;
+    }
+    onChange(f * 12 + i);
+  }, [feet, inches, onChange]);
+
+  const total = Number(feet || 0) * 12 + Number(inches || 0);
+  const low = feet !== "" && total < test.min;
+  const minFeet = Math.floor(test.min / 12);
+  const maxFeet = Math.floor(test.max / 12);
+
+  return (
+    <div>
+      <div className="flex items-center justify-center gap-2 border border-rule-2 py-6">
+        <input
+          inputMode="numeric"
+          autoFocus
+          value={feet}
+          onChange={(e) => setFeet(e.target.value.replace(/\D/g, "").slice(0, 2))}
+          placeholder="0"
+          aria-label="Feet"
+          className="figure w-20 bg-transparent text-right text-[56px] text-chalk outline-none placeholder:text-chalk-off"
+        />
+        <span className="figure text-[40px] text-chalk-off">&apos;</span>
+        <input
+          inputMode="numeric"
+          value={inches}
+          onChange={(e) => {
+            const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
+            setInches(Number(raw) > 11 ? "11" : raw);
+          }}
+          onBlur={() => setInches((s) => (s === "" ? "0" : s))}
+          placeholder="0"
+          aria-label="Inches"
+          className="figure w-16 bg-transparent text-left text-[56px] text-chalk outline-none placeholder:text-chalk-off"
+        />
+        <span className="figure text-[40px] text-chalk-off">&quot;</span>
+      </div>
+      <p className="label mt-2">Feet : inches</p>
+      {low && (
+        <p className="meta mt-1">
+          Below the plausible range ({minFeet}&apos;-{maxFeet}&apos;).
+        </p>
+      )}
     </div>
   );
 }

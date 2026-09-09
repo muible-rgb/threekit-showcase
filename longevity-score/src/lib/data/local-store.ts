@@ -55,7 +55,13 @@ export class LocalStore implements DataStore {
     try {
       const raw = window.localStorage.getItem(DB_KEY);
       if (!raw) {
-        const fresh = seed();
+        // A real visitor's very first load. The demo crew is seeded so the
+        // Board has something on it, but nobody is signed in as one of them -
+        // that was the bug: a new person landed on a stranger's finished
+        // scorecard instead of Register, and had to notice a small banner and
+        // tap it before they could enter their own name. Registering is what
+        // sets meId now; the seed never does.
+        const fresh: Database = { ...seed(), meId: null };
         window.localStorage.setItem(DB_KEY, JSON.stringify(fresh));
         return fresh;
       }
@@ -76,11 +82,6 @@ export class LocalStore implements DataStore {
     } catch {
       return [];
     }
-  }
-
-  /** The first real write means this is no longer a demo. */
-  private endDemo(): void {
-    if (this.db.isDemo) this.db.isDemo = false;
   }
 
   private persist(): void {
@@ -216,7 +217,6 @@ export class LocalStore implements DataStore {
       benchmarkVersion: input.benchmarkVersion ?? CURRENT_BENCHMARK_VERSION,
       id: this.newId("r"),
     };
-    this.endDemo();
     this.db.results.push(created);
     this.enqueue({ kind: "result", payload: created });
     this.persist();
@@ -358,27 +358,55 @@ export class LocalStore implements DataStore {
     this.persist();
   }
 
+  /**
+   * The eight seeded ids, never whoever is actually signed in. Ids are fixed
+   * strings ("p_you", "p_dan", ...), not random, so this is stable across
+   * calls without having to tag rows some other way.
+   */
+  private demoParticipantIds(): Set<string> {
+    return new Set(buildSeedDatabase().participants.map((p) => p.id));
+  }
+
+  /**
+   * Regenerates the demo crew for testing without touching whoever is
+   * actually signed in on this device - a developer re-seeding a board
+   * should not delete a real person's own results to do it.
+   */
   async reset(): Promise<void> {
-    this.db = buildSeedDatabase();
+    const myId = this.db.meId;
+    const myParticipant = this.db.participants.find((p) => p.id === myId) ?? null;
+    const fresh = buildSeedDatabase();
+    this.db = {
+      ...fresh,
+      meId: myId,
+      participants: myParticipant ? [...fresh.participants, myParticipant] : fresh.participants,
+      sessionParticipants: [
+        ...fresh.sessionParticipants,
+        ...this.db.sessionParticipants.filter((sp) => sp.participantId === myId),
+      ],
+      results: [...fresh.results, ...this.db.results.filter((r) => r.participantId === myId)],
+      unscored: [...fresh.unscored, ...this.db.unscored.filter((m) => m.participantId === myId)],
+    };
     this.outbox = [];
     this.persist();
   }
 
   /**
-   * Throw the demo dataset away. Separate from reset() on purpose: reset puts
-   * the demo back, this gets rid of it. Someone who has just installed the app
-   * to test on Saturday should not have to scroll past eight strangers.
+   * Throw the demo crew away, keeping whoever is actually signed in. Someone
+   * who has just registered for real should not lose their own card because
+   * they also wanted the eight strangers off the board.
    */
   async clearDemo(): Promise<void> {
+    const demoIds = this.demoParticipantIds();
     this.db = {
       version: 1,
       isDemo: false,
-      meId: null,
-      participants: [],
+      meId: this.db.meId,
+      participants: this.db.participants.filter((p) => !demoIds.has(p.id)),
       sessions: [],
-      sessionParticipants: [],
-      results: [],
-      unscored: [],
+      sessionParticipants: this.db.sessionParticipants.filter((sp) => !demoIds.has(sp.participantId)),
+      results: this.db.results.filter((r) => !demoIds.has(r.participantId)),
+      unscored: this.db.unscored.filter((m) => !demoIds.has(m.participantId)),
     };
     this.outbox = [];
     this.persist();

@@ -13,7 +13,7 @@ import type { Direction, Sex, TestBinding } from "@/lib/scoring/types";
  * the mean of one percentile per capacity.
  */
 
-export type InputKind = "number" | "reps" | "time" | "half_step" | "load_distance";
+export type InputKind = "number" | "reps" | "time" | "half_step" | "load_distance" | "feet_inches";
 
 export interface BatteryTest {
   slug: string;
@@ -132,7 +132,7 @@ export const BATTERY_TESTS: BatteryTest[] = [
     unit: "in",
     unitLabel: "inches",
     direction: "higher_better",
-    input: "number",
+    input: "feet_inches",
     min: 12,
     max: 160,
     step: 1,

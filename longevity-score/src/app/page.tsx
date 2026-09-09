@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/row";
 import { EntrySheet } from "@/components/entry-sheet";
 import { Register } from "@/components/register";
-import { DemoBanner } from "@/components/demo-banner";
 import {
   BATTERY_TESTS,
   BATTERY_TEST_COUNT,
@@ -138,6 +137,11 @@ export default function ScorecardPage() {
       </header>
 
       <SectionLabel>The eight</SectionLabel>
+      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-gap border-b border-rule-2 py-1.5">
+        <span />
+        <span className="label w-14 text-right">Band</span>
+        <span className="label w-9 text-right">Pctl</span>
+      </div>
       <div>
         {BATTERY_TESTS.map((test) => (
           <TestRow
@@ -170,8 +174,6 @@ export default function ScorecardPage() {
       <p className="meta mt-6">
         {card!.updatedAt ? `Updated ${formatDate(card!.updatedAt)}` : "Nothing entered"}
       </p>
-
-      <DemoBanner />
 
       {editing && (
         <EntrySheet
