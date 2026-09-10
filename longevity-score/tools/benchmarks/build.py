@@ -149,7 +149,7 @@ ref.to_csv(f"{OUT}/long_game_validation_reference_v{VERSION}.csv", index=False)
 
 # 6. parameters json
 params = dict(
-    version=VERSION, generated="2026-09-06",
+    version=VERSION, generated="2026-09-10",
     age_smoothing="PCHIP (shape-preserving cubic Hermite) through knots; flat beyond end knots",
     events=dict(
         mile_run=dict(vo2_mu=lg.VO2_MU, vo2_sd_lo=lg.VO2_SD_LO, vo2_sd_hi=lg.VO2_SD_HI, low_tail_widening='sd_lo x (1+0.5*clip((age-60)/25,0,1))', pop_adj=lg.POP_ADJ_VO2, cap_s=lg.MILE_CAP_S,
@@ -172,7 +172,7 @@ with open(f"{OUT}/long_game_parameters_v{VERSION}.json", "w") as f:
 # 7. xlsx (data workbook, no formulas)
 with pd.ExcelWriter(f"{OUT}/long_game_benchmarks_v{VERSION}.xlsx", engine="openpyxl") as xw:
     readme = pd.DataFrame({"README": [
-        f"The Long Game population benchmarks v{VERSION} (2026-09-06).",
+        f"The Long Game population benchmarks v{VERSION} (2026-09-10).",
         "Sheet 'anchors': raw result at percentile p for every event, sex, age 18-89. For time events (mile_run, pro_agility_5_10_5) higher percentile = faster.",
         "Sheet 'discrete_cdf': full integer/half-point distributions for pull_ups, push_ups, sit_to_rise. Use percentile_midrank = 100*(P(X<x)+0.5*P(X=x)) to score a result.",
         "Sheet 'validation_reference': spot-check values at ages 25/40/55/70/85.",
@@ -201,7 +201,7 @@ FLOORS = {"mile_run": lg.MILE_CAP_S, "pro_agility_5_10_5": lg.AG_DNF, "broad_jum
 CEILINGS = {"single_leg_balance_ec": lg.BAL_CAP, "sit_to_rise": 10.0}
 
 lookup = dict(
-    version=VERSION, generated="2026-09-06", percentiles=ALL_PCTS,
+    version=VERSION, generated="2026-09-10", percentiles=ALL_PCTS,
     age_min=int(AGES[0]), age_max=int(AGES[-1]), convention="midrank", events={},
 )
 for ev in EVENTS:

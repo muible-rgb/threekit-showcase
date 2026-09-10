@@ -11,3 +11,4 @@ demo/dist/
 
 # Regenerated benchmark tables; the shipped one lives in data/benchmarks
 tools/benchmarks/out/
+__pycache__/

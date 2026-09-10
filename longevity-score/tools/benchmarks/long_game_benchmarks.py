@@ -1,5 +1,5 @@
 """
-The Long Game - population benchmark model, v1.0.0 (2026-09-06)
+The Long Game - population benchmark model, v1.1.0 (2026-09-10)
 
 Generates age- and sex-specific percentile benchmarks for eight events,
 ages 18-89, men and women. Every event is built from (a) smooth age curves
@@ -24,7 +24,7 @@ import numpy as np
 from scipy.interpolate import PchipInterpolator
 from scipy.stats import norm
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 AGES = np.arange(18, 90)
 PCTS = [1, 5, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 95, 99]
 SEXES = ["M", "F"]
@@ -440,7 +440,13 @@ GRIP_SD = {"M": {18: 9.5, 30: 9.9, 60: 9.5, 80: 8.5, 89: 8.0},
 CARRY_SPEED = {"M": {18: 1.70, 40: 1.65, 55: 1.58, 65: 1.45, 75: 1.30, 85: 1.05, 89: 0.95},
                "F": {18: 1.60, 40: 1.55, 55: 1.48, 65: 1.35, 75: 1.20, 85: 0.95, 89: 0.85}}
 CARRY_LOAD_KG = {"M": 22.68, "F": 15.88}  # per hand (50 lb / 35 lb)
-HANDLE_FACTOR = 1.30   # holding capacity on a handle vs dynamometer MVC (assumption)
+# v1.1.0: HANDLE_FACTOR was 1.30 - an assumed bonus for holding a handle over a
+# dynamometer MVC, with no cited source. Nothing in the evidence chain measures
+# that bonus, so it was pure optimism baked into every median. Set to 1.0: the
+# load is scored against grip exactly as Dodds measured it, no bonus assumed.
+# This alone was worth ~35% of every carry distance at every age - see the
+# methodology report's v1.1.0 changelog entry for the before/after medians.
+HANDLE_FACTOR = 1.00   # holding capacity on a handle vs dynamometer MVC (assumption)
 DYNAMIC_FACTOR = 0.80  # static endurance -> walking carry endurance (assumption)
 CARRY_CAP_S = 180.0
 

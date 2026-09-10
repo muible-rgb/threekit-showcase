@@ -1,15 +1,17 @@
 # The Long Game - Population Benchmark Methodology
-**Benchmark version 1.0.0 - 2026-09-06**
+**Benchmark version 1.1.0 - 2026-09-10**
 
 Scope: eight events, men and women, ages 18-89, percentiles 1-99, scored against the general population of the same age and sex (not athletes, military or gym members).
 
+This report is updated in place as the benchmarks are recalibrated; section 8 is the changelog. Everything below describes the current (1.1.0) table except where a section says otherwise. Filenames below carry whichever version generated them - `long_game_lookup_v1.0.0.json` still ships alongside `..._v1.1.0.json` so results scored under 1.0.0 keep scoring against it (section 7).
+
 Deliverables in this package:
 
-- `long_game_methodology_v1.0.0.md` - this report
-- `long_game_benchmarks_v1.0.0.csv` / `.xlsx` - anchor table: raw result at 15 percentiles x 72 ages x 2 sexes x 8 events (17,280 rows)
-- `long_game_discrete_cdf_v1.0.0.csv` - full integer / half-point distributions for pull-ups, push-ups and sit-to-rise (needed to score discrete results correctly)
-- `long_game_validation_reference_v1.0.0.csv` - spot-check values at ages 25/40/55/70/85
-- `long_game_parameters_v1.0.0.json` - every knot and constant in the model
+- `long_game_methodology_v1.0.0.md` - this report (filename is the original release; content tracks the current version)
+- `long_game_benchmarks_v{VERSION}.csv` / `.xlsx` - anchor table: raw result at 15 percentiles x 72 ages x 2 sexes x 8 events (17,280 rows)
+- `long_game_discrete_cdf_v{VERSION}.csv` - full integer / half-point distributions for pull-ups, push-ups and sit-to-rise (needed to score discrete results correctly)
+- `long_game_validation_reference_v{VERSION}.csv` - spot-check values at ages 25/40/55/70/85
+- `long_game_parameters_v{VERSION}.json` - every knot and constant in the model
 - `long_game_benchmarks.py` - the model and scoring API; `build.py` regenerates all files
 
 ---
@@ -175,13 +177,15 @@ Resulting whole-population values, men: age 25 P50 = 4, P75 = 7, P90 = 11, P95 =
 - Fast gait speed norms (Bohannon 1997; Bohannon & Williams Andrews 2011) for the walking-speed curve.
 - Loaded-carry literature (Knapik 1996 load carriage review; strongman farmer's-walk studies) only to sanity-check that holding capacity on a handle exceeds dynamometer MVC.
 
-**Model.** Grip strength ~ Normal(median(age), SD(age)) from Dodds. Relative load `f = load / (1.30 * grip)`; the 1.30 handle factor reflects that people hold a dumbbell handle at roughly 1.3x their dynamometer MVC. Hold time = Rohmert(f) x 0.80 (dynamic factor: walking, swinging and re-gripping shorten static endurance). Distance = age-specific loaded walking speed (men 1.70 m/s at 18 to 0.95 at 89; women 1.60 to 0.85) x min(hold time, 180 s). f >= 1 means the implement cannot be held: distance 0.
+**Model.** Grip strength ~ Normal(median(age), SD(age)) from Dodds. Relative load `f = load / (handle_factor * grip)`. Hold time = Rohmert(f) x 0.80 (dynamic factor: walking, swinging and re-gripping shorten static endurance). Distance = age-specific loaded walking speed (men 1.70 m/s at 18 to 0.95 at 89; women 1.60 to 0.85) x min(hold time, 180 s). f >= 1 means the implement cannot be held: distance 0.
 
-Resulting medians: men 158 m at 25, 129 at 55, 84 at 70, 39 at 85; women 119, 94, 61, 24. Share unable to lift the load: women 3% at 70, 10% at 80, 17% at 85, 26% at 89; men 1% at 70, 4% at 80, 9% at 85, 16% at 89. Ceiling (3 minutes at speed, about 300 m for young men) is reached at roughly the 98th percentile for men under 40.
+**handle_factor = 1.00 (was 1.30 in v1.0.0).** The original 1.30 assumed people can hold a dumbbell handle at roughly 1.3x their dynamometer MVC - a bonus over the grip strength Dodds actually measured, with no source cited for the multiplier itself. Every median in the table carried that bonus. v1.1.0 drops it: load is scored against grip exactly as measured, no bonus assumed. That one change moved every farmer-carry median down by 30-35%; see the v1.1.0 changelog entry for before/after numbers.
 
-**Limitations.** Three constants (1.30, 0.80, and the speed curve) are assumptions with wide plausible ranges; together they could move any distance by +/-40%. Between-person variation in walking speed and grip endurance is not modeled (only grip MVC varies), so tails are too tight. Fit men carrying 100 lb total will find grip is the limiter well before 3 minutes, which is the intended discriminating mechanism, but the exact hold times are unvalidated. If app data show most men hitting 3:00, raise the load or record time-to-drop as a secondary metric.
+Resulting medians (v1.1.0): men 104 m at 25, 85 at 55, 53 at 70, 20 at 85; women 79, 61, 36, 8. Share unable to lift the load: women 10% at 70, 27% at 80, 41% at 85, 53% at 89; men 5% at 70, 14% at 80, 24% at 85, 36% at 89 - all higher than v1.0.0's, because removing the handle bonus also means fewer people clear the load at all. The 3-minute walking cap (about 300 m for young men) is effectively never reached under this model any more - under v1.0.0 the top ~2% of men under 40 hit it; the recalibrated grip-vs-load ratio means grip fails well before the clock does for essentially everyone.
 
-**Grade D.** Label the carry score "provisional" in the UI until recalibrated.
+**Limitations.** Two constants remain assumptions with real plausible ranges: the 0.80 dynamic factor and the loaded-walking-speed curve (set at 70-75% of unloaded fast gait). A rough sensitivity check - dynamic factor +/-0.15, the speed fraction +/-5 points - moves the median carry distance by roughly +/-20%. Between-person variation in walking speed and grip endurance is still not modeled (only grip MVC varies), so tails are still too tight. If app data show a cluster of results well above or below what this table expects, that is the signal to revisit these two constants next, the same way the handle factor was revisited for v1.1.0.
+
+**Grade D.** Label the carry score "provisional" in the UI until recalibrated against real app data.
 
 ---
 
@@ -330,20 +334,22 @@ Run by `build.py` on the generated tables.
 | M | 70 | 107 | 124 | 141 | 159 | 177 |
 | M | 85 | 0 | 0 | 76 | 96 | 114 |
 
-**farmer_carry** (m)
+**farmer_carry** (m) - v1.1.0, after removing the 1.30 handle-factor bonus (see 3.5)
 
 | sex | age | P10 | P25 | P50 | P75 | P90 |
 |---|---|---|---|---|---|---|
-| F | 25 | 74 | 95 | 119 | 146 | 173 |
-| F | 40 | 75 | 95 | 119 | 145 | 173 |
-| F | 55 | 53 | 73 | 94 | 117 | 140 |
-| F | 70 | 26 | 43 | 61 | 78 | 95 |
-| F | 85 | 0 | 10 | 24 | 36 | 47 |
-| M | 25 | 100 | 126 | 158 | 196 | 237 |
-| M | 40 | 101 | 127 | 159 | 198 | 240 |
-| M | 55 | 79 | 102 | 129 | 160 | 193 |
-| M | 70 | 43 | 63 | 84 | 106 | 127 |
-| M | 85 | 7 | 23 | 39 | 53 | 66 |
+| F | 25 | 43 | 60 | 78 | 96 | 113 |
+| F | 40 | 45 | 61 | 79 | 96 | 112 |
+| F | 55 | 27 | 44 | 61 | 77 | 92 |
+| F | 70 | 0 | 21 | 36 | 50 | 62 |
+| F | 85 | 0 | 0 | 8 | 19 | 28 |
+| M | 25 | 63 | 83 | 104 | 127 | 148 |
+| M | 40 | 65 | 84 | 105 | 127 | 149 |
+| M | 55 | 47 | 66 | 85 | 105 | 124 |
+| M | 70 | 19 | 36 | 53 | 70 | 84 |
+| M | 85 | 0 | 6 | 20 | 32 | 43 |
+
+(v1.0.0's table, before the handle-factor fix, had every cell 30-35% higher - e.g. M 40 P50 was 159 m, not 105.)
 
 **pro_agility_5_10_5** (s)
 
@@ -385,14 +391,14 @@ Run by `build.py` on the generated tables.
 | M | 70 | 3.5 | 5.0 | 6.5 | 7.5 | 9.0 |
 | M | 85 | 1.0 | 2.0 | 3.5 | 5.0 | 6.5 |
 
-**Worked example** (from `long_game_benchmarks.py`): woman, 74, mile 17:00, 0 pull-ups, 3 push-ups, 95 cm jump, 70 m carry, 8.9 s shuttle, 6.0 s balance, SRT 7.0 → event scores 46.6 / 49.1 / 84.2 / 66.1 / 78.7 / 53.4 / 67.4 / 76.8; overall 65.3. Display: "Estimated 84th percentile among women age 74" for the push-ups.
+**Worked example** (from `long_game_benchmarks.py`, v1.1.0): woman, 74, mile 17:00, 0 pull-ups, 3 push-ups, 95 cm jump, 70 m carry, 8.9 s shuttle, 6.0 s balance, SRT 7.0 → event scores 46.6 / 49.1 / 84.2 / 66.1 / 98.6 / 53.4 / 67.4 / 76.8; overall 67.8. Display: "Estimated 84th percentile among women age 74" for the push-ups. (Under v1.0.0 the carry scored 78.7 and the overall was 65.3 - the same 70 m now ranks much higher because the recalibrated table no longer assumes a handle-grip bonus nobody could source.)
 
 ---
 
 ## 6. Least trustworthy estimates (in order)
 
 1. **Pull-ups, all ages, both sexes** - the male zero share at 20-45 and the women's positive-part distribution most of all.
-2. **Farmer carry** - three assumed physical constants; distances could be off by 40%.
+2. **Farmer carry** - two assumed physical constants remain (dynamic factor, loaded-speed curve); distances could still be off by roughly 20%. (A third, the handle factor, was an unsourced bonus and was removed in v1.1.0 - see 3.5.)
 3. **Agility** - absolute level at every age is assumed.
 4. **Mile run at 80+** - DNF share and the lower tail depend on the tail-widening assumption; the upper tail under 30 (P95+) is too fast.
 5. **Women's push-ups** - modified-to-strict conversion and zero share.
@@ -415,5 +421,7 @@ Also flag: app users will be fitter than the population. When you recalibrate fr
 ---
 
 ## 8. Changelog
+
+**1.1.0 (2026-09-10)** - recalibrated farmer_carry only; every other event is byte-identical to 1.0.0. Removed `HANDLE_FACTOR` (was 1.30, an assumed bonus for holding a handle over a dynamometer MVC with no cited source - see 3.5). Every farmer_carry cell moved down 30-35% at every age and sex: e.g. men P50 at 40 was 159 m, is now 105 m; women P50 at 40 was 119 m, is now 79 m. Share unable to lift the load rose correspondingly (e.g. men at 89 was 16%, is now 36%), and the 3-minute walking cap - reachable by the top ~2% of men under 40 in v1.0.0 - is no longer reached under this model. Reported user-facing symptom: a 250 ft carry at the prescribed load was scoring around the 3rd percentile for a man in his 30s-40s; under 1.1.0 the same result scores around the 17th-18th. Results already stored with `benchmarkVersion: "1.0.0"` keep scoring against the 1.0.0 table (section 7); nothing already recorded moves.
 
 **1.0.0 (2026-09-06)** - initial release. Eight events, ages 18-89, both sexes. Mid-rank convention for discrete and floor/ceiling cases. Farmer carry, pull-ups and agility provisional (Grade D).

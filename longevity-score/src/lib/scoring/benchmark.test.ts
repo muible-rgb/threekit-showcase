@@ -6,12 +6,13 @@ import { BATTERY_BINDINGS, BATTERY_TESTS } from "@/lib/battery";
 import type { Sex } from "./types";
 
 /**
- * The scorer against the real v1.0.0 table.
+ * The scorer against the real current-version table (1.1.0).
  *
  * The first block is the validation table from the handoff: the exact numbers
  * the scorer must return, to the decimal. If any of these move, either the
- * table changed (bump the version) or the scorer drifted from the reference
- * implementation (fix the scorer). Neither is a rounding problem to paper over.
+ * table changed (bump the version, and update this table to match on purpose)
+ * or the scorer drifted from the reference implementation (fix the scorer).
+ * Neither is a rounding problem to paper over.
  *
  * The rest are invariants that hold for every event, sex and age.
  */
@@ -22,7 +23,7 @@ const AGES = Array.from(
   (_, i) => currentBenchmark.age_min + i,
 );
 
-describe("validation table (handoff v1.0.0)", () => {
+describe("validation table (handoff v1.0.0, farmer_carry updated for v1.1.0)", () => {
   const rows: Array<[string, Sex, number, number, number]> = [
     ["mile_run", "M", 39, 402, 89.6],
     ["push_ups", "M", 39, 37, 91.3],
@@ -36,7 +37,10 @@ describe("validation table (handoff v1.0.0)", () => {
     ["sit_to_rise", "M", 25, 10, 76.9],
     ["broad_jump", "F", 85, 0, 19.2],
     ["pro_agility_5_10_5", "M", 85, 30, 15.2],
-    ["farmer_carry", "M", 40, 159, 49.9],
+    // v1.1.0 removed the unsourced 1.30 handle-factor bonus (methodology 3.5);
+    // 159 m at 40 was 49.9 under v1.0.0, is 93.9 now that the same distance
+    // is compared against grip strength with no bonus applied to it.
+    ["farmer_carry", "M", 40, 159, 93.9],
     ["mile_run", "M", 85, 1800, 5.1],
   ];
 
@@ -47,8 +51,8 @@ describe("validation table (handoff v1.0.0)", () => {
   }
 
   it("marks the table's version on every score", () => {
-    expect(scorer.version).toBe("1.0.0");
-    expect(scorer.scoreEvent("mile_run", "M", 39, 402).benchmarkVersion).toBe("1.0.0");
+    expect(scorer.version).toBe("1.1.0");
+    expect(scorer.scoreEvent("mile_run", "M", 39, 402).benchmarkVersion).toBe("1.1.0");
   });
 });
 
@@ -237,13 +241,14 @@ describe("the app's tests bound to the table", () => {
   it("reproduces the methodology report's worked example within a point", () => {
     // Woman, 74. The report's numbers come from the continuous Python model;
     // the table interpolates between integer percentiles, so allow the
-    // rounding that introduces.
+    // rounding that introduces. farmer_carry and the overall were updated for
+    // v1.1.0's handle-factor fix (was 78.7 / 65.3 under v1.0.0).
     const expected: Record<string, number> = {
       mile_run: 46.6,
       pull_ups: 49.1,
       push_ups: 84.2,
       broad_jump: 66.1,
-      farmer_carry: 78.7,
+      farmer_carry: 98.6,
       pro_agility_5_10_5: 53.4,
       single_leg_balance_ec: 67.4,
       sit_to_rise: 76.8,
@@ -264,6 +269,6 @@ describe("the app's tests bound to the table", () => {
       expect(Math.abs(s - expected[event]), event).toBeLessThanOrEqual(1.0);
       total += s;
     }
-    expect(Math.abs(total / 8 - 65.3)).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(total / 8 - 67.8)).toBeLessThanOrEqual(0.5);
   });
 });

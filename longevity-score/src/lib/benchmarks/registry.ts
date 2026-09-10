@@ -2,6 +2,7 @@ import type { BenchmarkLookup } from "@/lib/scoring/types";
 import { createScorer } from "@/lib/scoring/benchmark";
 
 import v1_0_0 from "@data/benchmarks/long_game_lookup_v1.0.0.json";
+import v1_1_0 from "@data/benchmarks/long_game_lookup_v1.1.0.json";
 
 /**
  * Every benchmark version the app can score against, keyed by version.
@@ -18,9 +19,10 @@ import v1_0_0 from "@data/benchmarks/long_game_lookup_v1.0.0.json";
  */
 export const BENCHMARKS: Record<string, BenchmarkLookup> = {
   "1.0.0": v1_0_0 as unknown as BenchmarkLookup,
+  "1.1.0": v1_1_0 as unknown as BenchmarkLookup,
 };
 
-export const CURRENT_BENCHMARK_VERSION = "1.0.0";
+export const CURRENT_BENCHMARK_VERSION = "1.1.0";
 
 export const currentBenchmark: BenchmarkLookup = BENCHMARKS[CURRENT_BENCHMARK_VERSION];
 

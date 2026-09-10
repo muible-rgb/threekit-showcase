@@ -75,7 +75,7 @@ export const BENCHMARK_NOTES: Record<string, BenchmarkNote> = {
       "Bohannon 1997; Bohannon & Williams Andrews 2011 (fast gait speed norms).",
     ],
     limitation:
-      "Three assumed constants - handle factor, dynamic factor and the speed curve - could together move any distance by 40%. Only grip strength varies between people in the model, so the tails are too tight. Provisional until recalibrated.",
+      "v1.1.0 removed an unsourced 30% handle-grip bonus that was inflating every distance - every median came down 30-35%. Two assumed constants remain, dynamic factor and the speed curve, which could still move a distance by roughly 20%. Only grip strength varies between people in the model, so the tails are too tight. Provisional until recalibrated against real app data.",
   },
   pro_agility_5_10_5: {
     event: "pro_agility_5_10_5",
